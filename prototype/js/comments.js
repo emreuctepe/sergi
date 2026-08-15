@@ -404,15 +404,16 @@
    * hangi mesafede, yarıçap kuralıyla mı yoksa pin sınırı yüzünden mi katıldı.
    * Yalnızca hata ayıklama görünümü kullanıyor (js/debug.js → MAG.pins).
    */
-  function clusterPoints(list, trace) {
+  /* points: [{ x, y, items:[comment] }] — her yorum (blok/nokta/sayfa) önceden
+     bir konuma çevrilir, hepsi burada kümelenir. */
+  function clusterPoints(points, trace) {
     var groups = [];
-    list.forEach(function (c) {
-      var p = { x: c.anchor.x, y: c.anchor.y, items: [c] };
+    points.forEach(function (p) {
       for (var i = 0; i < groups.length; i++) {
         var d0 = pinDist(groups[i], p);
         if (d0 <= CLUSTER_R) {
           if (trace) {
-            trace.push({ kind: "radius", id: c.id, x: p.x, y: p.y, cx: groups[i].x, cy: groups[i].y, d: d0 });
+            trace.push({ kind: "radius", id: p.items[0] && p.items[0].id, x: p.x, y: p.y, cx: groups[i].x, cy: groups[i].y, d: d0 });
           }
           return merge(groups[i], p);
         }
@@ -472,18 +473,23 @@
     U.emit("comments:decorated", {});
   };
 
+  /** Bir blogun sayfa icindeki layout konumu -> normalize (x,y). Baloncuk
+      blogun sol-ust kosesine yakin oturur (eski centigin yerinde). */
+  function blockPoint(node, pageEl) {
+    var x = 0;
+    var y = 0;
+    var n = node;
+    while (n && n !== pageEl) {
+      x += n.offsetLeft;
+      y += n.offsetTop;
+      n = n.offsetParent;
+    }
+    var pw = pageEl.offsetWidth || 1;
+    var ph = pageEl.offsetHeight || 1;
+    return { x: U.clamp((x + 8) / pw, 0.03, 0.97), y: U.clamp((y + 16) / ph, 0.03, 0.97) };
+  }
+
   function decoratePage(p) {
-    /* --- eski süslemeleri temizle --- */
-    U.$$(".anno", p.el).forEach(function (m) {
-      var parent = m.parentNode;
-      while (m.firstChild) parent.insertBefore(m.firstChild, m);
-      parent.removeChild(m);
-      parent.normalize();
-    });
-    U.$$("[data-comments]", p.el).forEach(function (b) {
-      b.removeAttribute("data-comments");
-      b.removeAttribute("data-top-comment");
-    });
     var oldPins = U.$(".page__pins", p.el);
     if (oldPins) oldPins.remove();
 
@@ -494,67 +500,30 @@
     }
     p.el.setAttribute("data-has-comments", roots.length);
 
-    var byBlock = {};
+    /* HER yorum bir baloncuk: blok -> blok konumu, nokta -> xy, sayfa -> kose.
+       Isaret/centik/alinti highlight yok; hepsi gorsellerdeki pinler gibi. */
     var points = [];
-    var orphans = [];
-
     roots.forEach(function (c) {
       migrateLegacy(p.el, c);
       c._degraded = false;
-
-      if (c.anchorType === "block") {
+      var pos = null;
+      if (c.anchorType === "point" && c.anchor) {
+        pos = { x: c.anchor.x, y: c.anchor.y };
+      } else if (c.anchorType === "block") {
         var node = U.$('[data-block-id="' + C.blockIdOf(c) + '"]', p.el);
-        if (node) {
-          var key = C.blockIdOf(c);
-          (byBlock[key] = byBlock[key] || { node: node, items: [] }).items.push(c);
-          return;
-        }
-        c._degraded = true; /* blok gerçekten silinmiş */
-      } else if (c.anchorType === "point" && c.anchor) {
-        points.push(c);
-        return;
+        if (node) pos = blockPoint(node, p.el);
+        else c._degraded = true;
       }
-      orphans.push(c);
+      if (!pos) pos = { x: 0.07, y: 0.93 };
+      points.push({ x: pos.x, y: pos.y, items: [c] });
     });
 
-    /* --- blok işaretleri + temsilci ses --- */
-    Object.keys(byBlock).forEach(function (key) {
-      var g = byBlock[key];
-      var top = C.representative(g.items);
-      g.node.setAttribute("data-comments", g.items.length);
-      if (top) g.node.setAttribute("data-top-comment", top.id);
-    });
-
-    /* --- alıntı ısısı: (blok, cümle) çifti başına tek işaret --- */
-    var quotes = {};
-    roots.forEach(function (c) {
-      var q = C.quoteOf(c);
-      if (!q) return;
-      var key = (C.blockIdOf(c) || "") + " " + q;
-      quotes[key] = quotes[key] || { exact: q, blockId: C.blockIdOf(c), n: 0 };
-      quotes[key].n++;
-    });
-    /* uzun alıntılar önce işaretlensin: iç içe geçenlerde uzun olan kazanır */
-    Object.keys(quotes)
-      .map(function (k) {
-        return quotes[k];
-      })
-      .sort(function (a, b) {
-        return b.exact.length - a.exact.length;
-      })
-      .forEach(function (q) {
-        var scope = (q.blockId && U.$('[data-block-id="' + q.blockId + '"]', p.el)) || p.el;
-        markQuote(scope, q.exact, q.n, q.blockId);
-      });
-
-    /* --- pinler ve kümeler --- */
     var pins = el("div.page__pins");
     var trace = MAG.debug && MAG.debug.pinsOn && MAG.debug.pinsOn() ? [] : null;
     var groups = clusterPoints(points, trace);
     groups.forEach(function (g) {
       pins.appendChild(pinNode(g));
     });
-    if (orphans.length) pins.appendChild(orphanBadge(p, orphans));
     if (pins.firstChild) p.el.appendChild(pins);
     if (trace) MAG.debug.drawPins(p, groups, trace);
   }
@@ -629,9 +598,12 @@
   };
 
   C.updateCount = function () {
+    /* Sayaç göstergesi kaldırıldı (buton artık eş okuma toggle'ı). Bir öğe
+       varsa yine güncelle, yoksa sessizce geç. */
+    var elc = U.$("#comment-count");
+    if (!elc) return;
     var page = MAG.canvas.currentPage();
     var n = page ? C.forPage(page.id).length : 0;
-    var elc = U.$("#comment-count");
     elc.textContent = n;
     elc.parentElement.dataset.empty = n === 0 ? "true" : "false";
   };
@@ -680,6 +652,13 @@
       C.toggleLayer();
     });
 
+    /* sahte tuşlar — işlevleri sonra eklenecek */
+    U.$$("#btn-like, #btn-share").forEach(function (b) {
+      b.addEventListener("click", function () {
+        MAG.overlays.toast("yakında");
+      });
+    });
+
     U.listen("page:change", function () {
       C.updateCount();
       hideBubble();
@@ -691,42 +670,11 @@
   };
 
   function onPagesClick(e) {
-    /* işaretler önce: bunlar bloğun içinde duruyor */
-    var mark = e.target.closest(".anno");
-    if (mark) {
-      e.preventDefault();
-      return openForMark(mark);
-    }
+    /* Artik tek dokunma hedefi: baloncuk (pin). Dokun -> ustte pop-up. */
     var pin = e.target.closest(".pin");
     if (pin) {
       e.preventDefault();
-      return MAG.popup.open({ ids: (pin.dataset.commentIds || "").split(",").filter(Boolean) }, pin);
-    }
-    var badge = e.target.closest(".comment-badge");
-    if (badge) {
-      e.preventDefault();
-      return MAG.popup.open({ pageId: badge.dataset.pageId, pageLevel: true }, badge);
-    }
-
-    /* --- eş okuma açıkken bloğa dokunmak --- */
-    if (!layerOn) return;
-    if (e.target.closest("button, a, input, textarea, .puzzle")) return;
-    var block = e.target.closest("[data-block-id]");
-    if (!block) return;
-    var pageEl = block.closest(".page");
-    if (!pageEl) return;
-    e.preventDefault();
-
-    var blockId = block.getAttribute("data-block-id");
-    if (block.hasAttribute("data-comments")) {
-      MAG.popup.open({ blockId: blockId, pageId: pageEl.dataset.pageId }, block);
-    } else {
-      MAG.overlays.openComposer({
-        pageId: pageEl.dataset.pageId,
-        sectionSlug: pageEl.dataset.section,
-        anchor: { type: "block", blockId: blockId },
-        blockHint: C.blockLabel(blockId),
-      });
+      MAG.popup.open({ ids: (pin.dataset.commentIds || "").split(",").filter(Boolean) }, pin);
     }
   }
 

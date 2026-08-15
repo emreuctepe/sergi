@@ -1,12 +1,10 @@
 /* ============================================================================
-   POPUP — üstte açılan yorum konuşma balonu  (yorum sistemi, yeni yol — 2.1)
+   POPUP — üstte açılan yorum balonu  (yorum sistemi 2.1)
    ----------------------------------------------------------------------------
-   Alttan açılan thread paneli yerine: bir işarete (pin / çentik / alıntı) dokun
-   → tuvalin ÜSTÜNDE, ona yakın bir kart açılır. Overlay olduğu için sayfa
-   düzenine hiç dokunmaz (z-index'te üstte, fixed konumlu).
-
-   Şimdilik tek yorum (temsilci ses) gösterir. Sıradaki adımlar: kaydırmalı
-   carousel (2.2), thread'e uzatma (2.3), serbest yerleştirme (2.4).
+   Bir baloncuğa (pin) dokun → tuvalin ÜSTÜNDE, ona yakın bir kart açılır.
+   Kartın içinde o baloncuktaki BÜTÜN yorumlar var: kaydırarak hepsini okursun
+   (carousel değil — dikey liste). Cevaplar girintili. Overlay olduğu için sayfa
+   düzenine hiç dokunmaz.
    ========================================================================= */
 
 (function (MAG) {
@@ -29,22 +27,14 @@
     return host;
   }
 
-  /** sel: C.rootsFor'un anladığı seçim ({ids}|{blockId,quote}|{pageId,pageLevel}…) */
   P.open = function (sel, anchorEl) {
     var roots = C.rootsFor(sel || {});
     if (!roots.length) return;
-    var rep = C.representative(roots) || roots[0];
-    var total = roots.reduce(function (n, c) {
-      return n + C.threadSize(c.id);
-    }, 0);
-
     P.close();
     ensureHost();
-    card = buildCard(rep, total);
+    card = buildCard(roots);
     host.appendChild(card);
     position(card, anchorEl);
-
-    /* dışına dokun / Esc ile kapat — açan tıklamanın hemen kapatmaması için ertele */
     setTimeout(function () {
       offOutside = U.on(
         document,
@@ -72,22 +62,49 @@
     return !!card;
   };
 
-  function buildCard(c, total) {
+  function buildCard(roots) {
+    var sorted = roots.slice().sort(function (a, b) {
+      return C.score(b) - C.score(a) || b.createdAt - a.createdAt;
+    });
+    var count = roots.reduce(function (n, c) {
+      return n + C.threadSize(c.id);
+    }, 0);
+
+    var list = el("div.cpop__list");
+    sorted.forEach(function (c) {
+      list.appendChild(commentBlock(c));
+    });
+
+    return el("div.cpop", { role: "dialog", "aria-label": "Yorumlar" }, [
+      el("div.cpop__bar", null, [
+        el("b.cpop__count", { text: count + " yorum" }),
+        el("button.cpop__x", { type: "button", text: "✕", "aria-label": "Kapat", onclick: P.close }),
+      ]),
+      list,
+    ]);
+  }
+
+  function commentBlock(c) {
+    var node = el("div.cpop__c", null, [inner(c)]);
+    C.replies(c.id).forEach(function (r) {
+      node.appendChild(el("div.cpop__reply", null, [inner(r)]));
+    });
+    return node;
+  }
+
+  function inner(c) {
     var rx = Object.keys(c.reactions || {});
     var q = C.quoteOf(c);
-    return el("div.cpop", { role: "dialog", "aria-label": c.author.name + " yorumu" }, [
-      el("button.cpop__x", { type: "button", text: "✕", "aria-label": "Kapat", onclick: P.close }),
+    return el("div", null, [
       el("div.cpop__head", null, [
         el("span.cpop__dot", { style: { "--c": c.author.color }, text: c.author.emoji }),
         el("b.cpop__name", { text: c.author.name }),
         el("span.cpop__time", { text: U.timeAgo(c.createdAt) }),
+        c.status === "pending" ? el("i.cpop__pending", { text: "onayda" }) : null,
       ]),
       q ? el("div.cpop__quote", { text: "“" + q + "”" }) : null,
       el("p.cpop__body", { text: c.body }),
-      el("div.cpop__foot", null, [
-        rx.length ? el("span.cpop__rx", { text: rx.join(" ") }) : null,
-        total > 1 ? el("span.cpop__more", { text: "+" + (total - 1) + " ses" }) : null,
-      ]),
+      rx.length ? el("div.cpop__rx", { text: rx.join("  ") }) : null,
     ]);
   }
 
@@ -104,8 +121,8 @@
     var cx = (a.left + a.right) / 2;
     var left = U.clamp(cx - w / 2, canvas.left + m, Math.max(canvas.left + m, canvas.right - w - m));
 
-    var top = a.bottom + m; /* ankrajın altına */
-    if (top + h > canvas.bottom - m) top = a.top - h - m; /* sığmazsa üstüne */
+    var top = a.bottom + m;
+    if (top + h > canvas.bottom - m) top = a.top - h - m;
     top = U.clamp(top, canvas.top + m, Math.max(canvas.top + m, canvas.bottom - h - m));
 
     card.style.left = Math.round(left) + "px";

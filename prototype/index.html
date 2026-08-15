@@ -107,30 +107,41 @@
 
       <!-- ALT BANT ---------------------------------------------------------- -->
       <footer id="band-bottom" class="band band--bottom">
-        <button id="btn-prev" class="band__btn" type="button" aria-label="Önceki sayfa">
-          <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
-            <path d="M18 15l-6-6-6 6" />
-          </svg>
-        </button>
+        <!-- sayfa gezinme: yukarı + aşağı yan yana -->
+        <div class="band__nav">
+          <button id="btn-prev" class="band__btn" type="button" aria-label="Önceki sayfa">
+            <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path d="M18 15l-6-6-6 6" />
+            </svg>
+          </button>
+          <button id="btn-next" class="band__btn" type="button" aria-label="Sonraki sayfa">
+            <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+        </div>
 
-        <button
-          id="btn-comments"
-          class="comment-toggle"
-          type="button"
-          aria-pressed="false"
-        >
-          <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
-            <path d="M20 12a7 7 0 0 1-7 7H8l-4 3v-4.6A7 7 0 0 1 11 5h2a7 7 0 0 1 7 7Z" />
-          </svg>
-          <span class="comment-toggle__label">yorumlar</span>
-          <span id="comment-count" class="comment-toggle__count">0</span>
-        </button>
+        <!-- eylemler: beğen · yorum · paylaş (şimdilik yalnız yorum işlevsel) -->
+        <div class="band__actions">
+          <button id="btn-like" class="band__act" type="button" aria-label="Beğen" data-fake="true">
+            <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path d="M12 21s-7-4.35-9.5-8.5C.5 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.4.8-1.2 2-2.4 4-2.4 3.5 0 5.5 3.5 3.5 7C19 16.65 12 21 12 21Z" />
+            </svg>
+          </button>
 
-        <button id="btn-next" class="band__btn" type="button" aria-label="Sonraki sayfa">
-          <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
-            <path d="M6 9l6 6 6-6" />
-          </svg>
-        </button>
+          <button id="btn-comments" class="band__act band__act--toggle" type="button" aria-pressed="false" aria-label="Eş okuma">
+            <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </button>
+
+          <button id="btn-share" class="band__act" type="button" aria-label="Paylaş" data-fake="true">
+            <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M12 15V3M8 7l4-4 4 4" />
+            </svg>
+          </button>
+        </div>
       </footer>
     </div>
 

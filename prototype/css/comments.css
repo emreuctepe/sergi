@@ -124,15 +124,6 @@
   top: 1.6cqi;
   box-shadow: 0 0 0 2px color-mix(in oklab, var(--ink) 30%, transparent);
 }
-/* Eş okuma açıkken bloklar dokunulabilir: dokunulan yer belli olsun. */
-:root[data-comment-layer="on"] .page [data-block-id] {
-  cursor: pointer;
-}
-:root[data-comment-layer="on"] .page [data-block-id]:hover {
-  background-color: color-mix(in oklab, var(--accent) 7%, transparent);
-  border-radius: var(--radius-sm);
-}
-
 /* --------------------------------------------------------------------------
    PİNLER — normalize (x,y) koordinatlarda
    -------------------------------------------------------------------------- */
@@ -161,10 +152,10 @@
   opacity: 1;
   scale: 1;
 }
-/* katman kapalıyken sadece çok hafif bir iz kalır */
-:root[data-comment-layer="off"] .pin {
-  opacity: 0.34;
-  scale: 0.62;
+/* Eş okuma KAPALIYKEN baloncuklar tamamen gizli: sadece dergiyi okumak
+   isteyeni rahatsız etmesin. */
+:root[data-comment-layer="off"] .page__pins {
+  display: none;
 }
 
 .pin__dot {
@@ -589,20 +580,22 @@
 
 
 /* ==========================================================================
-   POPUP — üstte açılan yorum konuşma balonu (yorum sistemi 2.1)
-   Mantığı: js/popup.js. Overlay, fixed konumlu — sayfa düzenine dokunmaz.
+   POPUP — üstte açılan yorum balonu (yorum sistemi 2.1). Mantık: js/popup.js.
+   Overlay, fixed konumlu; içinde o baloncuğun bütün yorumları (kaydırmalı).
    ========================================================================== */
 .cpop {
   position: fixed;
   z-index: var(--z-modal, 50);
-  width: min(320px, calc(100vw - 24px));
-  padding: 12px 14px;
+  width: min(330px, calc(100vw - 24px));
+  display: flex;
+  flex-direction: column;
   border-radius: var(--radius-md);
   background: var(--paper-raised);
   color: var(--ink);
   border: 1px solid var(--line-soft);
   box-shadow: var(--shadow-3);
   animation: cpop-in var(--dur-base) var(--ease-spring);
+  overflow: hidden;
 }
 @keyframes cpop-in {
   from {
@@ -610,12 +603,21 @@
     transform: scale(0.94) translateY(4px);
   }
 }
+.cpop__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 8px 8px 14px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.cpop__count {
+  font-family: var(--font-ui);
+  font-size: var(--fs-cmt-name);
+  color: var(--ink-soft);
+}
 .cpop__x {
-  position: absolute;
-  top: 6px;
-  inset-inline-end: 8px;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   display: grid;
   place-items: center;
   border-radius: var(--radius-full);
@@ -625,12 +627,31 @@
 .cpop__x:hover {
   background: color-mix(in oklab, var(--ink) 8%, transparent);
 }
+
+/* içerik: kaydırmalı liste — hepsini burada okursun */
+.cpop__list {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  max-height: min(48vh, 340px);
+  padding: 4px 14px 10px;
+}
+.cpop__c {
+  padding: 10px 0;
+}
+.cpop__c + .cpop__c {
+  border-top: 1px solid var(--line-soft);
+}
+.cpop__reply {
+  margin-top: 8px;
+  padding-inline-start: 12px;
+  border-inline-start: 2px solid var(--line);
+}
+
 .cpop__head {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 6px;
-  padding-inline-end: 20px;
+  margin-bottom: 5px;
 }
 .cpop__dot {
   display: grid;
@@ -654,6 +675,16 @@
   font-size: var(--ui-fs-xs);
   color: var(--ink-faint);
 }
+.cpop__pending {
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--warn) 18%, transparent);
+  color: var(--warn);
+  font-size: 9px;
+  font-style: normal;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
 .cpop__quote {
   margin-bottom: 4px;
   padding-inline-start: 8px;
@@ -668,19 +699,7 @@
   font-size: var(--fs-cmt);
   line-height: 1.4;
 }
-.cpop__foot {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 8px;
-  font-family: var(--font-ui);
-  font-size: var(--ui-fs-xs);
-  color: var(--ink-faint);
-}
-.cpop__more {
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-  background: color-mix(in oklab, var(--accent) 12%, transparent);
-  color: var(--accent);
-  font-weight: 800;
+.cpop__rx {
+  margin-top: 5px;
+  font-size: var(--ui-fs-sm);
 }

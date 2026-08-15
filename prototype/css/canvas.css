@@ -477,3 +477,49 @@
     display: none;
   }
 }
+
+/* --- alt bant yeni düzen: [yukarı aşağı] · [beğen yorum paylaş] ------------- */
+.band--bottom {
+  justify-content: center;
+  gap: 16px;
+}
+.band__nav,
+.band__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.band__act {
+  display: grid;
+  place-items: center;
+  width: var(--ui-tap);
+  height: var(--ui-tap);
+  border-radius: var(--radius-full);
+  color: inherit;
+  opacity: 0.85;
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out);
+}
+.band__act:hover {
+  opacity: 1;
+  background: color-mix(in oklab, currentColor 12%, transparent);
+}
+.band__act .icon {
+  width: 22px;
+  height: 22px;
+}
+/* sahte (henüz işlevsiz) tuşlar soluk durur */
+.band__act[data-fake="true"] {
+  opacity: 0.5;
+}
+
+/* eş okuma toggle: açıkken vurgulu (sahte değil, işlevsel) */
+.band__act--toggle {
+  opacity: 0.85;
+}
+.band__act--toggle[aria-pressed="true"] {
+  color: var(--accent);
+  opacity: 1;
+  background: color-mix(in oklab, var(--accent) 14%, transparent);
+}
