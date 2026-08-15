@@ -1,0 +1,1227 @@
+/* ============================================================================
+   COMMENTS — ankraj işaretleri, pinler, yorum katmanı, thread paneli
+   ========================================================================= */
+
+/* --------------------------------------------------------------------------
+   YORUM YAZI ÖLÇEĞİ
+   Bütün sunumlar (Fısıltı, Kenar, Şerh) ve thread paneli buradan besleniyor —
+   tek yerden büyütülüp küçültülür. Gövde arayüz "sm"inin 1.5 katı: yorumlar
+   dergi metniyle yarışacak kadar değil ama rahat okunacak kadar iri.
+   -------------------------------------------------------------------------- */
+:root {
+  --fs-cmt: calc(var(--ui-fs-sm) * 1.5); /* yorum gövdesi */
+  --fs-cmt-quote: calc(var(--ui-fs-xs) * 1.5); /* alıntı satırı */
+  --fs-cmt-name: var(--ui-fs-sm); /* ad / künye */
+}
+
+/* --------------------------------------------------------------------------
+   ALINTI ISISI
+   Bu işaret artık "burada bir yorum var" demiyor — "bu cümleyi kaç kişi
+   alıntıladı" diyor. Bir cümle başına TEK işaret olduğu için üst üste binme
+   diye bir şey yok, ve yorum sayısı arttıkça işaret gürültülenmiyor: koyulaşıyor.
+   Kalınlık ısıyla artar, böylece renk körlüğünde de okunur.
+   -------------------------------------------------------------------------- */
+.anno {
+  --heat-a: 30%;
+  --heat-h: 0.09em;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  padding-bottom: 0.06em;
+  background-image: linear-gradient(
+    to top,
+    color-mix(in oklab, var(--accent) var(--heat-a), transparent) 0 var(--heat-h),
+    transparent var(--heat-h)
+  );
+  transition:
+    background-color var(--dur-base) var(--ease-out),
+    background-image var(--dur-base) var(--ease-out);
+  border-radius: 2px;
+}
+.anno[data-heat="2"] { --heat-a: 50%; --heat-h: 0.15em; }
+.anno[data-heat="3"] { --heat-a: 78%; --heat-h: 0.24em; }
+.anno[data-heat="4"] { --heat-a: 100%; --heat-h: 0.34em; }
+
+/* Eş okuma KAPALIYKEN ilk okuyuş yazarındır: tek tük alıntılar tamamen çekilir,
+   yalnızca gerçekten çok alıntılanan cümleler hafif bir iz bırakır. Görünmeyen
+   işaret tıklanabilir de değil — okurken yanlışlıkla panel açılmasın. */
+:root[data-comment-layer="off"] .anno {
+  --heat-a: 0%;
+  pointer-events: none;
+}
+:root[data-comment-layer="off"] .anno[data-heat="3"] {
+  --heat-a: 24%;
+  --heat-h: 0.1em;
+  pointer-events: auto;
+}
+:root[data-comment-layer="off"] .anno[data-heat="4"] {
+  --heat-a: 40%;
+  --heat-h: 0.13em;
+  pointer-events: auto;
+}
+
+.anno:hover {
+  background-color: color-mix(in oklab, var(--accent) 16%, transparent);
+}
+
+/* Eş okuma AÇIKKEN zemin dolgusu yalnızca gerçekten kalabalık cümlelere ait.
+   Önce her işarete dolgu veriyorduk: 170 yorumluk bir sayıda tek bir sayfada
+   yedi işaret olabiliyor ve sayfa şeritli bir bloğa dönüşüyordu — dahası, ısı 4
+   ile ısı 2 aynı görünüyordu, yani "koyulaşır" sözü tutulmuyordu. Ağırlığı artık
+   altı çizginin kalınlığı taşıyor; dolgu 3. seviyede başlıyor. */
+:root[data-comment-layer="on"] .anno[data-heat="3"] {
+  background-color: color-mix(in oklab, var(--accent) 14%, transparent);
+}
+:root[data-comment-layer="on"] .anno[data-heat="4"] {
+  background-color: color-mix(in oklab, var(--accent) 22%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 18%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   BLOK İŞARETİ
+   Ankraj artık bloğun kendisi. Blok kenarındaki ince çentik "burada N ses var"
+   der; kaç yorum olursa olsun sayfa düzeni değişmez. Sunum yolları (Fısıltı,
+   Kenar) bunun üstüne kurulacak — bu, işaretin en sade hâli.
+   -------------------------------------------------------------------------- */
+[data-block-id][data-comments] {
+  position: relative;
+}
+[data-block-id][data-comments]::before {
+  content: attr(data-comments);
+  position: absolute;
+  inset-inline-start: calc(var(--pad-page) * -0.62);
+  top: 0.15em;
+  display: grid;
+  place-items: center;
+  min-width: 4.2cqi;
+  height: 4.2cqi;
+  padding: 0 0.8cqi;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  color: var(--paper);
+  font-family: var(--font-ui);
+  font-size: 2.4cqi;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transform: translateX(-3px);
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+  pointer-events: none;
+  /* manga paneli gibi konumlandırılmış içeriği olan blokların üstünde kalsın */
+  z-index: 2;
+}
+:root[data-comment-layer="on"] [data-block-id][data-comments]::before {
+  opacity: 1;
+  transform: none;
+}
+/* Manga panelleri kırpılmış kutulardır — çentik kenar boşluğuna konursa komşu
+   panelin altında kalıyor. Panelin kendi içine, köşesine oturuyor. */
+[data-block-kind="manga-item"][data-comments]::before {
+  inset-inline-start: 1.6cqi;
+  top: 1.6cqi;
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--ink) 30%, transparent);
+}
+/* Eş okuma açıkken bloklar dokunulabilir: dokunulan yer belli olsun. */
+:root[data-comment-layer="on"] .page [data-block-id] {
+  cursor: pointer;
+}
+:root[data-comment-layer="on"] .page [data-block-id]:hover {
+  background-color: color-mix(in oklab, var(--accent) 7%, transparent);
+  border-radius: var(--radius-sm);
+}
+
+/* --------------------------------------------------------------------------
+   PİNLER — normalize (x,y) koordinatlarda
+   -------------------------------------------------------------------------- */
+.page__pins {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.pin {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  scale: 0.6;
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    scale var(--dur-base) var(--ease-spring);
+}
+:root[data-comment-layer="on"] .pin {
+  opacity: 1;
+  scale: 1;
+}
+/* katman kapalıyken sadece çok hafif bir iz kalır */
+:root[data-comment-layer="off"] .pin {
+  opacity: 0.34;
+  scale: 0.62;
+}
+
+.pin__dot {
+  display: grid;
+  place-items: center;
+  width: 8.5cqi;
+  height: 8.5cqi;
+  border-radius: var(--radius-full);
+  background: var(--c, var(--accent));
+  color: #fff;
+  font-size: 4cqi;
+  line-height: 1;
+  box-shadow:
+    0 0 0 2.5px var(--paper),
+    0 3px 10px rgb(0 0 0 / 0.28);
+  animation: pin-in var(--dur-base) var(--ease-spring);
+}
+@keyframes pin-in {
+  from { transform: scale(0.4); }
+}
+
+.pin__n {
+  position: absolute;
+  right: -1.4cqi;
+  bottom: -1.4cqi;
+  min-width: 4.4cqi;
+  height: 4.4cqi;
+  padding: 0 1cqi;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-ui);
+  font-size: 2.6cqi;
+  font-weight: 800;
+  box-shadow: 0 0 0 2px var(--paper);
+}
+
+/* KÜME — birbirine yakın pinler tek işarette toplanır, üst üste binme biter.
+   Arkadaki hafif katmanlar "burada birden fazla ses var"ı sayıyı okumadan anlatır. */
+.pin[data-cluster] .pin__dot {
+  box-shadow:
+    0 0 0 2.5px var(--paper),
+    0 0 0 3.5px color-mix(in oklab, var(--ink) 18%, transparent),
+    2.5px 2.5px 0 0 var(--paper-raised),
+    2.5px 2.5px 0 1px color-mix(in oklab, var(--ink) 18%, transparent),
+    0 3px 10px rgb(0 0 0 / 0.28);
+}
+
+.pin[data-pending="true"] .pin__dot {
+  border: 2px dashed var(--paper);
+}
+.pin[data-mine="true"] .pin__dot {
+  box-shadow:
+    0 0 0 2.5px var(--paper),
+    0 0 0 5px var(--accent),
+    0 3px 10px rgb(0 0 0 / 0.28);
+}
+
+/* yeni pin bırakılırken gösterilen hayalet */
+.pin--ghost {
+  opacity: 1 !important;
+  scale: 1 !important;
+  width: 8.5cqi;
+  height: 8.5cqi;
+  border-radius: var(--radius-full);
+  border: 2px dashed var(--accent);
+  background: color-mix(in oklab, var(--accent) 20%, transparent);
+  animation: ghost-pulse 1.2s var(--ease-in-out) infinite;
+}
+@keyframes ghost-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.14); }
+}
+
+/* --------------------------------------------------------------------------
+   SAYFA SEVİYESİ ROZET — ankrajı bulunamayan yorumlar buraya düşer
+   -------------------------------------------------------------------------- */
+.comment-badge {
+  position: absolute;
+  right: var(--pad-page);
+  bottom: calc(var(--pad-page) * 1.5);
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 1.6cqi;
+  padding: 1.6cqi 3cqi;
+  border-radius: var(--radius-full);
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-2);
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+}
+:root[data-comment-layer="on"] .comment-badge {
+  opacity: 1;
+  transform: none;
+}
+.comment-badge__n {
+  font-weight: 800;
+  color: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   YORUM KATMANI PERDESİ
+   -------------------------------------------------------------------------- */
+/* Eş okumada İÇERİYİ artık karartmıyoruz. Eskiden bu tül tuvalin üstüne %12 koyu
+   bir örtü seriyordu — "içerisi bulanıklaşıyor" hissi buradan geliyordu. Ton
+   değişimi çevreye taşındı (bkz. css/base.css `body::after`): dergi objesi aynı
+   parlaklıkta kalır, çerçevenin DIŞI tonlanır. Kullanıcı isteği. */
+.comment-layer {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   THREAD PANELİ
+   -------------------------------------------------------------------------- */
+.thread {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
+}
+
+.thread__head {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-sp-3);
+  padding: var(--ui-sp-3) var(--ui-sp-4);
+  border-bottom: 1px solid var(--line);
+}
+.thread__title {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: var(--ui-fs-lg);
+  font-weight: 600;
+}
+.thread__title span {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* alıntılanan bağlam — yorumun neye yazıldığı */
+.thread__context {
+  margin: var(--ui-sp-3) var(--ui-sp-4) 0;
+  padding: var(--ui-sp-3);
+  border-left: 3px solid var(--accent);
+  background: var(--paper-sunken);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-family: var(--font-text);
+  font-size: var(--ui-fs-sm);
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+.thread__context b {
+  display: block;
+  margin-bottom: 3px;
+  font-family: var(--font-ui);
+  font-size: var(--ui-fs-xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 700;
+}
+
+.thread__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--ui-sp-3) var(--ui-sp-4) var(--ui-sp-4);
+  display: grid;
+  gap: var(--ui-sp-4);
+  align-content: start;
+}
+
+/* --- tek yorum ------------------------------------------------------------ */
+.cmt {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: var(--ui-sp-3);
+}
+.cmt__avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  background: var(--c, var(--accent));
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
+}
+.cmt__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--ui-sp-2);
+  margin-bottom: 3px;
+}
+.cmt__name {
+  font-size: var(--fs-cmt-name);
+  font-weight: 700;
+}
+.cmt__time {
+  font-size: var(--ui-fs-xs);
+  color: var(--ink-faint);
+}
+.cmt__tag {
+  font-size: var(--ui-fs-xs);
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+  background: var(--paper-sunken);
+  color: var(--ink-faint);
+  border: 1px solid var(--line);
+}
+.cmt__tag--pending {
+  background: color-mix(in oklab, var(--warn) 16%, transparent);
+  border-color: color-mix(in oklab, var(--warn) 40%, transparent);
+  color: var(--warn);
+}
+.cmt__tag--mine {
+  background: color-mix(in oklab, var(--accent) 14%, transparent);
+  border-color: color-mix(in oklab, var(--accent) 36%, transparent);
+  color: var(--accent);
+}
+.cmt__tag--featured {
+  background: color-mix(in oklab, var(--accent-3) 20%, transparent);
+  border-color: color-mix(in oklab, var(--accent-3) 44%, transparent);
+  color: var(--accent-3);
+  font-weight: 700;
+}
+/* Alıntı yorumun İÇİNDE yaşıyor — sayfada bir işaret olarak değil. */
+.cmt__quote {
+  margin-bottom: 4px;
+  padding-inline-start: var(--ui-sp-3);
+  border-inline-start: 2px solid color-mix(in oklab, var(--accent) 45%, transparent);
+  font-family: var(--font-text);
+  font-size: var(--fs-cmt-quote);
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+.cmt__body {
+  font-family: var(--font-text);
+  font-size: var(--fs-cmt);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.cmt__note {
+  margin-top: 5px;
+  font-size: var(--ui-fs-xs);
+  color: var(--ink-faint);
+  font-style: italic;
+}
+.cmt__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-sp-2);
+  margin-top: var(--ui-sp-2);
+}
+.cmt__act {
+  font-size: var(--ui-fs-xs);
+  color: var(--ink-faint);
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.cmt__act:hover {
+  background: var(--paper-sunken);
+  color: var(--ink);
+}
+
+.rx {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line);
+  background: var(--paper-raised);
+  font-size: var(--ui-fs-xs);
+  font-variant-numeric: tabular-nums;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-spring);
+}
+.rx:hover {
+  transform: translateY(-1px);
+}
+.rx[data-mine="true"] {
+  background: color-mix(in oklab, var(--accent) 14%, transparent);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+}
+.rx--add {
+  color: var(--ink-faint);
+  border-style: dashed;
+}
+
+/* --- cevaplar: 3. seviyeden sonra girinti sabitlenir --------------------- */
+.cmt__replies {
+  margin-top: var(--ui-sp-3);
+  padding-left: var(--ui-sp-3);
+  border-left: 2px solid var(--line);
+  display: grid;
+  gap: var(--ui-sp-3);
+}
+.cmt__replies .cmt__replies .cmt__replies {
+  padding-left: 0;
+  border-left: 0;
+}
+.cmt__more {
+  font-size: var(--ui-fs-xs);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   YORUM YAZMA
+   -------------------------------------------------------------------------- */
+.composer {
+  border-top: 1px solid var(--line);
+  padding: var(--ui-sp-3) var(--ui-sp-4)
+    calc(var(--ui-sp-3) + env(safe-area-inset-bottom, 0px));
+  background: var(--paper-raised);
+  display: grid;
+  gap: var(--ui-sp-3);
+}
+.composer__who {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-sp-2);
+  font-size: var(--ui-fs-xs);
+  color: var(--ink-faint);
+}
+.composer__who b {
+  color: var(--ink-soft);
+}
+.composer__avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  background: var(--c, var(--accent));
+}
+.composer__row {
+  display: flex;
+  gap: var(--ui-sp-2);
+  align-items: flex-end;
+}
+.composer textarea {
+  flex: 1;
+  min-height: 46px;
+  max-height: 140px;
+  resize: none;
+  padding: var(--ui-sp-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  background: var(--paper);
+  font-family: var(--font-text);
+  font-size: var(--ui-fs-base);
+  line-height: 1.45;
+}
+.composer textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
+}
+.composer__send {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  color: var(--accent-ink);
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-spring);
+}
+.composer__send:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.composer__send:not(:disabled):hover {
+  transform: scale(1.06);
+}
+.composer__hint {
+  font-size: var(--ui-fs-xs);
+  color: var(--ink-faint);
+  line-height: 1.45;
+}
+.composer__hint b {
+  color: var(--warn);
+}
+
+/* --------------------------------------------------------------------------
+   BOŞ DURUM
+   -------------------------------------------------------------------------- */
+.thread__empty {
+  padding: var(--ui-sp-6) var(--ui-sp-4);
+  text-align: center;
+  color: var(--ink-faint);
+  display: grid;
+  gap: var(--ui-sp-2);
+  justify-items: center;
+}
+.thread__empty .big {
+  font-size: 28px;
+}
+
+/* ==========================================================================
+   FISILTI — alt bant konuşur (yorum sunumu, Yol B)
+   Gerekçe: docs/YORUM-SISTEMI.md §4. Mantığı: js/whisper.js.
+
+   Bütün yol tek blokta duruyor (bant taşmasıyla birlikte): B5'te kaybederse
+   silmek bir bölüm seçip silmek kadar olsun.
+
+   Sayfaya HİÇ dokunulmuyor — şerit letterbox alanında, bandın içinde yaşıyor.
+   Bant yukarı doğru büyür (`position: absolute; bottom: 0`), yani tuvalin
+   yüksekliği ve sayfaların akışı olduğu gibi kalır.
+   ========================================================================== */
+:root {
+  /* Şeridin ayırdığı yer. Sabit: ses değişince bant zıplamasın diye gövde
+     her zaman iki satır yer tutar (kısa yorumda bile). Gövde 1.5×'e çıkınca
+     iki satır ~82px'e geldi; rezervasyon buna göre. */
+  --whisper-h: 84px;
+}
+
+.band--bottom[data-whisper="on"] {
+  height: auto;
+  flex-wrap: wrap;
+  row-gap: 6px;
+  padding-block: 6px;
+}
+
+/* Telefonda tuval bilerek 3:4'ün ÜSTÜNDE uzatılmıştır (tam kanama görseller
+   için taşma payı, bkz. css/canvas.css). Şerit o paydan ödünç alır: tuval
+   tasarım ölçüsünün altına asla inmez, yani sayfanın kurgulanmış içeriği
+   kapanmaz. Pay bittiyse (basık ekran) şerit tuvalin üstüne biner — bu, bu
+   yolun gerçek bedeli ve olduğu gibi görünmesi gerekiyor.
+
+   Tuval dikeyde ORTALANIR: alttan bir şerit boyu yer açmak için boydan iki
+   şerit borç almak gerekir (yarısı üstte kalır, orası zaten zemin). */
+@media (max-width: 560px) and (max-aspect-ratio: 3 / 4) {
+  :root[data-whisper="on"] {
+    --canvas-h: max(
+      calc(var(--canvas-w) * 4 / 3),
+      calc(100svh - 2 * var(--ui-band-h) - 2 * var(--whisper-h))
+    );
+  }
+}
+
+.whisper {
+  order: -1; /* düğmelerin üstünde: önce ses, sonra gezinme */
+  flex: 0 0 100%;
+  min-height: var(--whisper-h);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: var(--radius-md);
+  /* Kendi yüzeyi var: bant geniş ekranda saydamdır, şerit ise tuvalin alt
+     kenarına değebilir. Yüzey olmadan yazı zemine karışıyordu. */
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 1px solid var(--line-soft);
+  box-shadow: var(--shadow-1);
+  text-align: start;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+.whisper:hover,
+.whisper:focus-visible {
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--line-soft));
+}
+
+.whisper__dot {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-full);
+  background: var(--c, var(--accent));
+  color: #fff;
+  font-size: 15px;
+  line-height: 1;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.22);
+}
+
+.whisper__text {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.whisper__who {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  font-family: var(--font-ui);
+  font-size: var(--fs-cmt-name);
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.whisper__who b {
+  color: var(--ink-soft);
+  font-weight: 700;
+  flex: none;
+}
+.whisper__where {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.whisper__pending {
+  flex: none;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--warn) 18%, transparent);
+  color: var(--warn);
+  font-size: 9px;
+  font-style: normal;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+/* Ses bir TEASER: iki satır okunur, gerisi bir dokunuş uzakta.
+   `min-height` iki satırı her zaman ayırır — tek satırlık bir yorumda bant
+   küçülüp büyümesin (telefonda bu tuvali yeniden ölçtürürdü). */
+.whisper__body {
+  font-family: var(--font-text);
+  font-size: var(--fs-cmt);
+  line-height: 1.34;
+  min-height: 2.68em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Sessiz sayfa: yer ayrılmış, ses yok. */
+.whisper[data-quiet] {
+  cursor: default;
+  color: var(--ink-faint);
+}
+.whisper[data-quiet] .whisper__dot {
+  background: color-mix(in oklab, var(--ink) 12%, transparent);
+  box-shadow: none;
+}
+.whisper[data-quiet] .whisper__body {
+  font-style: italic;
+}
+
+.whisper__more {
+  flex: none;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-family: var(--font-ui);
+  font-size: var(--ui-fs-xs);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.whisper__chev {
+  color: var(--ink-faint);
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* Ses değişince şerit yeniden çizilir; yeni düğümler bu animasyonla gelir.
+   Sesin "geldiği" hissediliyor ama sayfa hiç oynamıyor. */
+.whisper__dot,
+.whisper__text {
+  animation: whisper-in var(--dur-base) var(--ease-out);
+}
+@keyframes whisper-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+:root[data-motion="off"] .whisper__dot,
+:root[data-motion="off"] .whisper__text {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .whisper__dot,
+  .whisper__text {
+    animation: none;
+  }
+}
+
+/* Odaktaki blok hafifçe aydınlanır: sesin nereden geldiği belli olsun.
+   Halka (spread) metin kutusunun birkaç piksel dışına taşar — arka planı
+   boyamak yerine ışık düşürüyormuş gibi durur. */
+:root[data-comment-layer="on"] .page [data-block-id][data-whisper-focus="true"] {
+  background-color: color-mix(in oklab, var(--accent) 8%, transparent);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 0.9cqi color-mix(in oklab, var(--accent) 8%, transparent);
+  transition:
+    background-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+[data-block-id][data-whisper-focus="true"]::before {
+  transform: scale(1.14);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent);
+}
+
+/* Çok dar ekran: şerit yine iki satır, ama sayaç ve ok yer kaplamasın. */
+@media (max-width: 359px) {
+  .whisper {
+    gap: 8px;
+    padding: 7px 8px;
+  }
+  .whisper__chev {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   KENAR — kenar rayı / dokuma (yorum sunumu, Yol A)
+   Gerekçe: docs/YORUM-SISTEMI.md §4. Mantığı: js/kenar.js.
+
+   İki biçim, ekrana göre js seçer:
+     data-kenar="rail"   → geniş ekran: kartlar TUVALİN DIŞINA, sağ boşluğa
+     data-kenar="weave"  → telefon: bloğun ardına inen şeritler, sayfa uzar
+   Kaybederse silmesi ucuz olsun diye tek blokta.
+   ========================================================================== */
+
+/* --- RAY (geniş, tuvalin dışında / letterbox gutter) --------------------- */
+
+/* Ray, tuvalin İÇİNDE değil sağındaki boşlukta yaşar: dergi objesi 3:4 ve tam
+   genişlikte kalır, metin daralmaz. #shell çocuğu olduğu için tuvalle birlikte
+   (dock kayması dâhil) kayar; konum ve genişliğini js ölçüp veriyor. Kartlar
+   tuvalle kaymadığından blok hizasını js kaydırmada tazeliyor. */
+.rail-gutter {
+  position: absolute;
+  left: 100%;
+  top: var(--rail-top, 0);
+  height: var(--rail-h, 100%);
+  width: var(--rail-w, 180px);
+  margin-inline-start: 14px;
+  z-index: var(--z-band, 40);
+  pointer-events: none; /* kartların kendisi tıklanır, boş boşluk değil */
+  display: none;
+}
+.rail-gutter[data-on="true"] {
+  display: block;
+}
+
+.rail-card {
+  position: absolute;
+  inset-inline: 0;
+  pointer-events: auto;
+  display: grid;
+  gap: 3px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 1px solid var(--line-soft);
+  box-shadow: var(--shadow-1);
+  text-align: start;
+  cursor: pointer;
+  /* `top` GEÇİŞSİZ: kart bloğunu kaydırmada birebir takip etmeli; top'a geçiş
+     koyarsak her karede yeni konuma animasyonla gider, kaydırmanın gerisinde
+     kalır. Çakışma itmesi de anında olur — doğruluk şıklığın önünde. */
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+  animation: rail-in var(--dur-base) var(--ease-out);
+}
+:root[data-motion="off"] .rail-card {
+  transition: none;
+  animation: none;
+}
+.rail-card:hover,
+.rail-card:focus-visible {
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--line-soft));
+  box-shadow: var(--shadow-2);
+}
+@keyframes rail-in {
+  from {
+    opacity: 0;
+    transform: translateX(6px);
+  }
+}
+
+.rail-card__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.rail-card__dot {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: var(--c, var(--accent));
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+  flex: none;
+}
+.rail-card__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-ui);
+  font-size: var(--fs-cmt-name);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.rail-card__pending {
+  flex: none;
+  padding: 1px 5px;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--warn) 18%, transparent);
+  color: var(--warn);
+  font-size: 9px;
+  font-style: normal;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+.rail-card__quote {
+  font-family: var(--font-text);
+  font-style: italic;
+  font-size: var(--fs-cmt-quote);
+  color: var(--ink-faint);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.rail-card__body {
+  font-family: var(--font-text);
+  font-size: var(--fs-cmt);
+  line-height: 1.34;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.rail-card__more {
+  justify-self: start;
+  margin-top: 1px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-family: var(--font-ui);
+  font-size: var(--ui-fs-xs);
+  font-weight: 800;
+}
+.rail-card[data-pending="true"] {
+  border-style: dashed;
+}
+
+/* Sığmayanları toplayan hap — rayın dibine yapışır. */
+.rail__more {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  pointer-events: auto;
+  padding: 7px 10px;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--ink) 6%, transparent);
+  border: 1px dashed var(--line);
+  color: var(--ink-soft);
+  font-family: var(--font-ui);
+  font-size: var(--ui-fs-xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+.rail__more:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* --- DOKUMA (telefon) ---------------------------------------------------- */
+
+/* Yorumlu sayfa uzar: şeritler akışa girdiği için içerik tuvali aşabilir.
+   "Sığan sayfa" kimliği bu modda bilerek esner (bkz. §4 Yol A riski). */
+:root[data-kenar="weave"] .page[data-kenar-grow] {
+  height: auto;
+  min-height: 100%;
+  justify-content: flex-start;
+  overflow: visible;
+  padding-bottom: calc(var(--pad-page) * 2.4);
+  /* uzayınca fit:scroll gibi davransın: zorla-dur kalksın (Safari çekiştirmesi) */
+  scroll-snap-stop: normal;
+}
+
+.weave {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: var(--sp-2);
+  padding: 6px 9px;
+  border-radius: var(--radius-md);
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 1px solid var(--line-soft);
+  border-inline-start: 2px solid color-mix(in oklab, var(--accent) 55%, var(--line-soft));
+  box-shadow: var(--shadow-1);
+  text-align: start;
+  cursor: pointer;
+  animation: weave-in var(--dur-base) var(--ease-out);
+}
+:root[data-motion="off"] .weave {
+  animation: none;
+}
+@keyframes weave-in {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+}
+/* Alt blok (li / dict satırı / manga paneli) içine düşen şerit: satırın altına
+   biraz nefes koy. */
+[data-sub] > .weave {
+  margin-top: 6px;
+}
+
+.weave__dot {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  background: var(--c, var(--accent));
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+  flex: none;
+}
+.weave__text {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+.weave__quote {
+  font-family: var(--font-text);
+  font-style: italic;
+  font-size: var(--fs-cmt-quote);
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Kapalıyken gövde tek satır; dokununca üç satıra açılır ("yerinde açılır"). */
+.weave__body {
+  font-family: var(--font-text);
+  font-size: var(--fs-cmt);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.weave[data-open] {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+.weave[data-open] .weave__quote {
+  white-space: normal;
+}
+.weave[data-open] .weave__body {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.weave[data-open] .weave__chev {
+  transform: rotate(90deg);
+}
+.weave__more {
+  flex: none;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-family: var(--font-ui);
+  font-size: var(--ui-fs-xs);
+  font-weight: 800;
+}
+.weave__chev {
+  color: var(--ink-faint);
+  font-size: 16px;
+  line-height: 1;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.weave[data-pending="true"] {
+  border-inline-start-color: var(--warn);
+}
+
+/* ==========================================================================
+   ŞERH — dipnot / haşiye (yorum sunumu, Yol D)
+   Gerekçe: docs/YORUM-SISTEMI.md §4 Yol D. Mantığı: js/serh.js.
+
+   Yorum kitabın diziliş dilinin parçası: metinde üst-simge numara, sayfa
+   altında numaralı not. Her şey in-flow — sayfa notlar için uzar.
+   Kaybederse silmesi ucuz olsun diye tek blokta.
+   ========================================================================== */
+
+/* Sayfa notlar için uzar (dokuma gibi). "Sığan sayfa" bu modda esner. */
+:root[data-serh="on"] .page[data-serh-grow] {
+  height: auto;
+  min-height: 100%;
+  justify-content: flex-start;
+  overflow: visible;
+  padding-bottom: calc(var(--pad-page) * 2.4);
+  scroll-snap-stop: normal;
+}
+
+/* --- metindeki üst-simge numara --- */
+.serh-ref {
+  font-family: var(--font-ui);
+  font-weight: 800;
+  font-size: 0.62em;
+  color: var(--accent);
+  cursor: pointer;
+  padding-inline: 0.15em;
+  vertical-align: super;
+  line-height: 0;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.serh-ref::before {
+  content: "["; /* köşeli ayraç: dipnot işareti olduğu belli olsun */
+  opacity: 0.55;
+}
+.serh-ref::after {
+  content: "]";
+  opacity: 0.55;
+}
+.serh-ref:hover,
+.serh-ref:focus-visible {
+  color: color-mix(in oklab, var(--accent) 70%, var(--ink));
+  outline: none;
+  text-decoration: underline;
+}
+
+/* --- sayfa altı haşiye bloğu --- */
+.serh-notes {
+  display: block;
+  margin-top: calc(var(--pad-page) * 0.9);
+  padding-top: calc(var(--pad-page) * 0.55);
+  /* üstte ince bir ayraç — dizgideki dipnot çizgisi */
+  border-top: 1px solid color-mix(in oklab, var(--ink) 26%, transparent);
+}
+
+.serh-note {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.6em;
+  padding: 0.5em 0.3em;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+.serh-note + .serh-note {
+  border-top: 1px solid var(--line-soft);
+}
+.serh-note:hover {
+  background-color: color-mix(in oklab, var(--accent) 6%, transparent);
+}
+/* numaraya dokununca hedef not kısa bir an parlar */
+.serh-note[data-flash] {
+  background-color: color-mix(in oklab, var(--accent) 15%, transparent);
+}
+
+.serh-note__n {
+  font-family: var(--font-ui);
+  font-weight: 800;
+  font-size: var(--fs-cmt-name);
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+  min-width: 1.4em;
+  text-align: end;
+}
+.serh-note__text {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.serh-note__head {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  flex-wrap: wrap;
+  font-family: var(--font-ui);
+  font-size: var(--fs-cmt-name);
+  color: var(--ink-soft);
+}
+.serh-note__dot {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: var(--radius-full);
+  background: var(--c, var(--accent));
+  color: #fff;
+  font-size: 0.85em;
+  line-height: 1;
+  flex: none;
+}
+.serh-note__name {
+  font-weight: 700;
+}
+.serh-note__pending {
+  padding: 0.05em 0.5em;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--warn) 18%, transparent);
+  color: var(--warn);
+  font-size: 0.72em;
+  font-style: normal;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+.serh-note__more {
+  padding: 0.05em 0.6em;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 0.82em;
+}
+.serh-note__quote {
+  font-family: var(--font-text);
+  font-style: italic;
+  font-size: var(--fs-cmt-quote);
+  color: var(--ink-faint);
+}
+.serh-note__body {
+  font-family: var(--font-text);
+  font-size: var(--fs-cmt);
+  line-height: 1.4;
+}
+.serh-note[data-pending="true"] .serh-note__n {
+  color: var(--warn);
+}

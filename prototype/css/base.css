@@ -1,0 +1,190 @@
+/* ============================================================================
+   BASE — sıfırlama, gövde, ikonlar, ortak yardımcı sınıflar
+   ========================================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: var(--ui-fs-base);
+  color: var(--ink);
+  background: var(--backdrop);
+  overflow: hidden; /* kaydırma tuvalin içinde olur */
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background var(--dur-slow) var(--ease-out);
+}
+
+/* masaüstünde arka plan sayı temasının dokusunu taşır */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      120% 80% at 50% -10%,
+      color-mix(in oklab, var(--accent) 22%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      90% 60% at 50% 110%,
+      color-mix(in oklab, var(--accent-3) 20%, transparent),
+      transparent 65%
+    ),
+    /* Derginin altındaki ışık havuzu. Zemin geniş ekranda dergiden kat kat
+       büyük; düz bir renk olarak bırakılırsa — özellikle karanlıkta — "boşluk"
+       değil "hata" gibi okunur. Havuz zemine masa hissi verir, dergiyi de
+       aydınlık bir noktaya oturtur. --on-backdrop iki temada da zemine göre
+       AÇIK renktir; ışık bu yüzden ondan türetilir. */
+      radial-gradient(
+        54% 62% at 50% 46%,
+        color-mix(in oklab, var(--on-backdrop) 14%, transparent),
+        transparent 72%
+      );
+  opacity: 0.5;
+  z-index: 0;
+}
+
+/* Eş okuma açıkken çevre tonlanır — tuval küçülüp geri çekilirken çevresi
+   kararır, dergi objesi öne çıkar (spotlight). Tuvalin ARKASINDA (z:0, #shell
+   z:1'in altında) olduğu için yalnızca çerçevenin DIŞINDA görünür: içerik opak,
+   hiç etkilenmez. "Renk değişimi çerçevenin dışında, içi aynı." */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: #000;
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+:root[data-comment-layer="on"] body::after {
+  opacity: 0.32;
+}
+
+img,
+svg,
+picture,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(a) {
+  color: var(--accent);
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: from-font;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* --- ikon çizim stili ------------------------------------------------------ */
+.icon {
+  width: 1.25em;
+  height: 1.25em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+
+/* --- yardımcılar ----------------------------------------------------------- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--ui-sp-3);
+  z-index: var(--z-toast);
+  padding: var(--ui-sp-2) var(--ui-sp-4);
+  background: var(--paper-raised);
+  color: var(--ink);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-2);
+  text-decoration: none;
+  transition: top var(--dur-base) var(--ease-out);
+}
+.skip-link:focus-visible {
+  top: var(--ui-sp-3);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.caps {
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  font-variant-numeric: tabular-nums;
+}
+
+/* İnce, kâğıt hissi veren doku — büyük yüzeylerde kullanılır */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'>\
+<filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/>\
+<feColorMatrix type='saturate' values='0'/></filter>\
+<rect width='120' height='120' filter='url(%23n)' opacity='0.35'/></svg>");
+}
+:root[data-theme="dark"] .grain::after {
+  mix-blend-mode: screen;
+  opacity: 0.22;
+}

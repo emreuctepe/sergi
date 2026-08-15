@@ -1,0 +1,748 @@
+/* ============================================================================
+   BLOCKS — dergi tipografisi ve bölüm şablonları
+   Bütün ölçüler `cqi` — yani 3:4 tuvalin genişliğine bağlı. Telefonda da
+   masaüstünde de aynı orantı.
+   ========================================================================= */
+
+.page__inner > .blk + .blk {
+  margin-top: var(--sp-3);
+}
+
+/* --------------------------------------------------------------------------
+   TAM KANAMA SAYFALARDA OKUNURLUK
+   Görselin üstündeki metin için alttan yukarı perde.
+   -------------------------------------------------------------------------- */
+.page--overlay .page__bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    color-mix(in oklab, #000 78%, transparent) 0%,
+    color-mix(in oklab, #000 42%, transparent) 34%,
+    transparent 68%
+  );
+}
+.page[data-kind="opener"] .page__bg::after,
+.page[data-kind="cover"] .page__bg::after {
+  background: linear-gradient(
+    to top,
+    color-mix(in oklab, #000 82%, transparent) 0%,
+    color-mix(in oklab, #000 30%, transparent) 46%,
+    color-mix(in oklab, #000 34%, transparent) 100%
+  );
+}
+.page--overlay .page__inner {
+  justify-content: flex-end;
+}
+.page[data-bleed="full"]:not([data-kind="manga"]) .page__inner {
+  padding: calc(var(--pad-page) * 1.2) var(--pad-page) calc(var(--pad-page) * 1.6);
+  margin-top: auto;
+}
+/* koyu olmayan sayfalarda arka plan çizimi metnin altında yumuşatılır */
+.page:not(.page--overlay) .page__bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    120% 70% at 50% 55%,
+    color-mix(in oklab, var(--paper) 82%, transparent),
+    color-mix(in oklab, var(--paper) 34%, transparent) 78%
+  );
+}
+
+.blk--invert {
+  color: #f7f2ea;
+}
+.blk--invert.caption,
+.blk--invert.kicker {
+  color: color-mix(in oklab, #f7f2ea 78%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   BAŞLIKLAR
+   -------------------------------------------------------------------------- */
+.kicker {
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: calc(var(--sp-2) * -0.4);
+}
+
+.h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  font-weight: 600;
+  text-wrap: balance;
+}
+.h1--big {
+  font-size: var(--fs-3xl);
+}
+
+.h2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  line-height: var(--lh-snug);
+  font-weight: 600;
+  text-wrap: balance;
+  margin-top: var(--sp-2);
+}
+
+.h3 {
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.lead {
+  font-family: var(--font-text);
+  font-size: var(--fs-md);
+  line-height: var(--lh-snug);
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+.blk--invert.lead {
+  color: color-mix(in oklab, #f7f2ea 88%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   GÖVDE METNİ
+   -------------------------------------------------------------------------- */
+.para {
+  font-family: var(--font-text);
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  hyphens: auto;
+  text-wrap: pretty;
+}
+.para + .para {
+  margin-top: var(--sp-2);
+}
+.para code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--paper-sunken);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+/* drop cap — derginin imzası */
+.para--drop::first-letter {
+  float: left;
+  font-family: var(--font-display);
+  font-size: calc(var(--fs-base) * 3.35);
+  line-height: 0.82;
+  padding: 0.06em 0.12em 0 0;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   VURGULAR
+   -------------------------------------------------------------------------- */
+.pull {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  line-height: var(--lh-snug);
+  font-style: italic;
+  color: var(--accent);
+  padding-left: var(--sp-3);
+  border-left: 2px solid var(--accent);
+  margin-block: var(--sp-3);
+  text-wrap: balance;
+}
+.pull--big {
+  font-size: var(--fs-xl);
+  border: 0;
+  padding: 0;
+  text-align: center;
+  font-style: normal;
+}
+.blk--invert.pull {
+  color: #fff;
+  border-color: color-mix(in oklab, #fff 60%, transparent);
+}
+
+.quote {
+  margin-block: var(--sp-3);
+  padding: var(--sp-3);
+  background: var(--paper-sunken);
+  border-radius: var(--radius-md);
+}
+.quote p {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  line-height: var(--lh-snug);
+  text-wrap: balance;
+}
+.quote p::before {
+  content: "“";
+  color: var(--accent);
+}
+.quote p::after {
+  content: "”";
+  color: var(--accent);
+}
+.quote cite {
+  display: block;
+  margin-top: var(--sp-2);
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  font-style: normal;
+  letter-spacing: var(--tracking-wide);
+  color: var(--ink-faint);
+}
+
+.note {
+  font-family: var(--font-ui);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-snug);
+  color: var(--ink-faint);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+}
+
+.caption {
+  font-family: var(--font-ui);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-snug);
+  color: var(--ink-faint);
+  letter-spacing: 0.01em;
+}
+
+.rule-wrap {
+  color: var(--accent);
+  opacity: 0.6;
+  margin-block: var(--sp-2);
+}
+.rule-wrap .rule {
+  width: 26cqi;
+  height: auto;
+}
+
+/* --------------------------------------------------------------------------
+   KÜNYE SATIRI
+   -------------------------------------------------------------------------- */
+.byline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-2);
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.byline__author {
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.blk--invert.byline,
+.blk--invert.byline .byline__author {
+  color: color-mix(in oklab, #f7f2ea 80%, transparent);
+}
+.byline__role::before,
+.byline__time::before {
+  content: "·";
+  margin-right: var(--sp-2);
+  opacity: 0.5;
+}
+
+/* --------------------------------------------------------------------------
+   İSTATİSTİK ŞERİDİ
+   -------------------------------------------------------------------------- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-2);
+  margin-block: var(--sp-3);
+}
+.stat {
+  padding: var(--sp-2);
+  background: var(--paper-sunken);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+.stat__v {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.stat__k {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* --------------------------------------------------------------------------
+   LİSTELER VE SÖZLÜK
+   -------------------------------------------------------------------------- */
+.list {
+  font-family: var(--font-text);
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  padding-left: var(--sp-4);
+  display: grid;
+  gap: var(--sp-2);
+}
+.list li::marker {
+  color: var(--accent);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 0.85em;
+}
+
+.dict {
+  display: grid;
+  gap: var(--sp-3);
+}
+.dict__row {
+  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--line);
+}
+.dict__row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.dict dt {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  color: var(--accent);
+  line-height: var(--lh-snug);
+}
+.dict dd {
+  margin: var(--sp-1) 0 0;
+  font-family: var(--font-text);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--ink-soft);
+}
+
+/* --------------------------------------------------------------------------
+   SÖYLEŞİ — iki ses
+   -------------------------------------------------------------------------- */
+.dialog {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--sp-2);
+  align-items: start;
+}
+.dialog + .dialog {
+  margin-top: var(--sp-3);
+}
+.dialog__who {
+  display: grid;
+  place-items: center;
+  width: 5.4cqi;
+  height: 5.4cqi;
+  border-radius: var(--radius-full);
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  font-weight: 800;
+  letter-spacing: 0;
+}
+.dialog--q .dialog__who {
+  background: var(--ink);
+  color: var(--paper);
+}
+.dialog--a .dialog__who {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.dialog__text {
+  font-family: var(--font-text);
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+}
+.dialog--q .dialog__text {
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink-soft);
+  padding-top: 0.35cqi;
+}
+
+/* --------------------------------------------------------------------------
+   MANGA — sağdan sola one-shot okuyucu
+   -------------------------------------------------------------------------- */
+.rtl-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, #fff 18%, transparent);
+  backdrop-filter: blur(6px);
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-wide);
+  color: #fff;
+  align-self: flex-start;
+}
+.rtl-hint__arrow {
+  font-size: var(--fs-sm);
+  animation: nudge-left 2.4s var(--ease-in-out) infinite;
+}
+@keyframes nudge-left {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-4px); }
+}
+
+.page[data-kind="manga"] {
+  background: var(--paper-sunken);
+  padding: calc(var(--pad-page) * 0.5);
+  justify-content: center;
+}
+.page[data-kind="manga"] .page__inner {
+  height: 100%;
+}
+
+.manga-page {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.manga {
+  flex: 1;
+  display: grid;
+  gap: 1.6cqi;
+  direction: rtl;
+}
+/* düzen varyantları — gerçek üründe içerikten gelir */
+.manga[data-layout="3-üst-1-alt"] {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr 1.25fr;
+}
+.manga[data-layout="3-üst-1-alt"] .manga-panel:nth-child(4) {
+  grid-column: 1 / -1;
+}
+.manga[data-layout="2-üst-2-alt"] {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+.manga[data-layout="1-buyuk-2-kucuk"] {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 1.5fr 1fr;
+}
+.manga[data-layout="1-buyuk-2-kucuk"] .manga-panel:nth-child(1) {
+  grid-column: 1 / -1;
+}
+
+.manga-panel {
+  position: relative;
+  overflow: hidden;
+  background: var(--paper-raised);
+  border: 2px solid var(--ink);
+  border-radius: 2px;
+  margin: 0;
+  direction: ltr;
+}
+.manga-panel__art {
+  position: absolute;
+  inset: 0;
+}
+.manga-panel__art svg {
+  width: 100%;
+  height: 100%;
+}
+.manga-bubble {
+  position: absolute;
+  top: 6%;
+  right: 6%;
+  max-width: 76%;
+  padding: 1.4cqi 2.2cqi;
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+  border-radius: 40% 40% 40% 40% / 46%;
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  line-height: 1.35;
+  text-align: center;
+  box-shadow: 2px 2px 0 color-mix(in oklab, var(--ink) 30%, transparent);
+}
+.manga-bubble--think {
+  border-radius: var(--radius-full);
+  border-style: dashed;
+}
+.manga-bubble--narrate {
+  border-radius: 2px;
+  top: auto;
+  bottom: 6%;
+  right: auto;
+  left: 6%;
+  text-align: right;
+  font-style: italic;
+  background: color-mix(in oklab, var(--paper-raised) 92%, var(--accent));
+}
+.manga-page__no {
+  align-self: center;
+  margin-top: 1.6cqi;
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  color: var(--ink-faint);
+  letter-spacing: var(--tracking-caps);
+}
+
+/* --------------------------------------------------------------------------
+   KAPAK
+   -------------------------------------------------------------------------- */
+.page[data-kind="cover"] .page__inner {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(var(--pad-page) * 1.4) var(--pad-page);
+  margin: 0;
+}
+.cover {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #fbf6ee;
+  text-align: center;
+}
+.cover__top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.cover__mark {
+  display: block;
+  width: 7cqi;
+  color: #fbf6ee;
+  opacity: 0.9;
+}
+.cover__mark svg {
+  width: 100%;
+  height: auto;
+}
+.cover__meta {
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.cover__mid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.cover__no {
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  letter-spacing: var(--tracking-caps);
+  opacity: 0.8;
+}
+.cover__title {
+  font-family: var(--font-display);
+  font-size: var(--fs-3xl);
+  line-height: 0.95;
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+  text-shadow: 0 2px 24px rgb(0 0 0 / 0.4);
+}
+.cover__sub {
+  font-family: var(--font-text);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+  opacity: 0.88;
+  max-width: 62cqi;
+  margin-inline: auto;
+  text-wrap: balance;
+}
+.cover__bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+.cover__chev {
+  font-size: var(--fs-md);
+  line-height: 0.6;
+  animation: bob 2.2s var(--ease-in-out) infinite;
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(4px); opacity: 1; }
+}
+
+/* ============================================================================
+   SAHNE KİTAPLIĞI
+   Sayfa görünür olunca `data-inview="true"` olur; animasyon oradan tetiklenir.
+   Yeni sahne eklemek = buraya bir seçici eklemek.
+   ========================================================================= */
+
+.page[data-scene]:not([data-scene="none"]) .blk {
+  will-change: transform, opacity;
+}
+
+/* fade-up — varsayılan, sıralı belirme */
+.page[data-scene="fade-up"] .blk,
+.page[data-scene="stagger"] .blk {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 55ms);
+}
+.page[data-scene="stagger"] .blk {
+  transition-delay: calc(var(--i, 0) * 110ms);
+}
+.page[data-inview="true"][data-scene="fade-up"] .blk,
+.page[data-inview="true"][data-scene="stagger"] .blk {
+  opacity: 1;
+  transform: none;
+}
+
+/* stagger listeleri de öğe öğe getirir */
+.page[data-scene="stagger"] .dict__row,
+.page[data-scene="stagger"] .list li {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
+  transition-delay: calc(220ms + var(--i, 0) * 90ms);
+}
+.page[data-inview="true"][data-scene="stagger"] .dict__row,
+.page[data-inview="true"][data-scene="stagger"] .list li {
+  opacity: 1;
+  transform: none;
+}
+
+/* parallax — arka plan metinden yavaş hareket eder */
+.page[data-scene="parallax"] .page__bg {
+  transform: scale(1.12) translateY(3%);
+  transition: transform 1.6s var(--ease-out);
+}
+.page[data-inview="true"][data-scene="parallax"] .page__bg {
+  transform: scale(1.04) translateY(0);
+}
+.page[data-scene="parallax"] .blk {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity var(--dur-scene) var(--ease-out),
+    transform var(--dur-scene) var(--ease-out);
+  transition-delay: calc(180ms + var(--i, 0) * 80ms);
+}
+.page[data-inview="true"][data-scene="parallax"] .blk {
+  opacity: 1;
+  transform: none;
+}
+
+/* mask-wipe — görsel aşağıdan açılır */
+.page[data-scene="mask-wipe"] .page__bg {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 1.1s var(--ease-out);
+}
+.page[data-inview="true"][data-scene="mask-wipe"] .page__bg {
+  clip-path: inset(0 0 0 0);
+}
+.page[data-scene="mask-wipe"] .blk {
+  opacity: 0;
+  transition: opacity var(--dur-scene) var(--ease-out);
+  transition-delay: calc(420ms + var(--i, 0) * 90ms);
+}
+.page[data-inview="true"][data-scene="mask-wipe"] .blk {
+  opacity: 1;
+}
+
+/* panel-reveal — manga panelleri okuma sırasına göre gelir */
+.page[data-scene="panel-reveal"] .manga-panel {
+  opacity: 0;
+  transform: scale(0.94);
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-spring);
+  transition-delay: calc(var(--i, 0) * 150ms);
+}
+.page[data-inview="true"][data-scene="panel-reveal"] .manga-panel {
+  opacity: 1;
+  transform: none;
+}
+
+/* signature — sayıya özel imza sahne (yaprak yağmuru + büyük söz) */
+.page[data-scene="signature"] .page__bg {
+  transform: scale(1.15) rotate(-1.5deg);
+  opacity: 0;
+  transition:
+    transform 2.4s var(--ease-out),
+    opacity 1.2s var(--ease-out);
+}
+.page[data-inview="true"][data-scene="signature"] .page__bg {
+  transform: scale(1) rotate(0deg);
+  opacity: 1;
+}
+.page[data-scene="signature"] .pull--big {
+  opacity: 0;
+  letter-spacing: 0.24em;
+  transition:
+    opacity 1.4s var(--ease-out),
+    letter-spacing 1.8s var(--ease-out);
+  transition-delay: 500ms;
+}
+.page[data-inview="true"][data-scene="signature"] .pull--big {
+  opacity: 1;
+  letter-spacing: var(--tracking-tight);
+}
+
+/* hareket kapalıysa: her şey sade belirmeye düşer, hiçbiri kaybolmaz */
+:root[data-motion="off"] .page .blk,
+:root[data-motion="off"] .page .manga-panel,
+:root[data-motion="off"] .page .dict__row,
+:root[data-motion="off"] .page .list li {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+:root[data-motion="off"] .page .page__bg {
+  clip-path: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .page .blk,
+  .page .manga-panel,
+  .page .dict__row,
+  .page .list li {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .page .page__bg {
+    clip-path: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .cover__chev,
+  .rtl-hint__arrow {
+    animation: none !important;
+  }
+}

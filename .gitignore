@@ -1,0 +1,8 @@
+# OS / editör
+.DS_Store
+Thumbs.db
+*.swp
+
+# Python (devserver.py çalışınca oluşabilir)
+__pycache__/
+*.pyc
