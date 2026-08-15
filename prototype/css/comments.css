@@ -972,8 +972,6 @@
   justify-content: flex-start;
   overflow: visible;
   padding-bottom: calc(var(--pad-page) * 2.4);
-  /* uzayınca fit:scroll gibi davransın: zorla-dur kalksın (Safari çekiştirmesi) */
-  scroll-snap-stop: normal;
 }
 
 .weave {
@@ -1095,7 +1093,6 @@
   justify-content: flex-start;
   overflow: visible;
   padding-bottom: calc(var(--pad-page) * 2.4);
-  scroll-snap-stop: normal;
 }
 
 /* --- metindeki üst-simge numara --- */

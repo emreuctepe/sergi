@@ -104,13 +104,7 @@
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  /* `proximity`, `mandatory` değil. mandatory tam 1 viewport sayfalar için
-     kusursuz ama viewport'tan UZUN sayfalarda (uzun makale ya da yorumla uzayan
-     sayfa) tarayıcılar çelişiyor: Chromium gevşetiyor, iOS Safari sıkı
-     çekiştiriyor — kaydırma "geri sıçrıyor". proximity yalnız sınıra yakınken
-     oturur: kısa sayfalar yine net snap yapar, uzun sayfalar serbest kaydırılır.
-     Net sayfa atlaması için ⌃⌄ düğmeleri + klavye zaten var. */
-  scroll-snap-type: y proximity;
+  scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
   overscroll-behavior-y: contain;
   scrollbar-width: none;
