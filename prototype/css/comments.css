@@ -587,638 +587,100 @@
   font-size: 28px;
 }
 
-/* ==========================================================================
-   FISILTI — alt bant konuşur (yorum sunumu, Yol B)
-   Gerekçe: docs/YORUM-SISTEMI.md §4. Mantığı: js/whisper.js.
-
-   Bütün yol tek blokta duruyor (bant taşmasıyla birlikte): B5'te kaybederse
-   silmek bir bölüm seçip silmek kadar olsun.
-
-   Sayfaya HİÇ dokunulmuyor — şerit letterbox alanında, bandın içinde yaşıyor.
-   Bant yukarı doğru büyür (`position: absolute; bottom: 0`), yani tuvalin
-   yüksekliği ve sayfaların akışı olduğu gibi kalır.
-   ========================================================================== */
-:root {
-  /* Şeridin ayırdığı yer. Sabit: ses değişince bant zıplamasın diye gövde
-     her zaman iki satır yer tutar (kısa yorumda bile). Gövde 1.5×'e çıkınca
-     iki satır ~82px'e geldi; rezervasyon buna göre. */
-  --whisper-h: 84px;
-}
-
-.band--bottom[data-whisper="on"] {
-  height: auto;
-  flex-wrap: wrap;
-  row-gap: 6px;
-  padding-block: 6px;
-}
-
-/* Telefonda tuval bilerek 3:4'ün ÜSTÜNDE uzatılmıştır (tam kanama görseller
-   için taşma payı, bkz. css/canvas.css). Şerit o paydan ödünç alır: tuval
-   tasarım ölçüsünün altına asla inmez, yani sayfanın kurgulanmış içeriği
-   kapanmaz. Pay bittiyse (basık ekran) şerit tuvalin üstüne biner — bu, bu
-   yolun gerçek bedeli ve olduğu gibi görünmesi gerekiyor.
-
-   Tuval dikeyde ORTALANIR: alttan bir şerit boyu yer açmak için boydan iki
-   şerit borç almak gerekir (yarısı üstte kalır, orası zaten zemin). */
-@media (max-width: 560px) and (max-aspect-ratio: 3 / 4) {
-  :root[data-whisper="on"] {
-    --canvas-h: max(
-      calc(var(--canvas-w) * 4 / 3),
-      calc(100svh - 2 * var(--ui-band-h) - 2 * var(--whisper-h))
-    );
-  }
-}
-
-.whisper {
-  order: -1; /* düğmelerin üstünde: önce ses, sonra gezinme */
-  flex: 0 0 100%;
-  min-height: var(--whisper-h);
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: 10px;
-  padding: 7px 10px;
-  border-radius: var(--radius-md);
-  /* Kendi yüzeyi var: bant geniş ekranda saydamdır, şerit ise tuvalin alt
-     kenarına değebilir. Yüzey olmadan yazı zemine karışıyordu. */
-  background: var(--paper-raised);
-  color: var(--ink);
-  border: 1px solid var(--line-soft);
-  box-shadow: var(--shadow-1);
-  text-align: start;
-  cursor: pointer;
-  transition: border-color var(--dur-fast) var(--ease-out);
-}
-.whisper:hover,
-.whisper:focus-visible {
-  border-color: color-mix(in oklab, var(--accent) 45%, var(--line-soft));
-}
-
-.whisper__dot {
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: var(--radius-full);
-  background: var(--c, var(--accent));
-  color: #fff;
-  font-size: 15px;
-  line-height: 1;
-  box-shadow: 0 1px 4px rgb(0 0 0 / 0.22);
-}
-
-.whisper__text {
-  min-width: 0;
-  display: grid;
-  gap: 1px;
-}
-
-.whisper__who {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  min-width: 0;
-  font-family: var(--font-ui);
-  font-size: var(--fs-cmt-name);
-  color: var(--ink-faint);
-  white-space: nowrap;
-}
-.whisper__who b {
-  color: var(--ink-soft);
-  font-weight: 700;
-  flex: none;
-}
-.whisper__where {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.whisper__pending {
-  flex: none;
-  padding: 1px 6px;
-  border-radius: var(--radius-full);
-  background: color-mix(in oklab, var(--warn) 18%, transparent);
-  color: var(--warn);
-  font-size: 9px;
-  font-style: normal;
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
-}
-
-/* Ses bir TEASER: iki satır okunur, gerisi bir dokunuş uzakta.
-   `min-height` iki satırı her zaman ayırır — tek satırlık bir yorumda bant
-   küçülüp büyümesin (telefonda bu tuvali yeniden ölçtürürdü). */
-.whisper__body {
-  font-family: var(--font-text);
-  font-size: var(--fs-cmt);
-  line-height: 1.34;
-  min-height: 2.68em;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Sessiz sayfa: yer ayrılmış, ses yok. */
-.whisper[data-quiet] {
-  cursor: default;
-  color: var(--ink-faint);
-}
-.whisper[data-quiet] .whisper__dot {
-  background: color-mix(in oklab, var(--ink) 12%, transparent);
-  box-shadow: none;
-}
-.whisper[data-quiet] .whisper__body {
-  font-style: italic;
-}
-
-.whisper__more {
-  flex: none;
-  padding: 3px 8px;
-  border-radius: var(--radius-full);
-  background: color-mix(in oklab, var(--accent) 12%, transparent);
-  color: var(--accent);
-  font-family: var(--font-ui);
-  font-size: var(--ui-fs-xs);
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
-.whisper__chev {
-  color: var(--ink-faint);
-  font-size: 18px;
-  line-height: 1;
-}
-
-/* Ses değişince şerit yeniden çizilir; yeni düğümler bu animasyonla gelir.
-   Sesin "geldiği" hissediliyor ama sayfa hiç oynamıyor. */
-.whisper__dot,
-.whisper__text {
-  animation: whisper-in var(--dur-base) var(--ease-out);
-}
-@keyframes whisper-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-}
-:root[data-motion="off"] .whisper__dot,
-:root[data-motion="off"] .whisper__text {
-  animation: none;
-}
-@media (prefers-reduced-motion: reduce) {
-  .whisper__dot,
-  .whisper__text {
-    animation: none;
-  }
-}
-
-/* Odaktaki blok hafifçe aydınlanır: sesin nereden geldiği belli olsun.
-   Halka (spread) metin kutusunun birkaç piksel dışına taşar — arka planı
-   boyamak yerine ışık düşürüyormuş gibi durur. */
-:root[data-comment-layer="on"] .page [data-block-id][data-whisper-focus="true"] {
-  background-color: color-mix(in oklab, var(--accent) 8%, transparent);
-  border-radius: var(--radius-sm);
-  box-shadow: 0 0 0 0.9cqi color-mix(in oklab, var(--accent) 8%, transparent);
-  transition:
-    background-color var(--dur-base) var(--ease-out),
-    box-shadow var(--dur-base) var(--ease-out);
-}
-[data-block-id][data-whisper-focus="true"]::before {
-  transform: scale(1.14);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent);
-}
-
-/* Çok dar ekran: şerit yine iki satır, ama sayaç ve ok yer kaplamasın. */
-@media (max-width: 359px) {
-  .whisper {
-    gap: 8px;
-    padding: 7px 8px;
-  }
-  .whisper__chev {
-    display: none;
-  }
-}
 
 /* ==========================================================================
-   KENAR — kenar rayı / dokuma (yorum sunumu, Yol A)
-   Gerekçe: docs/YORUM-SISTEMI.md §4. Mantığı: js/kenar.js.
-
-   İki biçim, ekrana göre js seçer:
-     data-kenar="rail"   → geniş ekran: kartlar TUVALİN DIŞINA, sağ boşluğa
-     data-kenar="weave"  → telefon: bloğun ardına inen şeritler, sayfa uzar
-   Kaybederse silmesi ucuz olsun diye tek blokta.
+   POPUP — üstte açılan yorum konuşma balonu (yorum sistemi 2.1)
+   Mantığı: js/popup.js. Overlay, fixed konumlu — sayfa düzenine dokunmaz.
    ========================================================================== */
-
-/* --- RAY (geniş, tuvalin dışında / letterbox gutter) --------------------- */
-
-/* Ray, tuvalin İÇİNDE değil sağındaki boşlukta yaşar: dergi objesi 3:4 ve tam
-   genişlikte kalır, metin daralmaz. #shell çocuğu olduğu için tuvalle birlikte
-   (dock kayması dâhil) kayar; konum ve genişliğini js ölçüp veriyor. Kartlar
-   tuvalle kaymadığından blok hizasını js kaydırmada tazeliyor. */
-.rail-gutter {
-  position: absolute;
-  left: 100%;
-  top: var(--rail-top, 0);
-  height: var(--rail-h, 100%);
-  width: var(--rail-w, 180px);
-  margin-inline-start: 14px;
-  z-index: var(--z-band, 40);
-  pointer-events: none; /* kartların kendisi tıklanır, boş boşluk değil */
-  display: none;
-}
-.rail-gutter[data-on="true"] {
-  display: block;
-}
-
-.rail-card {
-  position: absolute;
-  inset-inline: 0;
-  pointer-events: auto;
-  display: grid;
-  gap: 3px;
-  padding: 8px 10px;
+.cpop {
+  position: fixed;
+  z-index: var(--z-modal, 50);
+  width: min(320px, calc(100vw - 24px));
+  padding: 12px 14px;
   border-radius: var(--radius-md);
   background: var(--paper-raised);
   color: var(--ink);
   border: 1px solid var(--line-soft);
-  box-shadow: var(--shadow-1);
-  text-align: start;
-  cursor: pointer;
-  /* `top` GEÇİŞSİZ: kart bloğunu kaydırmada birebir takip etmeli; top'a geçiş
-     koyarsak her karede yeni konuma animasyonla gider, kaydırmanın gerisinde
-     kalır. Çakışma itmesi de anında olur — doğruluk şıklığın önünde. */
-  transition:
-    border-color var(--dur-fast) var(--ease-out),
-    box-shadow var(--dur-fast) var(--ease-out);
-  animation: rail-in var(--dur-base) var(--ease-out);
+  box-shadow: var(--shadow-3);
+  animation: cpop-in var(--dur-base) var(--ease-spring);
 }
-:root[data-motion="off"] .rail-card {
-  transition: none;
-  animation: none;
-}
-.rail-card:hover,
-.rail-card:focus-visible {
-  border-color: color-mix(in oklab, var(--accent) 45%, var(--line-soft));
-  box-shadow: var(--shadow-2);
-}
-@keyframes rail-in {
+@keyframes cpop-in {
   from {
     opacity: 0;
-    transform: translateX(6px);
+    transform: scale(0.94) translateY(4px);
   }
 }
-
-.rail-card__head {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-}
-.rail-card__dot {
+.cpop__x {
+  position: absolute;
+  top: 6px;
+  inset-inline-end: 8px;
+  width: 24px;
+  height: 24px;
   display: grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
   border-radius: var(--radius-full);
-  background: var(--c, var(--accent));
-  color: #fff;
-  font-size: 11px;
-  line-height: 1;
-  flex: none;
-}
-.rail-card__name {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-family: var(--font-ui);
-  font-size: var(--fs-cmt-name);
-  font-weight: 700;
-  color: var(--ink-soft);
-}
-.rail-card__pending {
-  flex: none;
-  padding: 1px 5px;
-  border-radius: var(--radius-full);
-  background: color-mix(in oklab, var(--warn) 18%, transparent);
-  color: var(--warn);
-  font-size: 9px;
-  font-style: normal;
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
-}
-.rail-card__quote {
-  font-family: var(--font-text);
-  font-style: italic;
-  font-size: var(--fs-cmt-quote);
   color: var(--ink-faint);
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  font-size: 13px;
 }
-.rail-card__body {
-  font-family: var(--font-text);
-  font-size: var(--fs-cmt);
-  line-height: 1.34;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.cpop__x:hover {
+  background: color-mix(in oklab, var(--ink) 8%, transparent);
 }
-.rail-card__more {
-  justify-self: start;
-  margin-top: 1px;
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-  background: color-mix(in oklab, var(--accent) 12%, transparent);
-  color: var(--accent);
-  font-family: var(--font-ui);
-  font-size: var(--ui-fs-xs);
-  font-weight: 800;
-}
-.rail-card[data-pending="true"] {
-  border-style: dashed;
-}
-
-/* Sığmayanları toplayan hap — rayın dibine yapışır. */
-.rail__more {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  pointer-events: auto;
-  padding: 7px 10px;
-  border-radius: var(--radius-full);
-  background: color-mix(in oklab, var(--ink) 6%, transparent);
-  border: 1px dashed var(--line);
-  color: var(--ink-soft);
-  font-family: var(--font-ui);
-  font-size: var(--ui-fs-xs);
-  font-weight: 700;
-  cursor: pointer;
-}
-.rail__more:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-/* --- DOKUMA (telefon) ---------------------------------------------------- */
-
-/* Yorumlu sayfa uzar: şeritler akışa girdiği için içerik tuvali aşabilir.
-   "Sığan sayfa" kimliği bu modda bilerek esner (bkz. §4 Yol A riski). */
-:root[data-kenar="weave"] .page[data-kenar-grow] {
-  height: auto;
-  min-height: 100%;
-  justify-content: flex-start;
-  overflow: visible;
-  padding-bottom: calc(var(--pad-page) * 2.4);
-}
-
-.weave {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+.cpop__head {
+  display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
-  margin-top: var(--sp-2);
-  padding: 6px 9px;
-  border-radius: var(--radius-md);
-  background: var(--paper-raised);
-  color: var(--ink);
-  border: 1px solid var(--line-soft);
-  border-inline-start: 2px solid color-mix(in oklab, var(--accent) 55%, var(--line-soft));
-  box-shadow: var(--shadow-1);
-  text-align: start;
-  cursor: pointer;
-  animation: weave-in var(--dur-base) var(--ease-out);
+  margin-bottom: 6px;
+  padding-inline-end: 20px;
 }
-:root[data-motion="off"] .weave {
-  animation: none;
-}
-@keyframes weave-in {
-  from {
-    opacity: 0;
-    transform: translateY(-3px);
-  }
-}
-/* Alt blok (li / dict satırı / manga paneli) içine düşen şerit: satırın altına
-   biraz nefes koy. */
-[data-sub] > .weave {
-  margin-top: 6px;
-}
-
-.weave__dot {
+.cpop__dot {
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   border-radius: var(--radius-full);
   background: var(--c, var(--accent));
   color: #fff;
-  font-size: 11px;
-  line-height: 1;
+  font-size: 13px;
   flex: none;
 }
-.weave__text {
-  min-width: 0;
-  display: grid;
-  gap: 1px;
-}
-.weave__quote {
-  font-family: var(--font-text);
-  font-style: italic;
-  font-size: var(--fs-cmt-quote);
-  color: var(--ink-faint);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-/* Kapalıyken gövde tek satır; dokununca üç satıra açılır ("yerinde açılır"). */
-.weave__body {
-  font-family: var(--font-text);
-  font-size: var(--fs-cmt);
-  line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.weave[data-open] {
-  grid-template-columns: auto minmax(0, 1fr) auto;
-}
-.weave[data-open] .weave__quote {
-  white-space: normal;
-}
-.weave[data-open] .weave__body {
-  white-space: normal;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-.weave[data-open] .weave__chev {
-  transform: rotate(90deg);
-}
-.weave__more {
-  flex: none;
-  padding: 2px 7px;
-  border-radius: var(--radius-full);
-  background: color-mix(in oklab, var(--accent) 12%, transparent);
-  color: var(--accent);
-  font-family: var(--font-ui);
-  font-size: var(--ui-fs-xs);
-  font-weight: 800;
-}
-.weave__chev {
-  color: var(--ink-faint);
-  font-size: 16px;
-  line-height: 1;
-  transition: transform var(--dur-fast) var(--ease-out);
-}
-.weave[data-pending="true"] {
-  border-inline-start-color: var(--warn);
-}
-
-/* ==========================================================================
-   ŞERH — dipnot / haşiye (yorum sunumu, Yol D)
-   Gerekçe: docs/YORUM-SISTEMI.md §4 Yol D. Mantığı: js/serh.js.
-
-   Yorum kitabın diziliş dilinin parçası: metinde üst-simge numara, sayfa
-   altında numaralı not. Her şey in-flow — sayfa notlar için uzar.
-   Kaybederse silmesi ucuz olsun diye tek blokta.
-   ========================================================================== */
-
-/* Sayfa notlar için uzar (dokuma gibi). "Sığan sayfa" bu modda esner. */
-:root[data-serh="on"] .page[data-serh-grow] {
-  height: auto;
-  min-height: 100%;
-  justify-content: flex-start;
-  overflow: visible;
-  padding-bottom: calc(var(--pad-page) * 2.4);
-}
-
-/* --- metindeki üst-simge numara --- */
-.serh-ref {
-  font-family: var(--font-ui);
-  font-weight: 800;
-  font-size: 0.62em;
-  color: var(--accent);
-  cursor: pointer;
-  padding-inline: 0.15em;
-  vertical-align: super;
-  line-height: 0;
-  transition: color var(--dur-fast) var(--ease-out);
-}
-.serh-ref::before {
-  content: "["; /* köşeli ayraç: dipnot işareti olduğu belli olsun */
-  opacity: 0.55;
-}
-.serh-ref::after {
-  content: "]";
-  opacity: 0.55;
-}
-.serh-ref:hover,
-.serh-ref:focus-visible {
-  color: color-mix(in oklab, var(--accent) 70%, var(--ink));
-  outline: none;
-  text-decoration: underline;
-}
-
-/* --- sayfa altı haşiye bloğu --- */
-.serh-notes {
-  display: block;
-  margin-top: calc(var(--pad-page) * 0.9);
-  padding-top: calc(var(--pad-page) * 0.55);
-  /* üstte ince bir ayraç — dizgideki dipnot çizgisi */
-  border-top: 1px solid color-mix(in oklab, var(--ink) 26%, transparent);
-}
-
-.serh-note {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.6em;
-  padding: 0.5em 0.3em;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background-color var(--dur-fast) var(--ease-out);
-}
-.serh-note + .serh-note {
-  border-top: 1px solid var(--line-soft);
-}
-.serh-note:hover {
-  background-color: color-mix(in oklab, var(--accent) 6%, transparent);
-}
-/* numaraya dokununca hedef not kısa bir an parlar */
-.serh-note[data-flash] {
-  background-color: color-mix(in oklab, var(--accent) 15%, transparent);
-}
-
-.serh-note__n {
-  font-family: var(--font-ui);
-  font-weight: 800;
-  font-size: var(--fs-cmt-name);
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-  line-height: 1.5;
-  min-width: 1.4em;
-  text-align: end;
-}
-.serh-note__text {
-  min-width: 0;
-  display: grid;
-  gap: 2px;
-}
-.serh-note__head {
-  display: flex;
-  align-items: center;
-  gap: 0.4em;
-  flex-wrap: wrap;
+.cpop__name {
   font-family: var(--font-ui);
   font-size: var(--fs-cmt-name);
+  font-weight: 700;
   color: var(--ink-soft);
 }
-.serh-note__dot {
-  display: inline-grid;
-  place-items: center;
-  width: 1.5em;
-  height: 1.5em;
-  border-radius: var(--radius-full);
-  background: var(--c, var(--accent));
-  color: #fff;
-  font-size: 0.85em;
-  line-height: 1;
-  flex: none;
+.cpop__time {
+  font-family: var(--font-ui);
+  font-size: var(--ui-fs-xs);
+  color: var(--ink-faint);
 }
-.serh-note__name {
-  font-weight: 700;
-}
-.serh-note__pending {
-  padding: 0.05em 0.5em;
-  border-radius: var(--radius-full);
-  background: color-mix(in oklab, var(--warn) 18%, transparent);
-  color: var(--warn);
-  font-size: 0.72em;
-  font-style: normal;
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
-}
-.serh-note__more {
-  padding: 0.05em 0.6em;
-  border-radius: var(--radius-full);
-  background: color-mix(in oklab, var(--accent) 12%, transparent);
-  color: var(--accent);
-  font-weight: 800;
-  font-size: 0.82em;
-}
-.serh-note__quote {
+.cpop__quote {
+  margin-bottom: 4px;
+  padding-inline-start: 8px;
+  border-inline-start: 2px solid color-mix(in oklab, var(--accent) 45%, transparent);
   font-family: var(--font-text);
   font-style: italic;
   font-size: var(--fs-cmt-quote);
   color: var(--ink-faint);
 }
-.serh-note__body {
+.cpop__body {
   font-family: var(--font-text);
   font-size: var(--fs-cmt);
   line-height: 1.4;
 }
-.serh-note[data-pending="true"] .serh-note__n {
-  color: var(--warn);
+.cpop__foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  font-family: var(--font-ui);
+  font-size: var(--ui-fs-xs);
+  color: var(--ink-faint);
+}
+.cpop__more {
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-weight: 800;
 }

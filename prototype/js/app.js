@@ -85,9 +85,6 @@
     MAG.canvas.init();
     MAG.overlays.init();
     MAG.comments.init();
-    MAG.whisper.init();
-    MAG.kenar.init();
-    MAG.serh.init();
     MAG.puzzles.init();
     wire();
 

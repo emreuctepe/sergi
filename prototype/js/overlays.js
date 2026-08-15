@@ -502,10 +502,6 @@
           dismiss();
           O.openLang();
         }),
-        row("Yorum sunumu", (COMMENT_UI[State.get("commentUI", "whisper")] || COMMENT_UI.whisper).name, function () {
-          dismiss();
-          O.openCommentUI();
-        }),
         toggleRow("Karanlık tema", document.documentElement.dataset.theme === "dark", function (on) {
           O.setTheme(on ? "dark" : "light");
         }),
@@ -667,65 +663,6 @@
       })
     );
     O.modal(body, { title: "Dil" });
-  };
-
-  /* ========================================================================
-     YORUM SUNUMU — sunum yolları aynı anda kodda durur, buradan değiştirilir
-     docs/YORUM-SISTEMI.md §4: karar ekrana bakarak verilecek, tarif okuyarak
-     değil. Sağlam olan bulunana kadar hepsi biriktiriliyor (prototip alanı).
-     ===================================================================== */
-
-  var COMMENT_UI = {
-    whisper: {
-      name: "Fısıltı",
-      note: "alt bant iki satıra açılır ve o an odaktaki bloğun sesini söyler",
-    },
-    rail: {
-      name: "Kenar",
-      note: "geniş ekranda derginin sağ boşluğunda ray, telefonda bloğun ardında dokuma",
-    },
-    serh: {
-      name: "Şerh",
-      note: "dipnot gibi: metinde üst-simge numara, sayfa altında numaralı not (haşiye)",
-    },
-    none: {
-      name: "Yok (temel)",
-      note: "yalnızca blok çentiği ve alıntı ısısı; dokun → panel açılır",
-    },
-  };
-
-  O.openCommentUI = function () {
-    var cur = State.get("commentUI", "whisper");
-    var body = el(
-      "div.langs",
-      null,
-      Object.keys(COMMENT_UI).map(function (id) {
-        var o = COMMENT_UI[id];
-        return el(
-          "button.lang",
-          {
-            type: "button",
-            disabled: !!o.soon,
-            "data-active": cur === id ? "true" : null,
-            onclick: function () {
-              State.set("commentUI", id);
-              O.closeTop();
-              refreshDock();
-              if (id !== "none" && !C.layerOn()) C.setLayer(true);
-            },
-          },
-          [el("b", { text: o.name }), el("span", { text: o.note })]
-        );
-      })
-    );
-    body.appendChild(
-      el("p.note", {
-        text:
-          "Aynı sayı, aynı yorumlar, farklı sunum. Fısıltı yalnızca eş okuma açıkken " +
-          "konuşur — katman kapalıyken okuma temiz kalır.",
-      })
-    );
-    O.modal(body, { title: "Yorum sunumu" });
   };
 
   /* ========================================================================

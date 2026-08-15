@@ -700,15 +700,15 @@
     var pin = e.target.closest(".pin");
     if (pin) {
       e.preventDefault();
-      return MAG.overlays.openThread({ ids: (pin.dataset.commentIds || "").split(",").filter(Boolean) });
+      return MAG.popup.open({ ids: (pin.dataset.commentIds || "").split(",").filter(Boolean) }, pin);
     }
     var badge = e.target.closest(".comment-badge");
     if (badge) {
       e.preventDefault();
-      return MAG.overlays.openThread({ pageId: badge.dataset.pageId, pageLevel: true });
+      return MAG.popup.open({ pageId: badge.dataset.pageId, pageLevel: true }, badge);
     }
 
-    /* --- YENİ: eş okuma açıkken bloğa dokunmak --- */
+    /* --- eş okuma açıkken bloğa dokunmak --- */
     if (!layerOn) return;
     if (e.target.closest("button, a, input, textarea, .puzzle")) return;
     var block = e.target.closest("[data-block-id]");
@@ -719,11 +719,7 @@
 
     var blockId = block.getAttribute("data-block-id");
     if (block.hasAttribute("data-comments")) {
-      /* Fısıltı açıksa ilk dokunuş sesi banda taşır, okumayı bölmez;
-         aynı bloğa ikinci dokunuş konuşmayı açar. Sunum kapalıysa eski
-         davranış: dokun → panel. */
-      if (MAG.whisper && MAG.whisper.focusBlock(blockId, pageEl.dataset.pageId)) return;
-      MAG.overlays.openThread({ blockId: blockId, pageId: pageEl.dataset.pageId });
+      MAG.popup.open({ blockId: blockId, pageId: pageEl.dataset.pageId }, block);
     } else {
       MAG.overlays.openComposer({
         pageId: pageEl.dataset.pageId,
@@ -736,11 +732,14 @@
 
   function openForMark(mark) {
     var pageEl = mark.closest(".page");
-    MAG.overlays.openThread({
-      blockId: mark.dataset.blockId || null,
-      quote: mark.dataset.quote,
-      pageId: pageEl ? pageEl.dataset.pageId : null,
-    });
+    MAG.popup.open(
+      {
+        blockId: mark.dataset.blockId || null,
+        quote: mark.dataset.quote,
+        pageId: pageEl ? pageEl.dataset.pageId : null,
+      },
+      mark
+    );
   }
 
   /* --- metin seçimi ------------------------------------------------------- */

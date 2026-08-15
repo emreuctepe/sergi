@@ -22,7 +22,6 @@
     theme: null, // null = sistem tercihi
     motion: null, // 'off' = animasyonlar kapalı
     dock: null, // 'off' = sade görünüm (masaüstünde menü kapalı); null = varsayılan (açık)
-    commentUI: "rail", // yorum sunumu: SEÇİLDİ → 'rail' (Kenar). Diğerleri hâlâ menüde: 'whisper' (fısıltı) | 'serh' | 'none'.
 
     /* --- ilerleme (reading_progress) --------------------------------------- */
     progress: {}, // { [issueSlug]: { pageId, index, updatedAt } }
