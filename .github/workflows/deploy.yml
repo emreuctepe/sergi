@@ -1,0 +1,35 @@
+name: Deploy prototype to Pages
+
+# Prototip `prototype/` klasöründe duruyor; GitHub Pages "branch" modu yalnızca
+# kök ya da /docs'tan yayınlayabildiği için siteyi buradan (Actions ile) basıyoruz.
+# Böylece repo düzeni bozulmadan prototype/ canlıya çıkar.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Actions sekmesinden elle de çalıştırılabilir
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Aynı anda tek dağıtım; yenisi gelirse eskisini iptal et
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: prototype # ← siteyi prototype/ klasöründen (index.html orada) basar
+      - id: deployment
+        uses: actions/deploy-pages@v4
