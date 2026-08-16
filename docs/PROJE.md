@@ -472,6 +472,9 @@ Her faz kendi başına çalışan bir şey teslim eder. Tarih baskısı yok; sı
 3. **Niş** henüz net değil — bölüm şablonları genel tutuluyor, netleşince nişe özel şablon eklenecek.
 4. **Marka adı** — kod içi ad `magazine`, tek yerden değiştirilebilir şekilde kurulacak.
 5. **Tanıtım ("about") sahnesi** her yeni ziyaretçiye mi, yoksa sadece ilk sayıda mı? (Öneri: cihazda bir kez, menüden tekrar izlenebilir.)
+6. **Sayfalama: elle mi, otomatik sayfalayıcı mı? (KARAR BEKLİYOR)** İçerik artık "her sayfa ≤ 1 ekran, temiz snap" ilkesine göre kurgulanıyor (uzun sayfa = kaydırınca okumadan atlama derdi). Uzun içeriği contain snap-sayfalara bölmenin iki yolu var:
+   - **Elle:** her uzun sayfayı data'da parçalara böl + yorum ankrajlarını taşı. Basit ama tekrarlı, token yoğun, ve "hangi ekrana sığar" derdi (en kısa telefona göre bölünür, masaüstünde boşluk kalır). *Prototipte Sözlük bölümü şimdilik elle bölündü.*
+   - **Otomatik sayfalayıcı (öneri):** render sırasında içerik viewport'a sığmıyorsa kendisi contain parçalara böler. Tek seferlik motor; her ekranda + gelecekteki her içerikte otomatik, minimum sayfa, elle bölme/ankraj derdi yok. Bedeli: yorum ankrajını "sayfa-bağımsız" (bloğa göre) yapmak için küçük bir refactor. **Gerçek ürünün içerik-derleyici modeli de zaten bu** — Faz 1'de derleyici bunu üstlenmeli. Kalan 7 uzun sayfaya (km-1/3/4/5, sy-1/2/3) geçmeden önce buna karar verilecek.
 
 ## 9. Bilinçli Olarak Kapsam Dışı
 

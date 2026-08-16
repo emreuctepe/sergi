@@ -694,8 +694,8 @@
           kind: "puzzle",
           blocks: [
             { t: "kicker", text: "Oyun" },
-            { t: "h1", text: "Bu ayın bulmacaları" },
-            { t: "lead", text: "İkisi senin için seçildi: biri editörden, biri senin oynadıklarına bakarak." },
+            { t: "h1", text: "Bu ayın bulmacası" },
+            { t: "lead", text: "Bu ayın bulmacası. Çöz, sonucunu okurlarla karşılaştır." },
             { t: "puzzleSlots" },
           ],
         },
@@ -710,6 +710,29 @@
       type: "outro",
       title: "Sayı sonu",
       pages: [
+        {
+          id: "son-kunye",
+          depth: ["all"],
+          fit: "contain",
+          scene: "fade-up",
+          bg: "scene:leaves",
+          blocks: [
+            { t: "kicker", text: "Künye" },
+            { t: "h2", text: "Bu sayıda emeği geçenler" },
+            { t: "rule" },
+            {
+              t: "list",
+              style: "dict",
+              items: [
+                { term: "Emre Üçtepe", def: "Editör · söyleşi — [@emreuctepe](https://example.com)" },
+                { term: "Deniz Kaya", def: "Foto-öykü: Gece Hattı — [@denizkaya](https://example.com)" },
+                { term: "Selin Aydın", def: "Kızıl Mevsim yazısı — [@selinaydin](https://example.com)" },
+                { term: "Mert Doğan", def: "One-shot: Son Tren — [@mertdogan](https://example.com)" },
+                { term: "Aslı Ün", def: "Sözlük · illüstrasyon — [@asliun](https://example.com)" },
+              ],
+            },
+          ],
+        },
         {
           id: "son-1",
           depth: ["all"],

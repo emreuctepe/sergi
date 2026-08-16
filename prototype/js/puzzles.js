@@ -768,23 +768,31 @@
     host.appendChild(card);
   };
 
-  /** Bulmaca yuvalarını basar. */
+  /** Sade bulmaca: her sayı 1 bulmaca, DOĞRUDAN AÇIK, rastgele seçilir (reels
+     gibi — seçmek yok). Prototipte sayfa yenilenince değişir; gerçek sayıda
+     herkese aynısı verilecek şekilde sabitlenebilir (sonra karar). */
   P.mount = function () {
     var host = U.$("#puzzle-slots");
     if (!host) return;
     U.clear(host);
 
-    if (!State.get("coldStartAnswer")) {
-      P.coldStart(host, function () {
-        P.mount();
-      });
-      return;
-    }
+    var pool = (D.issue.puzzlePool || []).length ? D.issue.puzzlePool : D.puzzles.map(function (p) { return p.id; });
+    var puzzle = D.puzzleById(pool[Math.floor(Math.random() * pool.length)]);
+    if (!puzzle) return;
 
-    var rec = P.recommend();
-    host.appendChild(slot(rec.editor.puzzle, "editor", rec));
-    host.appendChild(slot(rec.personal.puzzle, rec.personal.reason, rec));
-    host.appendChild(archiveLink());
+    var body = el("div.pslot__body");
+    var wrap = el("article.pslot.pslot--solo", null, [
+      el("header.pslot__head", null, [
+        el("span.pslot__icon", { text: puzzle.icon }),
+        el("div.pslot__meta", null, [
+          el("h3.pslot__title", { text: puzzle.name }),
+          el("p.pslot__blurb", { text: puzzle.blurb }),
+        ]),
+      ]),
+      body,
+    ]);
+    host.appendChild(wrap);
+    openPuzzle(puzzle, body, wrap); /* kart/CTA yok — bulmaca direkt oynanır */
   };
 
   var REASON = {
