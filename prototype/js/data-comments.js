@@ -663,25 +663,25 @@
     ["orumcek", "Tanımın ikinci cümlesi tanımdan iyi.", { "❤️": 19 }, 21],
     ["yelkovan", "“Arasındaki iş” ifadesi çok hoşuma gitti.", { "👍": 12 }, 20],
   ]);
-  on("sz-3:0.0", "Yürümek değil, sadece ormanda bulunmak.", [
+  on("sz-2:0.2", "Yürümek değil, sadece ormanda bulunmak.", [
     ["kaplumbaga", "Yürüyünce spor oluyor, durunca orman oluyor. Fark bu.", { "❤️": 23, "💯": 6 }, 19],
   ]);
-  on("sz-3:0.1", "Sisin ardındaki dağ.", [
+  on("sz-2:0.3", "Sisin ardındaki dağ.", [
     ["kelebek", "Yūgen'i beş kelimeyle anlatmışsınız, geri kalanı okumaya gerek yok.", { "❤️": 27 }, 18],
     ["kertenkele", "Sis kalkınca yūgen bitiyor mu peki?", { "😄": 15 }, 17],
     ["balik", "Bitmiyor, yer değiştiriyor.", { "❤️": 22 }, 16, 1],
   ]);
-  on("sz-4:0.0", "Kusurun, eskimenin ve eksikliğin içindeki güzellik.", [
+  on("sz-2:0.4", "Kusurun, eskimenin ve eksikliğin içindeki güzellik.", [
     ["ari", "Bu kelimeyi herkes biliyor ama tanımı hep yanlış hatırlıyor.", { "💯": 18 }, 15],
     ["sincap", "Kırık bir fincanı attıktan sonra bunu okudum, üzüldüm.", { "😄": 29, "❤️": 11 }, 14],
     ["guvercin", "Altın yapıştırıcıyla tamir etmek de bunun bir parçası değil mi?", { "👀": 13 }, 13],
   ]);
 
-  on("sz-5:1", "pahalıya çevirmektir", [
+  on("sz-3:1", "pahalıya çevirmektir", [
     ["yelkovan", "Çevirmen olarak: bu cümleyi çerçeveletip masaya koyacağım.", { "❤️": 34, "💯": 15 }, 12],
     ["karga", "Yine de bazı şeyler gerçekten çevrilemiyor. Hepsi fiyat meselesi değil.", { "🤔": 12 }, 11],
   ]);
-  on("sz-5:2", "Çevrilemez diye bir şey yok.", [
+  on("sz-3:2", "Çevrilemez diye bir şey yok.", [
     ["nilufer", "İddialı ama katılıyorum.", { "❤️": 22 }, 10],
     ["kurbaga", "Şiir çevirisi yapmış biri olarak: katılmıyorum ama tartışmayı seviyorum.", { "🤔": 19, "😄": 5 }, 9],
     ["ayi", "İkiniz de haklısınız, mesele neyi kaybetmeye razı olduğun.", { "💯": 24 }, 8],

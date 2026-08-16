@@ -635,7 +635,7 @@
             { t: "kicker", text: "Sözlük" },
             { t: "h1", text: "Bu ayın beş kelimesi" },
             { t: "rule" },
-            { t: "lead", text: "Beş kelime, beş sayfa. Her biri tek kelimeyle söylenip cümlelerle çevrilen." },
+            { t: "lead", text: "Tek kelimeyle söylenip cümlelerle çevrilen beşli." },
           ],
         },
         {
@@ -650,43 +650,15 @@
               items: [
                 { term: "Mono no aware", def: "Şeylerin geçiciliğinden doğan tatlı hüzün. Yaprağın döküleceğini bilerek ona bakmak." },
                 { term: "Komorebi", def: "Yaprakların arasından süzülen ışık. Işığın kendisi değil, yaprakla arasındaki iş." },
-              ],
-            },
-          ],
-        },
-        {
-          id: "sz-3",
-          depth: ["all"],
-          fit: "contain",
-          scene: "fade-up",
-          blocks: [
-            {
-              t: "list",
-              style: "dict",
-              items: [
                 { term: "Shinrin-yoku", def: "Orman banyosu. Yürümek değil, sadece ormanda bulunmak." },
                 { term: "Yūgen", def: "Anlatılamayacak kadar derin olanın verdiği his. Sisin ardındaki dağ." },
-              ],
-            },
-          ],
-        },
-        {
-          id: "sz-4",
-          depth: ["all"],
-          fit: "contain",
-          scene: "fade-up",
-          blocks: [
-            {
-              t: "list",
-              style: "dict",
-              items: [
                 { term: "Wabi-sabi", def: "Kusurun, eskimenin ve eksikliğin içindeki güzellik." },
               ],
             },
           ],
         },
         {
-          id: "sz-5",
+          id: "sz-3",
           depth: ["mid", "full"],
           fit: "contain",
           scene: "fade-up",
