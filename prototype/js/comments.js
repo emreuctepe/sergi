@@ -507,7 +507,10 @@
       migrateLegacy(p.el, c);
       c._degraded = false;
       var pos = null;
-      if (c.anchorType === "point" && c.anchor) {
+      if (c._pinXY) {
+        /* okur baloncuğu elle taşımış — o konum her şeyin önünde. */
+        pos = { x: c._pinXY.x, y: c._pinXY.y };
+      } else if (c.anchorType === "point" && c.anchor) {
         pos = { x: c.anchor.x, y: c.anchor.y };
       } else if (c.anchorType === "block") {
         var node = U.$('[data-block-id="' + C.blockIdOf(c) + '"]', p.el);
@@ -536,7 +539,11 @@
     return el(
       "button.pin",
       {
-        style: { "--x": (group.x * 100).toFixed(2) + "%", "--y": (group.y * 100).toFixed(2) + "%" },
+        style: {
+          "--x": (group.x * 100).toFixed(2) + "%",
+          "--y": (group.y * 100).toFixed(2) + "%",
+          "--sway-delay": (-(Math.random() * 3.4)).toFixed(2) + "s",
+        },
         "data-comment-ids": group.items
           .map(function (c) {
             return c.id;
@@ -614,11 +621,15 @@
 
   var pressTimer = null;
   var pressStart = null;
+  var drag = null;
+  var suppressClick = false;
 
   C.init = function () {
     var pagesEl = U.$("#pages");
 
     pagesEl.addEventListener("click", onPagesClick);
+    /* baloncuğu basılı tutup sürükleme — kendi konumunda "yüzer" */
+    pagesEl.addEventListener("pointerdown", onPinDown);
 
     pagesEl.addEventListener("keydown", function (e) {
       if (e.key !== "Enter" && e.key !== " ") return;
@@ -671,10 +682,61 @@
 
   function onPagesClick(e) {
     /* Artik tek dokunma hedefi: baloncuk (pin). Dokun -> ustte pop-up. */
+    if (suppressClick) return; /* az önce sürüklendi, tıklama sayılmasın */
     var pin = e.target.closest(".pin");
     if (pin) {
       e.preventDefault();
       MAG.popup.open({ ids: (pin.dataset.commentIds || "").split(",").filter(Boolean) }, pin);
+    }
+  }
+
+  /* --- baloncuğu sürükle: kendi yerinde yüzer, okur konumunu oynatabilir ----
+     Dokun = pop-up açar; basılı tutup kaydır = taşır. Eşik geçilene kadar
+     tıklama iptal edilmez, yani kısa dokunuşlar bozulmaz. */
+  function onPinDown(e) {
+    if (e.button != null && e.button !== 0) return;
+    var pin = e.target.closest(".pin");
+    if (!pin || pin.classList.contains("pin--ghost")) return;
+    var pageEl = pin.closest(".page");
+    if (!pageEl) return;
+    drag = { pin: pin, pageEl: pageEl, startX: e.clientX, startY: e.clientY, moved: false, id: e.pointerId };
+    window.addEventListener("pointermove", onPinMove);
+    window.addEventListener("pointerup", onPinUp);
+    window.addEventListener("pointercancel", onPinUp);
+  }
+
+  function onPinMove(e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    if (!drag.moved && Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) < 6) return;
+    if (!drag.moved) {
+      drag.moved = true;
+      drag.pin.classList.add("pin--dragging");
+      try { drag.pin.setPointerCapture(drag.id); } catch (_) {}
+    }
+    e.preventDefault();
+    var n = MAG.canvas.toNormalized(e.clientX, e.clientY, drag.pageEl);
+    n = { x: U.clamp(n.x, 0.03, 0.97), y: U.clamp(n.y, 0.03, 0.97) };
+    drag.pin.style.setProperty("--x", (n.x * 100).toFixed(2) + "%");
+    drag.pin.style.setProperty("--y", (n.y * 100).toFixed(2) + "%");
+    drag.last = n;
+  }
+
+  function onPinUp() {
+    window.removeEventListener("pointermove", onPinMove);
+    window.removeEventListener("pointerup", onPinUp);
+    window.removeEventListener("pointercancel", onPinUp);
+    if (!drag) return;
+    var d = drag;
+    drag = null;
+    d.pin.classList.remove("pin--dragging");
+    if (d.moved && d.last) {
+      /* yeni konumu her yoruma yaz: yeniden çizimde de yerinde kalsın. */
+      (d.pin.dataset.commentIds || "").split(",").filter(Boolean).forEach(function (id) {
+        var c = C.byId(id);
+        if (c) c._pinXY = { x: d.last.x, y: d.last.y };
+      });
+      suppressClick = true;
+      setTimeout(function () { suppressClick = false; }, 0);
     }
   }
 

@@ -236,23 +236,23 @@
   var DEPTHS = [
     {
       id: "min",
-      name: "En az",
-      line: "Sadece özü. Bir kahve molası.",
-      bars: 1,
+      name: "Doomscroller",
+      icon: "🫠",
+      line: "Sosyal medya kullanmaktan beyni sıvı olanlar için.",
       detail: "Uzun yazılar madde madde, foto-öykü kısaltılmış, manga ve bulmaca yerinde.",
     },
     {
       id: "mid",
-      name: "Orta",
-      line: "Dengeli. Çoğu okur burada.",
-      bars: 2,
+      name: "Dengeli",
+      icon: "⚖️",
+      line: "Çoğu okur burada.",
       detail: "Yazıların tam gövdesi, galerinin çoğu, söyleşinin ana bölümü.",
     },
     {
       id: "full",
-      name: "Klasik",
-      line: "Her şey. Uzun uzun.",
-      bars: 3,
+      name: "Doomreader",
+      icon: "🧠",
+      line: "Hâlâ uzun metin okuyabilen üst insanlar için.",
       detail: "Ek bölümler, derinlemesine kutular, tüm fotoğraflar, tüm söyleşi.",
     },
   ];
@@ -284,7 +284,7 @@
             },
           },
           [
-            el("span.depth-card__bars", { "data-n": d.bars }, [el("i"), el("i"), el("i")]),
+            el("span.depth-card__icon", { text: d.icon }),
             el("span.depth-card__main", null, [
               el("b", { text: d.name }),
               el("span.depth-card__line", { text: d.line }),
@@ -307,7 +307,9 @@
       })[0].name;
       O.closeTop();
       MAG.render.renderFlow({ keepPageId: keep ? keep.id : null });
-      if (opts.switching) O.toast("Okuma modu: " + id.toUpperCase());
+      if (opts.switching) {
+        O.toast("Okuma modu: " + DEPTHS.filter(function (d) { return d.id === id; })[0].name);
+      }
       if (opts.onDone) opts.onDone(id);
     }
 

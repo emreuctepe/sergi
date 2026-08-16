@@ -112,6 +112,10 @@
   --shadow-2: 0 4px 12px rgb(27 22 19 / 0.1), 0 12px 32px rgb(27 22 19 / 0.09);
   --shadow-3: 0 8px 24px rgb(27 22 19 / 0.14), 0 32px 64px rgb(27 22 19 / 0.16);
   --scrim: rgb(20 16 13 / 0.55);
+  /* Yüzen yüzeylerin (modal, panel, popup) kenar halkası. --ink'e bağlı olduğu
+     için temaya uyar: karanlıkta açık bir çizgi, aydınlıkta koyu bir çizgi —
+     yüzey koyu zeminde eriyip arka planla karışmasın diye. */
+  --edge: inset 0 0 0 1px color-mix(in oklab, var(--ink) 16%, transparent);
 
   /* --- sayı teması: varsayılan (tema yüklenmezse) ------------------------- */
   --accent: #b8432c;

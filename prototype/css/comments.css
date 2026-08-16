@@ -144,9 +144,15 @@
   place-items: center;
   opacity: 0;
   scale: 0.6;
+  cursor: grab;
+  touch-action: none; /* dikey sürükleme sayfayı kaydırmasın, pini taşısın */
   transition:
     opacity var(--dur-base) var(--ease-out),
     scale var(--dur-base) var(--ease-spring);
+}
+.pin--dragging {
+  cursor: grabbing;
+  z-index: 20;
 }
 :root[data-comment-layer="on"] .pin {
   opacity: 1;
@@ -171,10 +177,25 @@
   box-shadow:
     0 0 0 2.5px var(--paper),
     0 3px 10px rgb(0 0 0 / 0.28);
-  animation: pin-in var(--dur-base) var(--ease-spring);
+  /* idle salınım — baloncuk yerinde hafifçe yüzer. Her pin farklı gecikmeyle
+     başlar (--sway-delay) ki hepsi aynı anda sallanmasın. */
+  animation: pin-sway 3.4s var(--ease-in-out) infinite;
+  animation-delay: var(--sway-delay, 0s);
 }
-@keyframes pin-in {
-  from { transform: scale(0.4); }
+@keyframes pin-sway {
+  0%, 100% { transform: translateY(0.5cqi) rotate(-1.6deg); }
+  50%      { transform: translateY(-1.1cqi) rotate(1.6deg); }
+}
+/* sürüklenirken: salınım dursun, biraz büyüsün, gölge kalksın */
+.pin--dragging .pin__dot {
+  animation: none;
+  transform: scale(1.16);
+  box-shadow:
+    0 0 0 2.5px var(--paper),
+    0 8px 22px rgb(0 0 0 / 0.42);
+}
+:root[data-motion="off"] .pin__dot {
+  animation: none;
 }
 
 .pin__n {
@@ -592,8 +613,7 @@
   border-radius: var(--radius-md);
   background: var(--paper-raised);
   color: var(--ink);
-  border: 1px solid var(--line-soft);
-  box-shadow: var(--shadow-3);
+  box-shadow: var(--shadow-3), var(--edge);
   animation: cpop-in var(--dur-base) var(--ease-spring);
   overflow: hidden;
 }

@@ -24,7 +24,7 @@
   z-index: var(--z-modal);
   background: var(--paper-raised);
   color: var(--ink);
-  box-shadow: var(--shadow-3);
+  box-shadow: var(--shadow-3), var(--edge);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -191,7 +191,7 @@
   overscroll-behavior: contain;
   background: var(--paper-raised);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-3);
+  box-shadow: var(--shadow-3), var(--edge);
   opacity: 0;
   transform: translateY(16px) scale(0.98);
   transition:
@@ -441,31 +441,15 @@
   border-color: var(--accent);
   background: color-mix(in oklab, var(--accent) 8%, transparent);
 }
-.depth-card__bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  height: 26px;
-}
-.depth-card__bars i {
-  width: 5px;
-  border-radius: 3px;
-  background: var(--accent);
-  opacity: 0.22;
-}
-.depth-card__bars i:nth-child(1) {
-  height: 11px;
-}
-.depth-card__bars i:nth-child(2) {
-  height: 18px;
-}
-.depth-card__bars i:nth-child(3) {
-  height: 26px;
-}
-.depth-card__bars[data-n="1"] i:nth-child(1),
-.depth-card__bars[data-n="2"] i:nth-child(-n + 2),
-.depth-card__bars[data-n="3"] i {
-  opacity: 1;
+.depth-card__icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  font-size: 26px;
+  line-height: 1;
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--accent) 9%, transparent);
 }
 .depth-card__main {
   display: grid;

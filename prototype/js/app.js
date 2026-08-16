@@ -9,7 +9,7 @@
   var D = MAG.data;
   var State = MAG.state;
 
-  var DEPTH_LABEL = { min: "En az", mid: "Orta", full: "Klasik" };
+  var DEPTH_LABEL = { min: "Doomscroller", mid: "Dengeli", full: "Doomreader" };
 
   function applyPreferences() {
     var root = document.documentElement;
@@ -39,7 +39,7 @@
     /* okuma modu etiketi her değişimde tazelensin */
     U.listen("state:change", function (e) {
       if (e.detail.path === "depth") {
-        U.$("#depth-label").textContent = DEPTH_LABEL[e.detail.value] || "Orta";
+        U.$("#depth-label").textContent = DEPTH_LABEL[e.detail.value] || "Dengeli";
       }
     });
 
