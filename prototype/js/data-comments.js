@@ -647,41 +647,41 @@
   on("sz-1:1", null, [
     ["ayi", "Bu bölüm her sayıda olsun. En sevdiğim kısım.", { "❤️": 24 }, 30],
   ]);
-  on("sz-1:3.0", "Yaprağın döküleceğini bilerek ona bakmak.", [
+  on("sz-2:0.0", "Yaprağın döküleceğini bilerek ona bakmak.", [
     ["yildiz", "Mono no aware'ı bundan iyi anlatan bir tanım okumadım.", { "❤️": 29, "💯": 8 }, 29],
     ["balina", "Bu tanım bütün sayının konusu aslında.", { "❤️": 17 }, 28],
     ["karga", "Biraz fazla romantize ediliyor bu kelime, Japonca'da bu kadar ağır değil.", { "🤔": 14 }, 27],
     ["ayi", "Ağır değil ama sık kullanılıyor, o yüzden ağırlaşmış olabilir.", { "💯": 11 }, 26, 2],
   ]);
-  on("sz-1:3.1", "Yaprakların arasından süzülen ışık", [
+  on("sz-2:0.1", "Yaprakların arasından süzülen ışık", [
     ["balina", "Komorebi için Türkçede tek kelime bulmaya çalışıyorum, olmuyor.", { "❤️": 21 }, 25],
     ["tilki", "“Yaprak ışığı” desek? Kısa değil ama yakın.", { "👍": 14 }, 24, 0],
     ["kurbaga", "“Gölge kırıntısı” diyen birini duymuştum, o da güzeldi.", { "❤️": 18 }, 23],
     ["horoz", "Bizim köyde buna “alaca” derlerdi. Tam değil ama yakın.", { "🤯": 26, "❤️": 9 }, 22],
   ]);
-  on("sz-1:3.1", "Işığın kendisi değil, yaprakla arasındaki iş.", [
+  on("sz-2:0.1", "Işığın kendisi değil, yaprakla arasındaki iş.", [
     ["orumcek", "Tanımın ikinci cümlesi tanımdan iyi.", { "❤️": 19 }, 21],
     ["yelkovan", "“Arasındaki iş” ifadesi çok hoşuma gitti.", { "👍": 12 }, 20],
   ]);
-  on("sz-1:3.2", "Yürümek değil, sadece ormanda bulunmak.", [
+  on("sz-3:0.0", "Yürümek değil, sadece ormanda bulunmak.", [
     ["kaplumbaga", "Yürüyünce spor oluyor, durunca orman oluyor. Fark bu.", { "❤️": 23, "💯": 6 }, 19],
   ]);
-  on("sz-1:3.3", "Sisin ardındaki dağ.", [
+  on("sz-3:0.1", "Sisin ardındaki dağ.", [
     ["kelebek", "Yūgen'i beş kelimeyle anlatmışsınız, geri kalanı okumaya gerek yok.", { "❤️": 27 }, 18],
     ["kertenkele", "Sis kalkınca yūgen bitiyor mu peki?", { "😄": 15 }, 17],
     ["balik", "Bitmiyor, yer değiştiriyor.", { "❤️": 22 }, 16, 1],
   ]);
-  on("sz-1:3.4", "Kusurun, eskimenin ve eksikliğin içindeki güzellik.", [
+  on("sz-4:0.0", "Kusurun, eskimenin ve eksikliğin içindeki güzellik.", [
     ["ari", "Bu kelimeyi herkes biliyor ama tanımı hep yanlış hatırlıyor.", { "💯": 18 }, 15],
     ["sincap", "Kırık bir fincanı attıktan sonra bunu okudum, üzüldüm.", { "😄": 29, "❤️": 11 }, 14],
     ["guvercin", "Altın yapıştırıcıyla tamir etmek de bunun bir parçası değil mi?", { "👀": 13 }, 13],
   ]);
 
-  on("sz-2:1", "pahalıya çevirmektir", [
+  on("sz-5:1", "pahalıya çevirmektir", [
     ["yelkovan", "Çevirmen olarak: bu cümleyi çerçeveletip masaya koyacağım.", { "❤️": 34, "💯": 15 }, 12],
     ["karga", "Yine de bazı şeyler gerçekten çevrilemiyor. Hepsi fiyat meselesi değil.", { "🤔": 12 }, 11],
   ]);
-  on("sz-2:2", "Çevrilemez diye bir şey yok.", [
+  on("sz-5:2", "Çevrilemez diye bir şey yok.", [
     ["nilufer", "İddialı ama katılıyorum.", { "❤️": 22 }, 10],
     ["kurbaga", "Şiir çevirisi yapmış biri olarak: katılmıyorum ama tartışmayı seviyorum.", { "🤔": 19, "😄": 5 }, 9],
     ["ayi", "İkiniz de haklısınız, mesele neyi kaybetmeye razı olduğun.", { "💯": 24 }, 8],
