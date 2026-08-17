@@ -6,17 +6,18 @@
 
 ## Nerede kaldık?
 
-- **⚠️ İLK İŞ (kullanıcı) — ELE ALINDI, TELEFONDA TEYİT BEKLİYOR:** Kaydırma/scroll çakışması.
-  **Kök neden:** `scroll-snap-type: y mandatory` + viewport'tan uzun sayfalar (uzun makale ya da
-  dokuma/şerh ile uzayan sayfa). Chromium gevşetiyor (önizlemede sorun görünmüyor), **iOS Safari
-  sıkı çekiştiriyor** → gerçek telefonda çakışma. **Çözüm uygulandı:** (1) snap `mandatory` →
-  `proximity` (`css/canvas.css`); (2) uzayan sayfalarda `snap-stop: always` → `normal`
-  (`css/comments.css` dokuma+şerh grow). Kısa sayfalar hâlâ net snap. **Sıradaki:** kullanıcı
-  gerçek telefonda dener. Yetmezse yedek: koşullu snap (JS mandatory↔none) ya da içeriği ≤1
-  viewport parçalara bölme (derleyici işi).
-- **Aktif adım:** B5 **KARAR VERİLDİ → KENAR.** Kullanıcı Fısıltı/Şerh/Uğultu/Mektuplar arasından **Kenar**'ı seçti. Varsayılan `commentUI = "rail"`. Diğer yollar şimdilik menüde kalıyor (silme onaya bağlı). Sırada Kenar'ı sağlamlaştırmak.
-- **Son tamamlanan:** B5 kararı — Kenar. (Öncesi: B4.2 Şerh + yorum yazısı 1.5×.)
-- **Sonraki dosya:** Kenar cilası — masaüstü dock↔ray boşluk gerilimi ([`YORUM-SISTEMI.md`](YORUM-SISTEMI.md) §4 v2)
+- **Yorum sistemi 2.x — SADELEŞTİRİLDİ:** Fısıltı/Kenar/Şerh üç deneyi budandı; tek model kaldı:
+  her yorum bir **baloncuk (pin)**, dokununca üstte **pop-up** (tüm yorumlar kaydırmalı). Metin/paragraf
+  highlight'ları tamamen kalktı. Baloncuklar idle'da hafif **salınıyor** ve basılı tutup **sürüklenebiliyor**
+  (konum yoruma yazılır, yeniden çizimde kalır). Eş okuma kapalıyken pinler gizli.
+- **Son tamamlananlar:** (1) Rötuşlar — modal/panel/popup kontrast halkası (`--edge`), yüzen/sürüklenebilir
+  baloncuklar, okuma modu isimleri **Doomscroller 🫠 / Dengeli ⚖️ / Doomreader 🧠**. (2) **Analitik paneli**
+  (editör-only, sahte veri): `js/data-analytics.js` + `js/analytics.js` + `css/analytics.css`. Türev+olay
+  ayrımı etiketli, **tam agregasyon** (kişi-bazlı iz yok), yasal not. Menü > "Analitik" veya `#analitik`.
+- **Sayfalama kararı:** Otomatik sayfalayıcı prototipte görünmez → **asıl build'e ertelendi** ([`PROJE.md`](PROJE.md) §8).
+  Prototipte sadece Sözlük 3 `fit:contain` sayfaya bölündü (örnek).
+- **SIRADA (kullanıcı):** Gerçek içerikle 1. sayıyı döşemek (yazı/manga/röportaj/görseller tek tek gelecek),
+  uçtan uca test, sonra **asıl build** (SvelteKit mimarisi).
 - **Not:** Prototip saf HTML/CSS/JS, derleme adımı yok. `prototype/index.html` çift
   tıklanarak açılabilir (klasik `<script>` etiketleri, ES modül yok — `file://` uyumlu).
 

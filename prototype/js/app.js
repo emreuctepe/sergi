@@ -86,6 +86,7 @@
     MAG.overlays.init();
     MAG.comments.init();
     MAG.puzzles.init();
+    MAG.analytics.init();
     wire();
 
     var seenIntro = State.get("seenIntro");

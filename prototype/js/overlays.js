@@ -530,6 +530,10 @@
           dismiss();
           O.openAdmin();
         }),
+        row("Analitik", "editör", function () {
+          dismiss();
+          MAG.analytics.open();
+        }),
         row("Prototipi sıfırla", "", function () {
           if (confirm("Tüm yerel veriler silinsin mi? (yorumlar, ilerleme, bulmaca sonuçları)")) State.reset();
         }),

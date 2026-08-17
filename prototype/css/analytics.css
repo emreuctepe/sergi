@@ -1,0 +1,47 @@
+/* ============================================================================
+   ANALİTİK — editör paneli. İşlevsel/saf veri; süsleme minimum.
+   ========================================================================== */
+.an {
+  padding: var(--ui-sp-4);
+  display: grid;
+  gap: var(--ui-sp-3);
+  font-family: var(--font-ui);
+  font-size: var(--ui-fs-sm);
+  color: var(--ink);
+}
+.an-lede { color: var(--ink-soft); line-height: 1.5; }
+.an-legend { display: flex; align-items: center; gap: 6px; color: var(--ink-faint); font-size: var(--ui-fs-xs); }
+
+.an-head { display: flex; align-items: baseline; gap: 8px; margin-top: var(--ui-sp-3); }
+.an-h { font-family: var(--font-display); font-size: var(--ui-fs-md); font-weight: 600; }
+.an-tag {
+  font-size: 10px; letter-spacing: var(--tracking-caps); text-transform: uppercase;
+  padding: 1px 6px; border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--ink) 10%, transparent); color: var(--ink-soft);
+}
+.an-tag[data-k="olay"] { background: color-mix(in oklab, var(--accent) 16%, transparent); color: var(--accent); }
+.an-note { color: var(--ink-faint); font-size: var(--ui-fs-xs); }
+.an-foot { margin-top: var(--ui-sp-3); color: var(--ink-faint); font-size: var(--ui-fs-xs); line-height: 1.5; }
+
+/* KPI şeridi */
+.an-kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+.an-kpi { padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--paper); }
+.an-kpi__v { display: block; font-size: var(--ui-fs-lg); font-weight: 700; font-variant-numeric: tabular-nums; }
+.an-kpi__l { display: block; color: var(--ink-soft); font-size: var(--ui-fs-xs); }
+.an-kpi__s { display: block; color: var(--ink-faint); font-size: 11px; margin-top: 2px; }
+
+/* tablo */
+.an-scroll { overflow-x: auto; }
+.an-t { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.an-t th, .an-t td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line-soft); white-space: nowrap; }
+.an-t th { color: var(--ink-faint); font-weight: 600; font-size: var(--ui-fs-xs); text-transform: uppercase; letter-spacing: var(--tracking-caps); }
+.an-t td { color: var(--ink); }
+
+/* yatay bar (huni/dağılım/oran) */
+.an-bar { position: relative; min-width: 160px; height: 18px; border-radius: var(--radius-sm); background: color-mix(in oklab, var(--ink) 8%, transparent); overflow: hidden; }
+.an-bar__fill { position: absolute; inset: 0 auto 0 0; background: color-mix(in oklab, var(--accent) 55%, transparent); border-radius: inherit; }
+.an-bar__lbl { position: relative; z-index: 1; display: block; padding: 0 6px; line-height: 18px; font-size: 11px; color: var(--ink); }
+
+/* günlük sparkline */
+.an-spark { display: flex; align-items: flex-end; gap: 3px; height: 60px; padding-top: 4px; }
+.an-spark__bar { flex: 1; min-width: 4px; background: color-mix(in oklab, var(--accent) 45%, transparent); border-radius: 2px 2px 0 0; }
