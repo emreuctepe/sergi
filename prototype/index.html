@@ -165,11 +165,29 @@
          Sayı dosyaları kendilerini MAG.issues'a kaydeder, data.js hangisinin
          açılacağına karar verir — bu yüzden içerik data.js'ten ÖNCE, yorumlar
          data-comments.js'ten önce gelmeli.
+
+         Bir sayı iki biçimden biriyle yazılabilir:
+           · tek dosya (2026-09): kendini doğrudan MAG.issues'a yazar.
+           · bölünmüş (2026-10): content.js + issue.js + sections/*.js;
+             content.js parçaları tek MAG.issues[slug] nesnesine toplar.
+         İkisi de aynı şekli üretir; data.js farkı bilmez.
          ================================================================== -->
     <script src="js/util.js"></script>
     <script src="js/art.js"></script>
+    <script src="js/content.js"></script>
 
-    <script src="js/issues/2026-10.js"></script>
+    <!-- Sayı 04 · bölünmüş: meta + bölüm bölüm (js/content.js toplar) -->
+    <script src="js/issues/2026-10/issue.js"></script>
+    <script src="js/issues/2026-10/sections/00-kapak.js"></script>
+    <script src="js/issues/2026-10/sections/01-editorden.js"></script>
+    <script src="js/issues/2026-10/sections/02-gurultu.js"></script>
+    <script src="js/issues/2026-10/sections/03-anatomi.js"></script>
+    <script src="js/issues/2026-10/sections/04-beyaz-sapka.js"></script>
+    <script src="js/issues/2026-10/sections/05-bes-hamle.js"></script>
+    <script src="js/issues/2026-10/sections/06-bulmaca.js"></script>
+    <script src="js/issues/2026-10/sections/07-son.js"></script>
+
+    <!-- Sayı 03 · tek dosya (eski biçim; kendini doğrudan MAG.issues'a yazar) -->
     <script src="js/issues/2026-09.js"></script>
     <script src="js/data.js"></script>
     <script src="js/issues/2026-10.comments.js"></script>
