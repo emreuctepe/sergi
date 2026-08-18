@@ -668,6 +668,339 @@
     return a;
   }
 
+  /* ========================================================================
+     BULMACA 5 · ÜÇ HALKA  (sayı 04 · "Gürültü")
+     ------------------------------------------------------------------------
+     Trilaterasyon: bir anten uzaklığı biliyor, yönü bilmiyor — seni bir
+     ÇEMBERİN üstüne koyuyor. İki çember iki noktada kesişiyor, üçüncüsü
+     hangisi olduğunu söylüyor. Telefonun GPS'i kapalıyken de bulunmasının
+     tamamı bu; sayının dosyasında anlatılan şeyin oynanabilir hâli.
+
+     TEK KURAL, HER TURDA AYNI
+     Bir dokunuş, GÖRÜNEN her kule için "ölçtüğü uzaklığa uyuyor mu" diye
+     sınanıyor. Öğretici turda ilk aşamada tek kule görünür olduğu için
+     halkanın her yeri doğru cevap — dersin kendisi bu. Kule eklendikçe aynı
+     kural kabul edilen alanı kendiliğinden daraltıyor; ayrı bir mantık yok.
+
+     Uzaklıklar elle yazılmıyor, hedeften türetiliyor: içerik dosyasında
+     tutarsız bir ölçüm yazılması mümkün değil.
+     ===================================================================== */
+
+  var UcHalka = base(function (root) {
+    var self = this;
+    var cfg = this.config;
+    var rounds = cfg.rounds || [];
+    var saved = this.savedState || {};
+
+    var idx = Math.min(saved.round || 0, Math.max(0, rounds.length - 1));
+    var allDone = (saved.round || 0) >= rounds.length;
+
+    /* --- geometri --------------------------------------------------------- */
+
+    function dist(a, b) {
+      return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+    }
+
+    /** Turun ölçümleri: gerçek uzaklık + (varsa) sabit bir gürültü sapması. */
+    function readings(round) {
+      var rand = U.rng(4242 + rounds.indexOf(round));
+      return round.towers.map(function (t) {
+        var real = dist(t, round.target);
+        var off = round.noise ? (rand() * 2 - 1) * round.noise : 0;
+        return { t: t, r: real + off, ölçüm: real + off };
+      });
+    }
+
+    /** Bir dokunuş, görünen ölçümlerin hepsine uyuyor mu? */
+    function fits(p, shown, tol) {
+      var worst = null;
+      for (var i = 0; i < shown.length; i++) {
+        var sap = Math.abs(dist(p, shown[i].t) - shown[i].r);
+        if (!worst || sap > worst.sap) worst = { sap: sap, m: shown[i] };
+      }
+      return { ok: worst ? worst.sap <= tol : false, worst: worst };
+    }
+
+    /** İki çemberin kesişimi — ipucunda aday noktaları göstermek için. */
+    function kesisim(m1, m2) {
+      var d = dist(m1.t, m2.t);
+      if (d === 0 || d > m1.r + m2.r || d < Math.abs(m1.r - m2.r)) return [];
+      var a = (m1.r * m1.r - m2.r * m2.r + d * d) / (2 * d);
+      var h2 = m1.r * m1.r - a * a;
+      if (h2 < 0) return [];
+      var h = Math.sqrt(h2);
+      var mx = m1.t.x + (a * (m2.t.x - m1.t.x)) / d;
+      var my = m1.t.y + (a * (m2.t.y - m1.t.y)) / d;
+      var rx = (-(m2.t.y - m1.t.y) * h) / d;
+      var ry = ((m2.t.x - m1.t.x) * h) / d;
+      return [{ x: mx + rx, y: my + ry }, { x: mx - rx, y: my - ry }];
+    }
+
+    /* --- tur durumu ------------------------------------------------------- */
+
+    var round, ölçümler, görünen, tol, faz, tap, çözüldü, ipuçları;
+
+    function turuKur(i) {
+      round = rounds[i];
+      ölçümler = readings(round);
+      /* Öğretici turda kuleler tek tek açılıyor; ötekilerde üçü birden. */
+      faz = round.teach ? 1 : 3;
+      görünen = ölçümler.slice(0, faz);
+      tol = round.noise ? round.noise + 4 : 6;
+      tap = null;
+      çözüldü = false;
+      ipuçları = null;
+    }
+
+    var DERS = [
+      "Halkanın üstündeki her nokta eşit derecede doğru. Bir ölçüm, bir çember demek — yön bilgisi yok.",
+      "İki halka en fazla iki noktada kesişiyor. Hangisi olduğunu hâlâ bilmiyoruz.",
+      "Üçüncü halka iki adaydan birini onaylıyor. Konum bu: üç uzaklık, sıfır yön.",
+    ];
+
+    /* --- çizim ------------------------------------------------------------ */
+
+    function svgHalka(m, i, aktif) {
+      var renk = i === 1 ? "var(--accent-2, #b81167)" : "var(--accent, #00806b)";
+      if (round.noise) {
+        /* Gürültülü ölçüm bir çizgi değil, bir bant. */
+        return (
+          '<circle cx="' + m.t.x + '" cy="' + m.t.y + '" r="' + m.r + '" fill="none" stroke="' + renk +
+          '" stroke-width="' + round.noise * 2 + '" opacity="' + (aktif ? 0.2 : 0.1) + '"/>' +
+          '<circle cx="' + m.t.x + '" cy="' + m.t.y + '" r="' + m.r + '" fill="none" stroke="' + renk +
+          '" stroke-width="0.4" stroke-dasharray="2 2" opacity="0.7"/>'
+        );
+      }
+      return (
+        '<circle cx="' + m.t.x + '" cy="' + m.t.y + '" r="' + m.r + '" fill="none" stroke="' + renk +
+        '" stroke-width="0.9" opacity="0.8"/>'
+      );
+    }
+
+    function svgKule(m, i) {
+      var renk = i === 1 ? "var(--accent-2, #b81167)" : "var(--accent, #00806b)";
+      return (
+        '<g>' +
+        '<path d="M' + (m.t.x - 3) + ' ' + (m.t.y + 4) + ' L' + m.t.x + ' ' + (m.t.y - 4) + ' L' +
+        (m.t.x + 3) + ' ' + (m.t.y + 4) + 'Z" fill="' + renk + '"/>' +
+        '<circle cx="' + m.t.x + '" cy="' + (m.t.y - 5) + '" r="1.2" fill="' + renk + '"/>' +
+        "</g>"
+      );
+    }
+
+    var harita = document.createElement("div");
+    harita.className = "map";
+
+    function çiz() {
+      var g = "";
+      var i;
+      for (i = 10; i < 100; i += 10) {
+        g +=
+          '<line x1="' + i + '" y1="0" x2="' + i + '" y2="100" stroke="var(--line, #ccc)" stroke-width="0.25"/>' +
+          '<line x1="0" y1="' + i + '" x2="100" y2="' + i + '" stroke="var(--line, #ccc)" stroke-width="0.25"/>';
+      }
+
+      var halkalar = görünen.map(svgHalka).join("");
+      var kuleler = görünen.map(svgKule).join("");
+
+      var adaylar = "";
+      if (ipuçları) {
+        adaylar = ipuçları
+          .map(function (p) {
+            return '<circle cx="' + p.x + '" cy="' + p.y + '" r="3" fill="none" stroke="var(--ink, #333)" stroke-width="0.7" stroke-dasharray="1.5 1.5"/>';
+          })
+          .join("");
+      }
+
+      var isaret = "";
+      if (tap) {
+        isaret =
+          '<circle cx="' + tap.x + '" cy="' + tap.y + '" r="2.2" fill="' +
+          (çözüldü ? "var(--ok, #3f7d52)" : "var(--danger, #e0705f)") + '"/>';
+      }
+      if (çözüldü) {
+        isaret +=
+          '<circle cx="' + round.target.x + '" cy="' + round.target.y +
+          '" r="5" fill="none" stroke="var(--ok, #3f7d52)" stroke-width="0.9"/>';
+      }
+
+      harita.innerHTML =
+        '<svg viewBox="0 0 100 100" role="img" aria-label="Kuleler ve ölçüm halkaları — cihazın yerini işaretle">' +
+        '<rect width="100" height="100" fill="var(--paper-sunken, #eee)"/>' +
+        g + halkalar + adaylar + kuleler + isaret +
+        "</svg>";
+    }
+
+    /* --- arayüz ----------------------------------------------------------- */
+
+    var meter = el("div.meter", null, rounds.map(function () { return el("i"); }));
+    var prompt = el("p.prompt");
+    var okuma = el("div.read");
+    var geri = el("p.fb");
+    var satır = el("div.row");
+
+    var ipucuBtn = el("button.btn.btn--ghost", {
+      type: "button",
+      text: "İpucu",
+      onclick: function () {
+        if (çözüldü || görünen.length < 2) return;
+        ipuçları = kesisim(görünen[0], görünen[1]);
+        self.hint();
+        geri.textContent = ipuçları.length
+          ? "İlk iki halkanın kesiştiği iki nokta işaretlendi. Üçüncüsü hangisini onaylıyor?"
+          : "Bu iki halka kesişmiyor — ölçümlerden biri gürültülü olmalı.";
+        çiz();
+      },
+    });
+
+    var sonrakiBtn = el("button.btn.btn--primary", {
+      type: "button",
+      text: "Sonraki tur",
+      hidden: true,
+      onclick: function () {
+        idx++;
+        if (idx >= rounds.length) return bitir(true);
+        turuKur(idx);
+        self.progress({ round: idx });
+        tazele();
+      },
+    });
+
+    satır.appendChild(ipucuBtn);
+    satır.appendChild(sonrakiBtn);
+
+    function tazele() {
+      meter.querySelectorAll("i").forEach(function (d, i) {
+        if (i < idx) d.setAttribute("data-on", "");
+        else d.removeAttribute("data-on");
+      });
+
+      okuma.innerHTML = "";
+      görünen.forEach(function (m, i) {
+        okuma.appendChild(
+          el("span.chip", {
+            "data-i": i,
+            text: (m.t.ad || "Kule") + " · " + m.r.toFixed(0) + " birim" + (round.noise ? " ±" + round.noise : ""),
+          })
+        );
+      });
+
+      if (çözüldü) {
+        prompt.textContent = idx === rounds.length - 1 ? "Son tur da tamam." : DERS[2];
+      } else if (round.teach) {
+        prompt.textContent =
+          faz === 1
+            ? "Kule A cihazın ne kadar uzağında olduğunu biliyor, hangi yönde olduğunu bilmiyor. Cihaz nerede olabilir? Bir yere dokun."
+            : faz === 2
+            ? "Bir kule daha. Şimdi iki ölçüme birden uyan bir nokta bul."
+            : "Üçüncü kule geldi. Artık tek bir yer kaldı — işaretle.";
+      } else if (round.noise) {
+        prompt.textContent =
+          "Ölçümlerde gürültü var: her halka artık bir bant. Üçünün birden örtüştüğü yere dokun.";
+      } else if (round.dar) {
+        prompt.textContent =
+          "Bu üç kule neredeyse aynı hat üzerinde. Halkalar birbirini sıyırıyor — kesişim zayıf. Yine de tek bir nokta var.";
+      } else {
+        prompt.textContent = "Üç ölçüm, üç halka. Üçüne birden uyan noktaya dokun.";
+      }
+
+      geri.textContent = "";
+      sonrakiBtn.hidden = !çözüldü;
+      ipucuBtn.hidden = çözüldü || görünen.length < 2;
+      çiz();
+    }
+
+    /* `duyur` yalnızca bulmaca BU oturumda bitince true. Daha önce çözülmüş bir
+       bulmacaya dönüldüğünde ekran aynı görünür ama sonuç kartı yeniden açılmaz. */
+    function bitir(duyur) {
+      root.innerHTML = "";
+      root.appendChild(
+        el("div.done", null, [
+          el("span", { text: "✓" }),
+          el("span", { text: "Dört tur, üç halka. Artık telefonunun neden GPS'siz de bulunabildiğini biliyorsun." }),
+        ])
+      );
+      if (duyur) self.solved({ rounds: rounds.length });
+    }
+
+    harita.addEventListener("click", function (e) {
+      if (çözüldü) return;
+      var svg = harita.querySelector("svg");
+      var r = svg.getBoundingClientRect();
+      var p = { x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 };
+      tap = p;
+
+      var s = fits(p, görünen, tol);
+      if (!s.ok) {
+        self._attempts++;
+        self.failed();
+        geri.textContent =
+          (s.worst.m.t.ad || "Kule") + " " + s.worst.m.r.toFixed(0) + " birim diyor, sen " +
+          dist(p, s.worst.m.t).toFixed(0) + " birimdesin. Halkanın üstünde olmalısın.";
+        çiz();
+        return;
+      }
+
+      /* Öğretici turda doğru dokunuş bir sonraki kuleyi getiriyor: ders,
+         cevabın yanlış olmasından değil, YETMEMESİNDEN çıkıyor. */
+      if (round.teach && faz < 3) {
+        var ders = DERS[faz - 1];
+        faz++;
+        görünen = ölçümler.slice(0, faz);
+        ipuçları = null;
+        tap = null;
+        tazele();
+        geri.textContent = ders;
+        return;
+      }
+
+      çözüldü = true;
+      self.progress({ round: idx + 1 });
+      tazele();
+      geri.textContent = round.noise
+        ? "Gürültü konumu bulanıklaştırdı ama yok etmedi: nokta değil, alan. Yine de bulundun."
+        : "Bulundu.";
+
+      if (idx === rounds.length - 1) {
+        sonrakiBtn.textContent = "Bitir";
+      }
+    });
+
+    /* --- montaj ----------------------------------------------------------- */
+
+    if (allDone) return bitir(false);
+
+    root.appendChild(meter);
+    root.appendChild(prompt);
+    root.appendChild(harita);
+    root.appendChild(okuma);
+    root.appendChild(geri);
+    root.appendChild(satır);
+
+    turuKur(idx);
+    tazele();
+  });
+
+  UcHalka.prototype.css = `
+    .map { border-radius: 10px; overflow: hidden; cursor: crosshair; }
+    .map svg { display: block; width: 100%; aspect-ratio: 1; touch-action: manipulation; }
+    .read { display: flex; flex-wrap: wrap; gap: 1.6cqi; }
+    .chip {
+      padding: 1.4cqi 3cqi; border-radius: 999px;
+      border: 1px solid var(--line, #ddd);
+      font-size: clamp(10px, 3cqi, 13px);
+      font-variant-numeric: tabular-nums;
+      color: var(--ink-soft, #555);
+    }
+    .chip[data-i="1"] { border-color: var(--accent-2, #b81167); color: var(--accent-2, #b81167); }
+    .fb {
+      margin: 0; min-height: 2.6em;
+      font-size: clamp(11px, 3.2cqi, 14px);
+      line-height: 1.45;
+      color: var(--ink-soft, #555);
+    }
+  `;
+
   /* ------------------------------------------------------------------------
      KAYIT — her bulmaca kendi etiketini tanımlar
      --------------------------------------------------------------------- */
@@ -677,6 +1010,7 @@
     "haiku-tamamla": HaikuTamamla,
     "renk-dizisi": RenkDizisi,
     "panel-sirala": PanelSirala,
+    "uc-halka": UcHalka,
   };
 
   Object.keys(REGISTRY).forEach(function (id) {

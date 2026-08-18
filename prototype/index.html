@@ -160,11 +160,20 @@
 
     <!-- =====================================================================
          BETİKLER — klasik etiketler, ES modül yok (file:// uyumluluğu için).
-         Sıra önemlidir: art → data → çekirdek → özellikler → boot.
+         Sıra önemlidir: art → sayılar → data → çekirdek → özellikler → boot.
+
+         Sayı dosyaları kendilerini MAG.issues'a kaydeder, data.js hangisinin
+         açılacağına karar verir — bu yüzden içerik data.js'ten ÖNCE, yorumlar
+         data-comments.js'ten önce gelmeli.
          ================================================================== -->
     <script src="js/util.js"></script>
     <script src="js/art.js"></script>
+
+    <script src="js/issues/2026-10.js"></script>
+    <script src="js/issues/2026-09.js"></script>
     <script src="js/data.js"></script>
+    <script src="js/issues/2026-10.comments.js"></script>
+    <script src="js/issues/2026-09.comments.js"></script>
     <script src="js/data-comments.js"></script>
     <script src="js/data-analytics.js"></script>
     <script src="js/state.js"></script>

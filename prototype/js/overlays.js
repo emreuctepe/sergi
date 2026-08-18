@@ -1183,21 +1183,30 @@
     );
 
     D.archive.forEach(function (a) {
+      /* "Açık" = okunuyor olan sayı. "Güncel" = derginin son sayısı.
+         Arşivden eski bir sayı açıldığında bu ikisi ayrışır. */
+      var acik = a.slug === D.issue.slug;
+      var okunabilir = D.hasIssue(a.slug);
+
       body.appendChild(
         el(
           "button.arch",
           {
             type: "button",
-            "data-current": a.current ? "true" : null,
+            "data-current": acik ? "true" : null,
             onclick: function () {
-              if (a.current) {
+              if (acik) {
                 O.closeTop();
                 MAG.canvas.goTo(0);
+              } else if (!okunabilir) {
+                O.toast("Bu sayı arşive henüz eklenmedi.");
               } else if (!State.isVerified()) {
                 O.closeTop();
                 O.openAuth("archive");
               } else {
-                O.toast("Prototipte yalnızca güncel sayı var.");
+                /* Sayı değişimi tam yeniden yükleme: aktif sayı URL'de taşınıyor,
+                   böylece her modül tek bir MAG.data ile açılıyor. */
+                window.location.href = D.issueHref(a.slug);
               }
             },
           },
@@ -1205,8 +1214,8 @@
             el("span.arch__cover", { html: MAG.art.scene(a.scene) }),
             el("span.arch__meta", null, [
               el("b", { text: "№ " + U.pad2(a.number) + " · " + a.title }),
-              el("span", { text: a.month }),
-              a.current ? el("span.arch__now", { text: "şu an okuduğun" }) : null,
+              el("span", { text: a.month + (a.current && !acik ? " · güncel sayı" : "") }),
+              acik ? el("span.arch__now", { text: "şu an okuduğun" }) : null,
             ]),
           ]
         )
@@ -1403,9 +1412,11 @@
       ])
     );
 
-    host.appendChild(
-      el("p.outro__next", { text: "Gelecek sayı: 1 Ekim 2026 · “Islak Asfalt”" })
-    );
+    if (D.issue.next) {
+      host.appendChild(
+        el("p.outro__next", { text: "Gelecek sayı: " + D.issue.next.date + " · “" + D.issue.next.title + "”" })
+      );
+    }
   };
 
   function ostat(v, k) {

@@ -16,6 +16,13 @@
   ayrımı etiketli, **tam agregasyon** (kişi-bazlı iz yok), yasal not. Menü > "Analitik" veya `#analitik`.
 - **Sayfalama kararı:** Otomatik sayfalayıcı prototipte görünmez → **asıl build'e ertelendi** ([`PROJE.md`](PROJE.md) §8).
   Prototipte sadece Sözlük 3 `fit:contain` sayfaya bölündü (örnek).
+- **ARTIK ÇOK SAYILI (C1).** İçerik `js/issues/<slug>.js` dosyalarında, `data.js` yalnızca hangisinin
+  açılacağına karar veriyor. Aktif sayı URL'de: `?sayi=2026-09` → Kızıl Mevsim, temiz adres → güncel sayı.
+  Arşivden eski sayıya geçmek gerçekten çalışıyor (doğrulanmış hesap gerekiyor, tasarım gereği).
+  **Yeni sayı yazmak:** `js/issues/<yyyy-mm>.js` (+ istersen `.comments.js`), `tokens.css`'e bir tema bloğu,
+  `data.js`'te `D.archive`'a bir satır, `index.html`'e iki script etiketi. Başka hiçbir yer değişmiyor.
+- **Yayımlanmış sayılar:** № 03 "Kızıl Mevsim" (2026-09) · № 04 "Gürültü" (2026-10, siber güvenlik/cyberpunk).
+  Arşivdeki № 02 ve № 01 hâlâ içeriksiz — arşivin boş hâli de bilerek duruyor.
 - **SIRADA (kullanıcı):** Gerçek içerikle 1. sayıyı döşemek (yazı/manga/röportaj/görseller tek tek gelecek),
   uçtan uca test, sonra **asıl build** (SvelteKit mimarisi).
 - **Not:** Prototip saf HTML/CSS/JS, derleme adımı yok. `prototype/index.html` çift
@@ -25,7 +32,8 @@
 
 1. **Derleme yok.** Node, npm, bundler yok. Çift tıkla çalışsın.
 2. **Ağ yok.** Dış font, dış görsel, CDN yok. Tüm görseller elle çizilmiş satır içi SVG.
-3. **Veri sahte ama gerçekçi.** `js/data.js` tek bir "sayı"yı eksiksiz içerir.
+3. **Veri sahte ama gerçekçi.** Her sayı `js/issues/<slug>.js` içinde eksiksiz durur;
+   `js/data.js` yalnızca hangisinin açılacağını seçer.
 4. **Durum `localStorage`'da.** Okuma modu, ilerleme, yorumlar, bulmaca sonuçları.
 5. **Her adım kendi başına çalışır.** Yarıda kalırsa prototip yine açılır, çökmez.
 
@@ -138,6 +146,8 @@
 | — | 🎨 | **Eş okuma tonlaması içeriden çevreye taşındı.** `#comment-layer` tuvalin İÇİNE %12 koyu tül seriyordu → "içerisi bulanıklaşıyor" hissi. Kullanıcı: "içi aynı renk kalsın, renk değişimini çerçevenin dışına ver." İç tül kapatıldı (`display:none`), yerine `body::after` çevre tülü (z:0, #shell'in altında, tuval opak olduğu için yalnız çerçevenin dışında görünür) — eş okuma açılınca %32 karararak dergi objesini öne çıkarıyor (spotlight). Zoom-out korundu. İçerik iki durumda da birebir aynı parlaklıkta. |
 | — | ♻️ | **`comments:decorated` olayı.** `decorate()` bitince tek olay yayıyor; Fısıltı ve Kenar buna bağlanıp otomatik tazeliyor. Önce her sunum ayrı ayrı `comment:added`/`flow:render`/… dinliyordu ve `MAG.flood()` hiçbirini yaymadığı için stres modunda ray eksik kart gösteriyordu — bu tek kapı onu kökten çözdü (ekleme, tepki, stres, moderasyon hepsi decorate'ten geçiyor). |
 | — | 📐 | **Fısıltı'nın bedeli ölçüldü.** Şerit 66 px, bant 50 → 129 px. Telefonda (390×844) tuval bunu 3:4'ün üstündeki **taşma payından** karşılıyor: 720 → 588 px, örtme **1 px** — kurgulanmış içerikten hiçbir şey kapanmıyor. Pay yoksa bedel görünüyor: basık telefonda alt %15, kısa masaüstü penceresinde (1280×800) alt %14, uzun pencerede (1280×1000) 8 px. Karar §8'de açık soru olarak duruyor. 498 yorumla çizim + fısıltı 14.5 ms. |
+| C1 | ✅ | **Çok sayılılık + Sayı 04 "Gürültü".** Prototip tek sayıya kilitliydi (`data.js` tek bir `D.issue` singleton'ı ihraç ediyordu; arşivdeki eski sayılar tıklanınca "yalnızca güncel sayı var" toast'ı veriyordu). İçerik `js/issues/<slug>.js` + `js/issues/<slug>.comments.js` dosyalarına çıktı, her biri kendini `MAG.issues`'a kaydediyor; `data.js` yükleyiciye, `data-comments.js` koşum takımına döndü. Aktif sayı **URL'de** taşınıyor (`?sayi=2026-09`) — localStorage'a yazılmıyor, böylece eski bir sayı okunurken yenilemek okuduğunu kaybettirmiyor ve arşiv paylaşılabilir bağlantı üretiyor. Sayı değişimi tam yeniden yükleme: her modül tek bir `MAG.data` ile açılıyor, `state.js` zaten `issueSlug` ile isimlendirdiği için ilerleme/bulmaca kayıtları ayrışıyor. Çekirdekte (render/canvas/comments/analytics) **tek satır değişmedi.** Yeni sayı: cyberpunk tema (mono başlıklar — kullanılmayan `--issue-display` token'ı nihayet bağlandı), 4 yeni sahne, yeni `term` blok tipi, `bg: "img:…"` öneki (çizilmiş sahneyi gerçek dosyayla değiştirmek tek satır), 8 bölüm / 27 sayfa (16·23·26), 98 tohum yorum, "Üç Halka" bulmacası. |
+| C1a | ✅ | **Ölçüm dersi.** `fit:contain` taşma kontrolünü `page.scrollHeight` ile yapmak yanıltıyor: `parallax`/`signature` sahneleri `.page__bg`'yi ölçekliyor, dönüştürülmüş arka plan sayfayı taşırıyor ve içerik taşması gibi okunuyor. Doğru ölçüm `.page__inner`. Bu ölçüyle taşma her iki sayıda, üç modda, mobil+masaüstünde **sıfır**. |
 | A21 | ✅ | **Responsive elden geçirme — “siyah bölümler”.** 11 ekran boyutunda ölçüldü, 4 ayrı kaynak bulundu: (1) telefonda 3:4 tuval ekranın %38'ini ölü bırakıyordu → tuval artık letterbox tam bir bant boyuna inene kadar uzuyor, ölü alan sıfır; (2) galeri “fotoğrafları” kâğıt paletinden boyanıyordu, karanlıkta kapkara dikdörtgene dönüyorlardı → fotoğrafın kendi tonlaması var artık; (3) tanıtım sahnesi karanlıkta siyah ekrandı (kâğıt zemin + koyu perde) → sayı rengiyle tonlama + karanlıkta hafifletilmiş perde; (4) basık-geniş pencerede yanlarda 500px+ boşluk kalıyordu → sabit menü eşiği 560px'den 440px'e indi, menü o boşluğu dolduruyor. Ayrıca karanlıkta dergiye kenar ışığı ve zemine ışık havuzu: obje zemine karışmıyor. |
 
 ---

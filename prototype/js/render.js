@@ -134,6 +134,26 @@
       ]);
     },
 
+    /* --- terminal kaydı ----------------------------------------------------
+       Kod bloğu değil, "ekranda akan kayıt" bloğu. `$` ile başlayan satır komut
+       sayılıp vurgulanıyor; gerisi çıktı. Metin olduğu gibi basılıyor (U.inline
+       yok) — log içindeki *yıldız* ve `ters tırnak` biçimlendirme değil, veridir.
+       -------------------------------------------------------------------- */
+    term: function (b) {
+      var node = el("div.term" + (b.invert ? ".term--invert" : ""));
+      if (b.host) node.appendChild(el("div.term__bar", { text: b.host }));
+
+      var pre = el("pre.term__body");
+      (b.lines || []).forEach(function (line) {
+        var isCmd = /^\s*[$#>]/.test(line);
+        pre.appendChild(el("span.term__line" + (isCmd ? ".term__line--cmd" : ""), { text: line }));
+      });
+      node.appendChild(pre);
+
+      if (b.caption) node.appendChild(el("p.term__cap", { html: U.inline(b.caption) }));
+      return node;
+    },
+
     /* --- manga sayfası ----------------------------------------------------- */
     manga: function (b) {
       var wrap = el("div.manga" + ".manga--" + (b.layout || "3-üst-1-alt").replace(/[^a-z0-9-]/gi, ""), {
@@ -190,10 +210,22 @@
      SAYFA ÇİZİMİ
      ===================================================================== */
 
+  /* Sayfa arka planı üç biçimde verilebilir:
+       scene:torii                    → art.js'teki satır içi SVG sahne
+       photo:101                      → art.js'in ürettiği sahte "fotoğraf"
+       img:assets/2026-10/kapak.webp  → gerçek dosya
+     Üçüncüsü prototipte hiç kullanılmıyor ama kapı açık duruyor: çizilmiş bir
+     sahneyi gerçek görselle değiştirmek tek satırlık bir iş olsun diye. */
   function backgroundFor(spec) {
     if (!spec) return null;
-    var m = /^(scene|photo):(.+)$/.exec(spec);
+    var m = /^(scene|photo|img):(.+)$/.exec(spec);
     if (!m) return null;
+
+    if (m[1] === "img") {
+      return el("div.page__bg", null, [
+        el("img.page__bg-img", { src: m[2], alt: "", loading: "lazy", decoding: "async" }),
+      ]);
+    }
     var html = m[1] === "scene" ? A.scene(m[2]) : A.photo(parseInt(m[2], 10), "tall");
     return el("div.page__bg", { html: html });
   }

@@ -168,6 +168,45 @@
    Gerçek üründe bu, `content/issues/<yyyy-mm>/theme.css` dosyasından gelir.
    ========================================================================= */
 
+/* 2026-10 · "Gürültü" — karbon, neon, tarama çizgisi
+   Açık modda cyberpunk'ı karanlığa değil SOĞUKLUĞA yaslıyor: kâğıt yerine ekran
+   beyazı. Böylece tema düğmesi anlamını koruyor; sayı iki modda da kendisi.
+   --issue-display mono: başlıklar terminalden konuşuyor. */
+:root[data-issue="2026-10"] {
+  --accent: #00705d;
+  --accent-soft: #d3f5ec;
+  --accent-ink: #f2fffb;
+  --accent-2: #b81167;
+  --accent-3: #5538c4;
+  --paper: #eceff4;
+  --paper-raised: #ffffff;
+  --paper-sunken: #dde2ea;
+  --line: #c6cedb;
+  --line-soft: #dfe4ec;
+  /* Mürekkep de soğuyor: varsayılan sıcak kahve, gri kâğıtta kirli duruyordu. */
+  --ink: #10161d;
+  --ink-soft: #3c4753;
+  --ink-faint: #78838f;
+  --backdrop: #080c12;
+  --issue-display: var(--font-mono);
+}
+:root[data-issue="2026-10"][data-theme="dark"] {
+  --accent: #2bffd4;
+  --accent-soft: #0a2f2a;
+  --accent-ink: #04120f;
+  --accent-2: #ff54a3;
+  --accent-3: #9b7cff;
+  --paper: #0a0e14;
+  --paper-raised: #131c27;
+  --paper-sunken: #05080c;
+  --line: #1f2a38;
+  --line-soft: #141d28;
+  --ink: #dde6f0;
+  --ink-soft: #93a3b5;
+  --ink-faint: #5d6b7b;
+  --backdrop: #04070a;
+}
+
 /* 2026-09 · "Kızıl Mevsim" — kâğıt, mürekkep, torii kırmızısı */
 :root[data-issue="2026-09"] {
   --accent: #b8432c;
