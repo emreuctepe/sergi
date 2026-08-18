@@ -32,7 +32,16 @@
   color: var(--d-text);
   font-family: var(--d-ui);
   -webkit-font-smoothing: antialiased;
+
+  /* base.css okuyucu için gövdeyi kilitler (`body{height:100%;overflow:hidden}`,
+     kaydırma .pages'te). Kitte gövdenin KENDİSİ kaydırma kabı olur — üst bar
+     position:sticky ile içeride yapışık kalır. */
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
+/* base.css'in sabit dekoratif ışık katmanları kit arayüzünde işe yaramaz. */
+.dev-body::before, .dev-body::after { display: none !important; }
 
 /* --- üst bar / sekmeler ---------------------------------------------------- */
 .dev-bar {

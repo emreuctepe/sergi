@@ -20,25 +20,33 @@
 
   var Cat = {};
 
-  /* --- JS serileştirici: paste'e hazır, JSON değil (anahtar tırnaksız) ------- */
+  /* --- JS serileştirici: paste'e hazır, JSON değil (anahtar tırnaksız) -------
+     Prettier benzeri: kısa ve tek satıra sığan nesne/dizi satır içi kalır
+     (`{ t: "cover" }`, `["all"]`); uzun ya da içinde çok satırlı çocuk barındıran
+     yapılar açılır (her alan/öğe kendi satırında, sonda virgül). Eşik ~72 sütun. */
+  var WRAP = 72;
+
   function toJS(v, indent) {
     indent = indent || "";
     var next = indent + "  ";
+
     if (Array.isArray(v)) {
       if (!v.length) return "[]";
-      var flat = v.every(function (x) {
-        return typeof x !== "object" || x === null;
-      });
-      if (flat) return "[" + v.map(function (x) { return toJS(x); }).join(", ") + "]";
-      return "[\n" + v.map(function (x) { return next + toJS(x, next); }).join(",\n") + "\n" + indent + "]";
+      var items = v.map(function (x) { return toJS(x, next); });
+      var inline = "[" + items.join(", ") + "]";
+      if (inline.length <= WRAP && inline.indexOf("\n") < 0) return inline;
+      return "[\n" + items.map(function (s) { return next + s; }).join(",\n") + ",\n" + indent + "]";
     }
+
     if (v && typeof v === "object") {
       var keys = Object.keys(v);
       if (!keys.length) return "{}";
-      return "{ " + keys.map(function (k) {
-        return safeKey(k) + ": " + toJS(v[k], indent);
-      }).join(", ") + " }";
+      var parts = keys.map(function (k) { return safeKey(k) + ": " + toJS(v[k], next); });
+      var inlineObj = "{ " + parts.join(", ") + " }";
+      if (inlineObj.length <= WRAP && inlineObj.indexOf("\n") < 0) return inlineObj;
+      return "{\n" + parts.map(function (s) { return next + s; }).join(",\n") + ",\n" + indent + "}";
     }
+
     if (typeof v === "string") return '"' + v.replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"';
     return String(v);
   }
