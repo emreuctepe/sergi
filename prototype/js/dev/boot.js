@@ -11,7 +11,8 @@
 
   function applyPrefs() {
     var root = document.documentElement;
-    root.dataset.theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    /* Kit her zaman koyu — arayüz kontrastı sistem tercihine bırakılmaz. */
+    root.dataset.theme = "dark";
     root.dataset.motion = "on";
     root.dataset.issue = D.issue.slug;
     root.lang = "tr";

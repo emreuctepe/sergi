@@ -67,7 +67,8 @@
 
   function blockCard(entry) {
     var snippet = toJS(entry.sample);
-    var stage = el("div.dev-stage" + (entry.dark ? ".dev-stage--dark" : ""), null, [renderBlock(entry.sample)]);
+    /* Sahne gerçek .canvas: sabit 3:4, dergi token'larıyla (paper/ink) boyanır. */
+    var stage = el("div.dev-stage.canvas", null, [renderBlock(entry.sample)]);
     var code = el("pre.dev-code", null, [el("code", { text: snippet })]);
     var copyBtn = el("button.dev-copy", {
       type: "button",
