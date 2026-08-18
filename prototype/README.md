@@ -29,6 +29,32 @@ python3 tools/devserver.py          # depo kökünden
 ama önbelleği kapatır ve `index.html`'deki css/js bağlantılarına dosya damgası
 ekler — kaydettiğin an tarayıcıda görürsün. Dosyaların kendisi değişmez.
 
+## Yeni sayı hazırlama — Yazım Kiti (`dev.html`)
+
+Sayı içeriği "lego" bloklardan (`{ t: "pull", text: "…" }`) kurulur; bunları
+sıfırdan yazarken boğulmamak için `dev.html` var (yalnızca yerel, üretime girmez):
+
+- **Katalog** sekmesi: her blok tipi canlı önizlemeli + **kopyalanabilir JS**.
+  İstediğini kopyala, bölüm dosyandaki `blocks` dizisine yapıştır. Arka plan
+  sahneleri ve sayfa alanları da burada listeli.
+- **Canlı editör** sekmesi: bir **bölümün** JS'ini panelde düzenle, gerçek 3:4
+  tuvalde **anında** gör (snap + derinlik filtresi çalışır). Katalogdan blok ekle,
+  bitince "Bölüm dosyası olarak kopyala" ile `js/issues/<sayı>/sections/` altına
+  yeni dosya olarak yapıştır.
+
+**Sayı yapısı iki biçimden biriyle yazılabilir** (ikisi de aynı şekli üretir,
+`data.js` farkı bilmez):
+
+- **Tek dosya** (`js/issues/2026-09.js`): kendini doğrudan `MAG.issues`'a yazar.
+- **Bölünmüş** (`js/issues/2026-10/`): `issue.js` (meta + tanıtım + bulmaca havuzu)
+  + `sections/NN-slug.js` (her biri `MAG.defineSection`). `js/content.js` parçaları
+  `order` alanına göre sıralayıp tek sayıya toplar. Yeni bölüm = yeni küçük dosya +
+  `index.html`'e bir `<script>` satırı.
+
+> **Yorum çıpası uyarısı:** yorumlar `pageId:blokIndex` ile bağlanır. Var olan bir
+> sayıda `id`'leri ve sayfa içi blok sırasını değiştirme — yoksa tohum yorumlar
+> yanlış cümleye kayar. Yeni sayıda (henüz yorum yokken) serbestsin.
+
 ## Neyi deneyebilirsin
 
 | Ne | Nasıl |

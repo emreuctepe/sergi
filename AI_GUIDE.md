@@ -20,7 +20,9 @@ sorularına saniyede yanıt bulması içindir. Mimari anlatı için
 | **Kalıcı durum** (okur, tercihler, ilerleme, yorumlar, tepkiler, bulmaca koşuları) | `MAG.state.data` → `js/state.js` | `localStorage["mag:state:v1"]`; alan adları Supabase şemasıyla birebir |
 | Durum varsayılanları (şema) | `DEFAULTS`, `js/state.js:15` | `reader, depth, locale, theme, motion, progress, finished, comments, reactions, puzzleRuns, tagScores, stats…` |
 | **Aktif sayı içeriği** | `MAG.data` → `js/data.js` | `issue, intro, sections, puzzles`; hangi sayı? URL `?sayi=` → `pickSlug()` |
-| Sayı kayıt defteri (çok sayılılık) | `MAG.issues` | her `js/issues/<slug>.js` kendini buraya yazar |
+| Sayı kayıt defteri (çok sayılılık) | `MAG.issues` | tek dosya kendini doğrudan yazar; **bölünmüş** sayı `js/content.js` ile toplanır |
+| Bölünmüş sayı ara belleği | `MAG.content.pending` → `js/content.js` | `defineSection`/`defineIssue` parçaları burada birikir, `order`'a göre `MAG.issues`'a toplanır |
+| Yazım kiti (dev, üretime girmez) | `MAG.dev` → `js/dev/*`, `dev.html` | `samples` (blok/sahne örnekleri) · `catalog` · `editor` |
 | Tohum yorumlar (aktif sayı) | `MAG.data.comments` | `js/data-comments.js` doldurur |
 | Sahte editör analitiği | `js/data-analytics.js` | slug ile tohumlu, tutarlı |
 | Okurun yazdığı yorumlar | `State.get("comments")` | `C.all()` = tohum + flood + bunlar |
@@ -38,7 +40,8 @@ sorularına saniyede yanıt bulması içindir. Mimari anlatı için
 | `util` | `js/util.js` | DOM yardımcıları, olay yolu, localStorage, tohumlu RNG, metin biçimleme |
 | `art` | `js/art.js` | Satır içi SVG sahne/foto/manga/avatar kitaplığı |
 | `data` | `js/data.js` | Aktif sayıyı seçer, akış/görünürlük yardımcıları |
-| `issues` | `js/issues/*.js` | Sayı içeriği (kendini kaydeder) |
+| `content` | `js/content.js` | Bölünmüş sayıları toplar: `defineIssue`/`defineSection` → `MAG.issues[slug]` |
+| `issues` | `js/issues/*.js` · `js/issues/<slug>/` | Sayı içeriği (tek dosya **veya** issue.js + sections/*) |
 | `state` | `js/state.js` | Merkezi durum + localStorage + sekmeler arası eşitleme |
 | `render` | `js/render.js` | İçerik ağacı → DOM; `BLOCKS` tablosu |
 | `canvas` | `js/canvas.js` | 3:4 tuval, snap gezinme, ilerleme, klavye, sahne gözlemcisi |
@@ -50,6 +53,7 @@ sorularına saniyede yanıt bulması içindir. Mimari anlatı için
 | `analytics` | `js/analytics.js` | Editör paneli (sahte agregasyon) |
 | `debug` | `js/debug.js` | Stres modu (`MAG.flood`), pin kümeleme görselleştirme (`MAG.pins`) |
 | `app` (boot) | `js/app.js` | Açılış sırası, modülleri bağlayan tek yer |
+| `dev.*` | `js/dev/*.js` (yalnız `dev.html`) | Yazım kiti: `samples`, `catalog` (blok galerisi), `editor` (canlı 3:4 önizleme), `boot` |
 
 ---
 
@@ -132,6 +136,15 @@ iç custom element'ler: `base, buildGrid` (kelime avı), `svgHalka/svgKule` (gö
 `boot` (açılış) · `applyPreferences` (tema/dil/derinlik uygula) ·
 `wire` (olay dinleyicileri bağla) · `start` (renderFlow + decorate + puzzles.mount) ·
 konsol kısayolu: `MAG.reset()`
+
+### `js/content.js` → `MAG.defineIssue`, `MAG.defineSection`, `MAG.content`
+`defineIssue(issue, intro, puzzles)` · `defineSection(slug, {order, …})` ·
+iç `assemble(slug)` (sıra-bağımsız; `order`'a göre `MAG.issues[slug]`'a toplar)
+
+### `js/dev/*` → `MAG.dev` (yalnız `dev.html`)
+`samples` (blok/sahne/animasyon örnekleri — katalog + editörün ortak kaynağı) ·
+`catalog.mount(host)` + `catalog.toJS/copy` · `editor.init/start` (canlı 3:4 önizleme) ·
+`boot` (sekmeler + kit açılışı, `app.js` yerine)
 
 ---
 

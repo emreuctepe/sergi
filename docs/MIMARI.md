@@ -34,17 +34,22 @@ sErgi/
 │   └── MIMARI.md            ← Bu dosya
 ├── tools/devserver.py       ← Basit yerel sunucu
 └── prototype/
-    ├── index.html           ← Tek sayfa. Tüm DOM iskeleti + script sırası
-    ├── css/                 ← 8 dosya, katman katman
+    ├── index.html           ← Okuyucu. Tüm DOM iskeleti + script sırası
+    ├── dev.html             ← Yazım Kiti (dev): blok kataloğu + canlı editör
+    ├── css/                 ← katman katman (+ dev.css, yalnız dev.html)
     ├── assets/2026-10/       ← Gerçek görsel yeri (şu an boş; SVG kullanılıyor)
     └── js/
-        ├── issues/          ← İÇERİK (her sayı ayrı dosya)
-        │   ├── 2026-09.js            ← "Kızıl Mevsim" sayısının tüm sayfaları
-        │   ├── 2026-09.comments.js   ← O sayıya özel tohum yorumlar
-        │   ├── 2026-10.js            ← "Gürültü" sayısı
+        ├── content.js       ← Bölünmüş sayıları toplar (defineIssue/defineSection)
+        ├── issues/          ← İÇERİK — iki biçim bir arada:
+        │   ├── 2026-09.js            ← tek dosya (eski biçim)
+        │   ├── 2026-09.comments.js   ← o sayıya özel tohum yorumlar
+        │   ├── 2026-10/              ← bölünmüş: issue.js + sections/NN-*.js
         │   └── 2026-10.comments.js
+        ├── dev/             ← Yazım Kiti betikleri (samples/catalog/editor/boot)
         └── *.js             ← ÇEKİRDEK MOTOR (içerikten bağımsız)
 ```
+
+Yeni sayı hazırlama akışı (Yazım Kiti, `dev.html`) için: [prototype/README.md](../prototype/README.md#yeni-sayı-hazırlama--yazım-kiti-devhtml).
 
 **CSS katmanları (yükleme sırası anlamlı):**
 `tokens` (değişkenler/tema) → `base` (iskelet) → `canvas` (3:4 tuval) →
