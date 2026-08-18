@@ -189,7 +189,147 @@
 .dev-reflist dd { margin: 0; opacity: 0.75; line-height: 1.45; }
 .dev-reflist code { font-family: var(--font-mono, monospace); font-size: 0.92em; }
 
+/* ==========================================================================
+   CANLI EDİTÖR
+   ========================================================================== */
+.dev-pane[data-pane="editor"] { height: calc(100vh - 57px); }
+.dev-editor, .dev-editor__grid { height: 100%; }
+.dev-editor__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 0;
+}
+
+/* SOL — 3:4 önizleme, gerçek .canvas sınıfını yeniden kullanır */
+.dev-editor__preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 18px;
+  min-height: 0;
+  overflow: auto;
+  background: var(--backdrop, #efeae1);
+  border-right: 1px solid var(--hairline, rgba(0, 0, 0, 0.12));
+}
+.dev-frame {
+  width: min(100%, calc((100vh - 170px) * 3 / 4));
+  aspect-ratio: 3 / 4;
+  flex: 0 0 auto;
+}
+/* .canvas yüksekliği normalde viewport'tan gelir; çerçeveye sığdır. */
+.dev-canvas.canvas {
+  height: 100%;
+  width: 100%;
+  border-radius: 6px;
+  box-shadow: var(--shadow-3, 0 8px 30px rgba(0, 0, 0, 0.18));
+}
+.dev-frame-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+.dev-frame-hint { font-family: var(--font-mono, monospace); }
+.dev-empty {
+  padding: 40px 20px;
+  text-align: center;
+  opacity: 0.6;
+  font-size: 13px;
+}
+
+/* SAĞ — düzenleme paneli */
+.dev-editor__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px clamp(14px, 2vw, 22px);
+  min-height: 0;
+}
+.dev-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.dev-panel-note { font-size: 12px; opacity: 0.72; margin: 0; line-height: 1.5; }
+.dev-panel-note code {
+  font-family: var(--font-mono, monospace);
+  background: var(--sunk, rgba(0, 0, 0, 0.06));
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.dev-seg {
+  display: inline-flex;
+  border: 1px solid var(--hairline, rgba(0, 0, 0, 0.18));
+  border-radius: 8px;
+  overflow: hidden;
+}
+.dev-seg__btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.dev-seg__btn + .dev-seg__btn { border-left: 1px solid var(--hairline, rgba(0, 0, 0, 0.14)); }
+.dev-seg__btn[aria-pressed="true"] { background: var(--accent, #b8432c); color: #fff; }
+
+.dev-btn, .dev-select {
+  appearance: none;
+  border: 1px solid var(--hairline, rgba(0, 0, 0, 0.18));
+  background: var(--card, #fff);
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.dev-btn--ghost { background: transparent; }
+.dev-btn--nav { min-width: 40px; font-size: 15px; line-height: 1; }
+.dev-btn.is-done { background: #3f7d52; border-color: #3f7d52; color: #fff; }
+
+.dev-source {
+  flex: 1;
+  min-height: 180px;
+  resize: none;
+  padding: 12px 14px;
+  border: 1px solid var(--hairline, rgba(0, 0, 0, 0.18));
+  border-radius: 10px;
+  background: #12141a;
+  color: #d6e0d6;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12.5px;
+  line-height: 1.55;
+  tab-size: 2;
+  white-space: pre;
+  overflow: auto;
+}
+.dev-source:focus { outline: 2px solid var(--accent, #b8432c); outline-offset: 1px; }
+
+.dev-err, .dev-warns {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  line-height: 1.5;
+}
+.dev-err { background: rgba(184, 67, 44, 0.12); color: #b8432c; border: 1px solid rgba(184, 67, 44, 0.4); }
+.dev-warns { background: rgba(200, 150, 30, 0.14); color: #8a6d15; border: 1px solid rgba(200, 150, 30, 0.4); }
+
+@media (max-width: 900px) {
+  .dev-pane[data-pane="editor"] { height: auto; }
+  .dev-editor, .dev-editor__grid { height: auto; }
+  .dev-editor__grid { grid-template-columns: 1fr; }
+  .dev-editor__preview { border-right: 0; border-bottom: 1px solid var(--hairline, rgba(0, 0, 0, 0.12)); }
+  .dev-frame { width: min(100%, calc(70vh * 3 / 4)); }
+  .dev-source { min-height: 240px; }
+}
+
 @media (prefers-color-scheme: dark) {
   .dev-card { background: #1b1d22; }
   .dev-stage { background: #15171c; }
+  .dev-btn, .dev-select { background: #22252b; }
 }
