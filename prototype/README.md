@@ -3,6 +3,15 @@
 Derginin **tam görünümlü sahte hâli**. Gerçek arka uç, gerçek içerik derleyicisi ve
 gerçek Supabase yok — ama ekranların hepsi var ve gerçekten çalışıyor.
 
+## İlgili belgeler
+
+- [`docs/MIMARI.md`](../docs/MIMARI.md) — mimari harita, modül haberleşmesi ve
+  Mermaid akış diyagramları (açılış + yorum yazma veri akışı).
+- [`AI_GUIDE.md`](../AI_GUIDE.md) — hangi fonksiyon hangi dosyada, global durum
+  nerede tutulur; olay veri yolu ve konsol kısayolları.
+- [`docs/PROJE.md`](../docs/PROJE.md) — nihai ürün planı (SvelteKit + Supabase).
+- [`docs/YORUM-SISTEMI.md`](../docs/YORUM-SISTEMI.md) — yorum ankraj mantığının gerekçesi.
+
 ## Nasıl açılır
 
 En kolayı: `index.html` dosyasına çift tıkla. Derleme adımı, `npm install`, sunucu
