@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="tr" data-theme="light" data-issue="2026-10">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Yazım Kiti · Dergi Prototipi</title>
+    <meta name="color-scheme" content="light dark" />
+    <meta name="robots" content="noindex" />
+
+    <!-- Aynı görsel motor: üretim CSS'i + yalnızca kit için dev.css -->
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/canvas.css" />
+    <link rel="stylesheet" href="css/blocks.css" />
+    <link rel="stylesheet" href="css/comments.css" />
+    <link rel="stylesheet" href="css/overlays.css" />
+    <link rel="stylesheet" href="css/puzzles.css" />
+    <link rel="stylesheet" href="css/dev.css" />
+  </head>
+
+  <body class="dev-body">
+    <!-- ===================================================================
+         ÜST BAR + SEKMELER
+         ================================================================ -->
+    <header class="dev-bar">
+      <span class="dev-bar__title">Yazım Kiti <small>dev · yalnızca yerel</small></span>
+      <nav class="dev-tabs" aria-label="Kit sekmeleri">
+        <button class="dev-tab" type="button" data-tab="catalog" aria-selected="true">Katalog</button>
+        <button class="dev-tab" type="button" data-tab="editor" aria-selected="false">Canlı editör</button>
+      </nav>
+    </header>
+
+    <!-- ===================================================================
+         KATALOG — blok şablon galerisi (js/dev/catalog.js doldurur)
+         ================================================================ -->
+    <main class="dev-pane" data-pane="catalog" data-active="true">
+      <div id="dev-catalog" class="dev-catalog"></div>
+    </main>
+
+    <!-- ===================================================================
+         CANLI EDİTÖR — Faz 2'de js/dev/editor.js buraya okur kabuğunu +
+         düzenleme panelini kurar.
+         ================================================================ -->
+    <section class="dev-pane" data-pane="editor" data-active="false">
+      <div id="dev-editor" class="dev-editor">
+        <p class="dev-lead" style="padding: 40px">Canlı editör Faz 2'de eklenecek.</p>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         BETİKLER — üretim motorunun alt kümesi (app.js YOK: otomatik okuma
+         akışı başlamasın) + kit betikleri.
+         ================================================================ -->
+    <script src="js/util.js"></script>
+    <script src="js/art.js"></script>
+    <script src="js/issues/2026-10.js"></script>
+    <script src="js/issues/2026-09.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/render.js"></script>
+
+    <script src="js/dev/samples.js"></script>
+    <script src="js/dev/catalog.js"></script>
+    <script src="js/dev/boot.js"></script>
+  </body>
+</html>
