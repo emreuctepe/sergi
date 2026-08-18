@@ -191,3 +191,15 @@ yazıyı ve ona iliştirilen sesleri aynı anda okuyabilsin.
 3. **One-shot manga.** Kimin çizeceği hâlâ açık — takvimi belirleyen en ağır kalem bu.
 4. **Onaydan sonra:** Faz 0 (gerçek SvelteKit iskeleti). Prototip o noktada
    referans olarak kalır, silinmez.
+
+### Asıl build'e kaydedilen iki madde ([`PROJE.md`](PROJE.md))
+
+- **Güvenlik denetimi (1.0 sonrası) → PROJE.md §6 Faz 9.** Site 1.0 canlıya
+  çıktıktan sonra giriş/kimlik başta olmak üzere önemli yüzeylerde güvenlik
+  açıkları taranacak (kod deneme sınırı, oturum, RLS yetki, XSS/enjeksiyon,
+  hesap devralma). Her faz sonrası tekrarlanan bir geçiş.
+- **Dergi boyutu ve saklama verimi → PROJE.md §8.7.** Bir sayının toplam
+  ağırlığı ölçülecek, en ağır parça (muhtemelen görseller) tespit edilecek;
+  görsel formatı/duyarlı boyut/tembel yükleme, kod bölme, CDN/edge önbelleği,
+  eski sayıların soğuk saklaması değerlendirilecek — arşiv büyüdükçe ilk açılış
+  maliyeti sabit kalsın diye.

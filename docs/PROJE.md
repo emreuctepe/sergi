@@ -453,6 +453,13 @@ Her faz kendi başına çalışan bir şey teslim eder. Tarih baskısı yok; sı
 - Erişilebilirlik denetimi, performans bütçesi, hata izleme.
 - `docs/` tamamlanması: içerik yazım rehberi, yeni bulmaca ekleme rehberi, yeni blok ekleme rehberi.
 
+### Faz 9 — Güvenlik denetimi (1.0 yayımı sonrası)
+Site 1.0 canlıya çıktıktan sonra, gerçek kullanıcı ve gerçek veri varken güvenlik açıkları taranır. Öncelik **kimlik/giriş yüzeyi** — dışarıdan gelen girdinin arka uca değdiği her yer.
+- **Giriş akışı:** e-posta + 6 haneli kod — kod tahmin/deneme sınırı (rate limit + kilitleme), kodun kısa ömrü ve tek kullanımlık olması, oturum/token yönetimi, anonim → doğrulanmış geçişte hesap devralma (account takeover) senaryoları.
+- **Yetki:** okur kendi olmayan yorumu/analitiği/moderasyon kuyruğunu göremesin/değiştiremesin (Supabase Row Level Security politikalarının denetimi), `/admin` yüzeyinin gerçekten korunması.
+- **Girdi:** yorum gövdesi ve profil alanlarında XSS/enjeksiyon, oran sınırı (spam/flood), içerik boyutu sınırları.
+- **Genel:** güvenlik başlıkları (CSP vb.), bağımlılık taraması, sır/anahtar sızıntısı kontrolü. Denetim tek seferlik değil, her sayı/faz sonrası tekrarlanan bir geçiş.
+
 ---
 
 ## 7. Doğrulama Stratejisi
@@ -475,6 +482,7 @@ Her faz kendi başına çalışan bir şey teslim eder. Tarih baskısı yok; sı
 6. **Sayfalama: elle mi, otomatik sayfalayıcı mı? (KARAR BEKLİYOR)** İçerik artık "her sayfa ≤ 1 ekran, temiz snap" ilkesine göre kurgulanıyor (uzun sayfa = kaydırınca okumadan atlama derdi). Uzun içeriği contain snap-sayfalara bölmenin iki yolu var:
    - **Elle:** her uzun sayfayı data'da parçalara böl + yorum ankrajlarını taşı. Basit ama tekrarlı, token yoğun, ve "hangi ekrana sığar" derdi (en kısa telefona göre bölünür, masaüstünde boşluk kalır). *Prototipte Sözlük bölümü şimdilik elle bölündü.*
    - **Otomatik sayfalayıcı (öneri):** render sırasında içerik viewport'a sığmıyorsa kendisi contain parçalara böler. Tek seferlik motor; her ekranda + gelecekteki her içerikte otomatik, minimum sayfa, elle bölme/ankraj derdi yok. Bedeli: yorum ankrajını "sayfa-bağımsız" (bloğa göre) yapmak için küçük bir refactor. **Gerçek ürünün içerik-derleyici modeli de zaten bu** — Faz 1'de derleyici bunu üstlenmeli. Kalan 7 uzun sayfaya (km-1/3/4/5, sy-1/2/3) geçmeden önce buna karar verilecek.
+7. **Bir derginin toplam boyutu ne kadar, saklama nasıl verimli olur?** Bir sayı = metin (derleyici çıktısı) + görseller (şimdilik satır içi SVG, ileride gerçek foto/manga) + yorumlar. Ölçülecek: tipik bir sayının yayımlanmış toplam ağırlığı (KB/MB), en ağır parça hangisi (büyük olasılıkla görseller). Değerlendirilecek verim yolları: görsel için modern format (AVIF/WebP) + duyarlı boyutlar + tembel yükleme, uzun/ağır sayfalar için kod bölme (yalnız açılan bölümü indir), metin/yorumu ayrı yükleme (zaten `js/issues/<slug>.js` + `.comments.js` ayrık), CDN/edge önbelleği, arşivdeki eski sayıların soğuk saklaması. Amaç: yeni sayı eklendikçe ilk açılış maliyeti sabit kalsın, okur her seferinde tüm arşivi indirmesin.
 
 ## 9. Bilinçli Olarak Kapsam Dışı
 
