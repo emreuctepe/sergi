@@ -80,6 +80,8 @@ window.MAG = window.MAG || {};
   /* --- ARKA PLAN SAHNELERİ (bg: "scene:<ad>") ------------------------------
      art.js'teki satır içi SVG sahneler. Sayı temasının renkleriyle boyanır. */
   DEV.scenes = [
+    /* Japonya sahneleri — dergi kimliğinin omurgası, önce onlar */
+    "genko", "sumi", "shoji", "emaki", "tanzaku",
     "paper", "leaves", "torii", "temple", "mountains", "city", "street",
     "rain", "waves", "moon", "bowl", "train", "portrait",
     "neon-city", "terminal", "circuit", "signal-grid",

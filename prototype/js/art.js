@@ -556,6 +556,363 @@
     );
   };
 
+  /* ------------------------------------------------------------------------
+     JAPONYA SAHNELERİ · dil, edebiyat, kültür
+     Derginin görsel omurgası. Aynı kural: tek bir sabit renk yok, hepsi sayının
+     CSS değişkenlerinden geliyor — washi/sumi/şu kırmızısı paletinde de, başka
+     bir sayının paletinde de kendini taşısın diye.
+
+     Beşi bilerek farklı ritimde: yoğun ızgara (genko), tek büyük jest (sumi),
+     geometrik ışık (shoji), yatay bant (emaki), dikey tekrar (tanzaku). Böylece
+     bir sayının içinde yan yana gelince birbirini tekrar etmiyorlar.
+
+     İki ortak motif aileyi bağlıyor: vermilyon mühür ve "okunmayan yazı".
+     --------------------------------------------------------------------- */
+
+  /** Vermilyon mühür (hanko) — kare taş, içinde oyulmuş soyut izler. */
+  function seal(x, y, size, seed) {
+    var rand = U.rng(seed || 7);
+    var pad = size * 0.22;
+    var cuts = "";
+    for (var i = 0; i < 5; i++) {
+      var ox = x + pad + rand() * (size - pad * 2);
+      var oy = y + pad + rand() * (size - pad * 2);
+      var len = size * (0.24 + rand() * 0.3);
+      cuts +=
+        rand() > 0.45
+          ? '<line x1="' + ox.toFixed(1) + '" y1="' + (oy - len / 2).toFixed(1) + '" x2="' + ox.toFixed(1) + '" y2="' + (oy + len / 2).toFixed(1) + '"/>'
+          : '<line x1="' + (ox - len / 2).toFixed(1) + '" y1="' + oy.toFixed(1) + '" x2="' + (ox + len / 2).toFixed(1) + '" y2="' + oy.toFixed(1) + '"/>';
+    }
+    return (
+      '<g opacity="0.8">' +
+      '<rect x="' + x + '" y="' + y + '" width="' + size + '" height="' + size + '" rx="' + (size * 0.12).toFixed(1) +
+      '" fill="var(--accent)"/>' +
+      '<g stroke="var(--paper)" stroke-width="' + (size * 0.08).toFixed(2) + '" stroke-linecap="square" opacity="0.9">' + cuts + "</g>" +
+      "</g>"
+    );
+  }
+
+  /** Soyut bir karakter — okunmuyor ama "yazı" gibi duruyor. Metnin altında
+      kalacağı için bilerek okunaksız: göz onu doku sanıp üstündeki başlığa geçsin. */
+  function glyph(cx, cy, box, rand) {
+    var n = 2 + Math.floor(rand() * 3);
+    var out = "";
+    for (var i = 0; i < n; i++) {
+      var len = box * (0.34 + rand() * 0.46);
+      var ox = cx + (rand() - 0.5) * box * 0.44;
+      var oy = cy + (rand() - 0.5) * box * 0.52;
+      out +=
+        rand() > 0.42
+          ? '<line x1="' + (ox - len / 2).toFixed(1) + '" y1="' + oy.toFixed(1) + '" x2="' + (ox + len / 2).toFixed(1) + '" y2="' + oy.toFixed(1) + '"/>'
+          : '<line x1="' + ox.toFixed(1) + '" y1="' + (oy - len / 2).toFixed(1) + '" x2="' + ox.toFixed(1) + '" y2="' + (oy + len / 2).toFixed(1) + '"/>';
+    }
+    return out;
+  }
+
+  /* 原稿用紙 — sayfa sağdan sola yarıya kadar yazılmış, kalem ortada durmuş.
+     En sakin sahne: uzun metin ve söyleşi sayfalarının altına. */
+  scenes.genko = function () {
+    var rand = U.rng(1024);
+    var CW = 24; /* hücre kenarı */
+    var PITCH = 29; /* sütun adımı — aradaki boşluk furigana payı */
+    var COLS = 10;
+    var ROWS = 15;
+    var X0 = 10;
+    var Y0 = 26;
+    var grid = "";
+    var ink = "";
+    var c, r, cx;
+
+    for (c = 0; c < COLS; c++) {
+      cx = X0 + c * PITCH;
+      grid += '<rect x="' + cx + '" y="' + Y0 + '" width="' + CW + '" height="' + ROWS * CW + '"/>';
+      for (r = 1; r < ROWS; r++) {
+        grid += '<line x1="' + cx + '" y1="' + (Y0 + r * CW) + '" x2="' + (cx + CW) + '" y2="' + (Y0 + r * CW) + '"/>';
+      }
+    }
+
+    /* yazı sağ üstten başlar; sola gittikçe seyrelir ve biter */
+    for (c = COLS - 1; c >= 0; c--) {
+      var nth = COLS - 1 - c;
+      if (nth > 5) break;
+      var ratio = nth < 3 ? 1 : 1 - (nth - 2) * 0.3 - rand() * 0.18;
+      var stop = Math.max(0, Math.round(ROWS * ratio));
+      cx = X0 + c * PITCH + CW / 2;
+      for (r = 0; r < stop; r++) ink += glyph(cx, Y0 + r * CW + CW / 2, CW - 6, rand);
+    }
+
+    /* washi lifleri */
+    var fibers = "";
+    for (var f = 0; f < 22; f++) {
+      var fy = rand() * 400;
+      fibers += '<line x1="' + (rand() * 120).toFixed(1) + '" y1="' + fy.toFixed(1) + '" x2="' + (180 + rand() * 130).toFixed(1) + '" y2="' + (fy + rand() * 6 - 3).toFixed(1) + '"/>';
+    }
+
+    return wrap(
+      "<defs>" +
+        grad("gk-paper", [["0", "var(--paper-raised)", 1], ["1", "var(--paper)", 1]]) +
+        "</defs>" +
+        '<rect width="300" height="400" fill="url(#gk-paper)"/>' +
+        '<g stroke="var(--ink)" stroke-width="0.6" opacity="0.06">' + fibers + "</g>" +
+        /* çift çerçeve — basılı müsvedde kâğıdının kenarı */
+        '<g fill="none" stroke="var(--accent)" opacity="0.45">' +
+        '<rect x="4" y="18" width="294" height="374" stroke-width="1.6"/>' +
+        '<rect x="7.5" y="21.5" width="287" height="367" stroke-width="0.7"/>' +
+        "</g>" +
+        '<g fill="none" stroke="var(--accent)" stroke-width="0.8" opacity="0.42">' + grid + "</g>" +
+        '<g stroke="var(--ink)" stroke-width="1.7" stroke-linecap="round" opacity="0.34">' + ink + "</g>" +
+        seal(98, 298, 24, 512)
+    );
+  };
+
+  /* 書道 — enso (円相) ve tek dikey sütun. Kapak ve bölüm açılışları için
+     tek büyük jest; ortası boş bırakıldı ki üstüne başlık otursun. */
+  scenes.sumi = function () {
+    var rand = U.rng(4649); /* 4-6-4-9 · "yoroshiku" */
+
+    /* fırçanın kuruduğu yerler: mürekkebin üstüne kâğıt renginde ince çizikler */
+    var column = "";
+    for (var g = 0; g < 5; g++) column += glyph(254, 66 + g * 30, 24, rand);
+
+    var splatter = "";
+    for (var s = 0; s < 14; s++) {
+      var a = rand() * Math.PI * 2;
+      var d = 96 + rand() * 46;
+      splatter +=
+        '<circle cx="' + (150 + Math.cos(a) * d).toFixed(1) + '" cy="' + (176 + Math.sin(a) * d * 0.9).toFixed(1) +
+        '" r="' + (0.7 + rand() * 2.4).toFixed(1) + '" opacity="' + (0.15 + rand() * 0.4).toFixed(2) + '"/>';
+    }
+
+    return wrap(
+      "<defs>" +
+        hatch("sm-tooth", "var(--ink)", 0.05) +
+        grad("sm-wash", [["0", "var(--ink)", 0], ["1", "var(--ink)", 0.13]]) +
+        "</defs>" +
+        '<rect width="300" height="400" fill="var(--paper)"/>' +
+        '<rect width="300" height="400" fill="url(#sm-tooth)"/>' +
+        '<rect y="300" width="300" height="100" fill="url(#sm-wash)"/>' +
+        /* Enso: halka bilerek kapanmıyor. Fırça baskısı sabit olmadığı için tek
+           kalın daire yerine üç yay üst üste — girişte ince, ortada dolgun,
+           çıkışta incelerek bitiyor. Çevre ≈ 528; çizilen 0→452, kalanı boşluk. */
+        '<g fill="none" transform="rotate(-34 150 176)">' +
+        '<circle cx="150" cy="176" r="84" stroke="var(--ink)" stroke-width="10" stroke-linecap="round" stroke-dasharray="164 364" opacity="0.88"/>' +
+        '<circle cx="150" cy="176" r="84" stroke="var(--ink)" stroke-width="18" stroke-linecap="round" stroke-dasharray="196 332" stroke-dashoffset="-142" opacity="0.88"/>' +
+        '<circle cx="150" cy="176" r="84" stroke="var(--ink)" stroke-width="11" stroke-linecap="round" stroke-dasharray="128 400" stroke-dashoffset="-324" opacity="0.88"/>' +
+        '<circle cx="150" cy="176" r="89" stroke="var(--ink)" stroke-width="4" stroke-linecap="round" stroke-dasharray="120 408" stroke-dashoffset="-150" opacity="0.24"/>' +
+        /* kasure — kuru fırça izi */
+        '<circle cx="150" cy="176" r="87" stroke="var(--paper)" stroke-width="1.7" stroke-dasharray="7 15" stroke-dashoffset="-320" opacity="0.5"/>' +
+        '<circle cx="150" cy="176" r="81" stroke="var(--paper)" stroke-width="1.2" stroke-dasharray="5 21" stroke-dashoffset="-352" opacity="0.42"/>' +
+        "</g>" +
+        '<g fill="var(--ink)">' + splatter + "</g>" +
+        '<g stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" opacity="0.62">' + column + "</g>" +
+        seal(240, 206, 28, 46)
+    );
+  };
+
+  /* 障子 — arkadan gelen ışık, kâğıda düşen bambu gölgesi. Sessiz sayfalar:
+     söyleşi, deneme, "editörden". Işık ortada, metin ona oturuyor. */
+  scenes.shoji = function () {
+    var X1 = 24;
+    var X2 = 276;
+    var Y1 = 20;
+    var Y2 = 336;
+    var COLS = 4;
+    var ROWS = 6;
+    var kumiko = "";
+    var i;
+
+    for (i = 1; i < COLS; i++) {
+      var mx = X1 + (i * (X2 - X1)) / COLS;
+      kumiko += '<rect x="' + (mx - 1.6).toFixed(1) + '" y="' + Y1 + '" width="3.2" height="' + (Y2 - Y1) + '"/>';
+    }
+    for (i = 1; i < ROWS; i++) {
+      var my = Y1 + (i * (Y2 - Y1)) / ROWS;
+      kumiko += '<rect x="' + X1 + '" y="' + (my - 1.6).toFixed(1) + '" width="' + (X2 - X1) + '" height="3.2"/>';
+    }
+
+    /* kâğıdın ARKASINDAKİ bambu — gölge olduğu için yumuşak, ama okunacak kadar koyu */
+    var bamboo = "";
+    [
+      { x: 54, w: 9, lean: 7 },
+      { x: 86, w: 6, lean: -5 },
+      { x: 226, w: 10, lean: 6 },
+      { x: 252, w: 6, lean: -4 },
+    ].forEach(function (b) {
+      bamboo += '<path d="M' + b.x + " " + Y2 + " L" + (b.x + b.lean) + " " + Y1 + " L" + (b.x + b.lean + b.w) + " " + Y1 + " L" + (b.x + b.w) + " " + Y2 + 'Z"/>';
+      for (var ny = 56; ny < Y2; ny += 52) {
+        var t = (Y2 - ny) / (Y2 - Y1);
+        var nx = b.x + b.lean * t;
+        bamboo += '<rect x="' + (nx - 1.6).toFixed(1) + '" y="' + ny + '" width="' + (b.w + 3.2) + '" height="3"/>';
+      }
+    });
+    /* yapraklar: sapa yakın üçlü kümeler, tek tek serpiştirilmiş değil */
+    [
+      [63, 104, 1], [63, 116, 1], [59, 128, -1],
+      [92, 196, -1], [88, 208, -1], [96, 218, 1],
+      [236, 132, 1], [232, 144, -1], [238, 156, 1],
+      [258, 250, -1], [254, 262, 1],
+    ].forEach(function (p) {
+      var d = p[2];
+      bamboo += '<path d="M' + p[0] + " " + p[1] + " q" + 15 * d + " -11 " + 34 * d + " -3 q" + -16 * d + " 11 " + -34 * d + ' 3Z"/>';
+    });
+
+    return wrap(
+      "<defs>" +
+        /* Işık kâğıdın ARKASINDA. --paper'a bağlasaydık koyu temada ekran kararır,
+           shoji'nin bütün fikri ters dönerdi. Bu yüzden A.photo'daki gibi palet
+           dışına çıkıp altın vurguyu kâğıda karıştırıyoruz: her iki temada da
+           "arkadan yanan fener" okuması korunuyor. */
+        '<radialGradient id="sj-glow" cx="0.5" cy="0.4" r="0.68">' +
+        '<stop offset="0" stop-color="color-mix(in oklab, var(--accent-2) 52%, var(--paper-raised))"/>' +
+        '<stop offset="0.5" stop-color="color-mix(in oklab, var(--accent-2) 26%, var(--paper))"/>' +
+        '<stop offset="1" stop-color="color-mix(in oklab, var(--accent-2) 8%, var(--paper-sunken))"/>' +
+        "</radialGradient>" +
+        grad("sj-floor", [["0", "var(--backdrop)", 0.55], ["1", "var(--backdrop)", 0.9]]) +
+        "</defs>" +
+        '<rect width="300" height="400" fill="var(--paper-sunken)"/>' +
+        '<rect x="' + X1 + '" y="' + Y1 + '" width="' + (X2 - X1) + '" height="' + (Y2 - Y1) + '" fill="url(#sj-glow)"/>' +
+        '<g fill="var(--ink)" opacity="0.2">' + bamboo + "</g>" +
+        /* kumiko kafes */
+        '<g fill="var(--ink)" opacity="0.66">' + kumiko + "</g>" +
+        /* dış kasa — ince, çünkü sahnenin konusu ışık, kasa değil */
+        '<rect x="17" y="13" width="266" height="352" fill="none" stroke="var(--ink)" stroke-width="5.5" opacity="0.72"/>' +
+        /* koshita — alt ahşap panel */
+        '<rect x="20" y="' + Y2 + '" width="260" height="26" fill="var(--ink)" opacity="0.42"/>' +
+        '<rect y="366" width="300" height="34" fill="url(#sj-floor)"/>' +
+        /* eşiğe düşen ışık lekesi */
+        '<path d="M62 366 L238 366 L268 400 L32 400Z" fill="var(--accent-2)" opacity="0.1"/>'
+    );
+  };
+
+  /* 絵巻 — altın suyari-gasumi (すやり霞) bantları arasından görünen manzara.
+     Klasik edebiyat dosyaları için: Genji, waka, Heian. Bantlar metni taşıyan
+     yatay şeritler olduğu için üstüne başlık koymak kolay. */
+  scenes.emaki = function () {
+    /* matsu — gövde ve üç yassı iğne öbeği; öbekler yukarı doğru küçülüyor */
+    function pine(x, y, s) {
+      return (
+        '<g transform="translate(' + x + " " + y + ") scale(" + s + ')" fill="var(--ink)">' +
+        '<path d="M-2 0 L-3.4 -40 L3.4 -40 L2 0Z" opacity="0.5"/>' +
+        '<path d="M-27 -30 q11 -12 27 -10 q16 -2 27 10 q-13 7 -27 6 q-14 1 -27 -6Z" opacity="0.44"/>' +
+        '<path d="M-21 -44 q9 -11 21 -9 q12 -2 21 9 q-10 6 -21 5 q-11 1 -21 -5Z" opacity="0.5"/>' +
+        '<path d="M-14 -57 q6 -9 14 -8 q8 -1 14 8 q-7 5 -14 4 q-7 1 -14 -4Z" opacity="0.56"/>' +
+        "</g>"
+      );
+    }
+
+    /* stilize kesik bulut: aynı dolguyla kaydırılmış yuvarlak bantlar */
+    function kasumi(bands, op) {
+      return (
+        '<g fill="var(--accent-2)" opacity="' + op + '">' +
+        bands
+          .map(function (b) {
+            return '<rect x="' + b[0] + '" y="' + b[1] + '" width="' + b[2] + '" height="' + b[3] + '" rx="' + (b[3] / 2).toFixed(1) + '"/>';
+          })
+          .join("") +
+        "</g>"
+      );
+    }
+
+    return wrap(
+      "<defs>" +
+        grad("em-silk", [["0", "var(--paper-raised)", 1], ["0.6", "var(--paper)", 1], ["1", "var(--paper-sunken)", 1]]) +
+        "</defs>" +
+        '<rect width="300" height="400" fill="url(#em-silk)"/>' +
+        /* uzak tepeler, arkadan öne */
+        '<path d="M0 236 q54 -40 108 -6 q52 32 96 -12 q48 -46 96 -2 L300 400 L0 400Z" fill="var(--accent-3)" opacity="0.2"/>' +
+        '<path d="M0 288 q66 -34 128 -4 q58 28 106 -14 q34 -30 66 -4 L300 400 L0 400Z" fill="var(--accent-3)" opacity="0.3"/>' +
+        /* çamlar — klasik matsu: gövde + katman katman yassı öbekler */
+        pine(48, 326, 1) +
+        pine(258, 308, 0.74) +
+        /* köşk: küçük ve düşük kontrast — sahneyi bulutlar taşıyor */
+        '<g opacity="0.8">' +
+        '<rect x="112" y="286" width="76" height="26" fill="var(--paper-sunken)"/>' +
+        '<path d="M96 290 Q150 246 204 290 Q150 270 96 290Z" fill="var(--ink)" opacity="0.72"/>' +
+        '<g stroke="var(--ink)" stroke-width="1.8" opacity="0.5">' +
+        '<line x1="124" y1="292" x2="124" y2="312"/><line x1="150" y1="292" x2="150" y2="312"/><line x1="176" y1="292" x2="176" y2="312"/>' +
+        "</g>" +
+        "</g>" +
+        /* altın kesik bulutlar */
+        kasumi([[-20, 58, 176, 17], [140, 68, 132, 15], [246, 56, 84, 14]], 0.72) +
+        kasumi([[-30, 126, 128, 14], [86, 136, 150, 13], [214, 124, 116, 15]], 0.55) +
+        kasumi([[-20, 208, 118, 16], [92, 218, 128, 14]], 0.6) +
+        kasumi([[128, 328, 192, 18], [-24, 340, 168, 16]], 0.68) +
+        /* mounting — kakemono/emaki kumaş kenarı; ince, çünkü asıl olay bulutlar */
+        '<rect width="300" height="17" fill="var(--accent-3)" opacity="0.4"/>' +
+        '<rect y="383" width="300" height="17" fill="var(--accent-3)" opacity="0.4"/>' +
+        '<g stroke="var(--accent-2)" stroke-width="1" opacity="0.45">' +
+        '<line x1="0" y1="18" x2="300" y2="18"/><line x1="0" y1="382" x2="300" y2="382"/>' +
+        "</g>" +
+        seal(252, 336, 26, 1180)
+    );
+  };
+
+  /* 短冊 — bambuya asılı şiir şeritleri (Tanabata). Şiir, haiku ve çeviri
+     dosyalarının açılışı; dikey tekrar sayfaya ritim veriyor. */
+  scenes.tanzaku = function () {
+    var rand = U.rng(707); /* 7 Temmuz */
+    var fills = [
+      "var(--paper-raised)",
+      "var(--accent-soft)",
+      "var(--accent)",
+      "var(--accent-2)",
+      "var(--paper-raised)",
+      "var(--accent-3)",
+      "var(--accent)",
+    ];
+    var strips = "";
+
+    [20, 60, 100, 142, 186, 228, 266].forEach(function (hx, i) {
+      var w = 24 + Math.round(rand() * 10);
+      var h = 128 + Math.round(rand() * 124);
+      var cx = hx + w / 2;
+      /* dalın o noktadaki yüksekliği — şerit ipini oraya bağla */
+      var t = (cx + 10) / 320;
+      var ly = (1 - t) * (1 - t) * 40 + 2 * (1 - t) * t * 64 + t * t * 36;
+      var y = ly + 12 + rand() * 8;
+      var rot = (rand() - 0.5) * 12;
+      var marks = "";
+      for (var gy = y + 20; gy < y + h - 14; gy += 21) marks += glyph(cx, gy, w * 0.62, rand);
+
+      strips +=
+        '<g transform="rotate(' + rot.toFixed(1) + " " + cx.toFixed(1) + " " + y.toFixed(1) + ')">' +
+        '<line x1="' + cx.toFixed(1) + '" y1="' + (y - 14).toFixed(1) + '" x2="' + cx.toFixed(1) + '" y2="' + y.toFixed(1) +
+        '" stroke="var(--ink)" stroke-width="1" opacity="0.5"/>' +
+        '<rect x="' + hx + '" y="' + y.toFixed(1) + '" width="' + w + '" height="' + h + '" rx="1.5" fill="' + fills[i] +
+        '" opacity="' + (0.62 + rand() * 0.26).toFixed(2) + '"/>' +
+        '<rect x="' + hx + '" y="' + y.toFixed(1) + '" width="' + w + '" height="5" fill="var(--ink)" opacity="0.24"/>' +
+        '<g stroke="var(--ink)" stroke-width="1.4" stroke-linecap="round" opacity="0.42">' + marks + "</g>" +
+        "</g>";
+    });
+
+    /* bambu dalı ve yaprakları */
+    var leaves = "";
+    [
+      [12, 34, 1],
+      [78, 44, -1],
+      [166, 52, 1],
+      [232, 44, -1],
+      [284, 32, 1],
+    ].forEach(function (p) {
+      leaves +=
+        '<path d="M' + p[0] + " " + p[1] + " q" + 24 * p[2] + " -16 " + 46 * p[2] + ' -6 q' + -22 * p[2] + " 16 " + -46 * p[2] + ' 6Z"/>';
+    });
+
+    return wrap(
+      "<defs>" +
+        grad("tz-dusk", [["0", "var(--accent-3)", 0.4], ["0.45", "var(--paper-sunken)", 1], ["1", "var(--paper-sunken)", 1]]) +
+        grad("tz-foot", [["0", "var(--ink)", 0], ["1", "var(--ink)", 0.34]]) +
+        "</defs>" +
+        '<rect width="300" height="400" fill="var(--paper-sunken)"/>' +
+        '<rect width="300" height="400" fill="url(#tz-dusk)"/>' +
+        '<circle cx="238" cy="70" r="30" fill="var(--paper-raised)" opacity="0.16"/>' +
+        strips +
+        '<path d="M-10 40 Q150 64 310 36" fill="none" stroke="var(--ink)" stroke-width="3.4" opacity="0.6"/>' +
+        '<g fill="var(--accent-3)" opacity="0.5">' + leaves + "</g>" +
+        '<rect y="320" width="300" height="80" fill="url(#tz-foot)"/>'
+    );
+  };
+
   A.scenes = scenes;
 
   A.scene = function (name, opts) {
