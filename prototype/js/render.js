@@ -172,6 +172,10 @@
         });
         wrap.appendChild(panel);
       });
+      /* Bazı düzenlerde başlık sayfanın kendi kompozisyonunda bir kutu
+         (bkz. 2026-09 "Kapalı Kapılar" planı) — ayrı açılış sayfası değil.
+         Panel indeksleri kaymasın diye en sona ekleniyor. */
+      if (b.title) wrap.appendChild(el("div.manga-title", { text: b.title }));
       var page = el("div.manga-page", null, [wrap, el("span.manga-page__no", { text: b.page })]);
       return page;
     },

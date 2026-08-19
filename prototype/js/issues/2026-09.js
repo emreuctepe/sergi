@@ -506,76 +506,45 @@
       kicker: "One-shot",
       author: "KARGAMANGA",
       minutes: 2,
-      /* Soldan sağa kurgulanmış bir dikey şerit — Japon one-shot'ı değil,
-         o yüzden rtl yok ve açılışta rtlhint gösterilmiyor. */
+      /* Soldan sağa okunuyor — Japon one-shot'ı değil, o yüzden rtl yok. */
       direction: "ltr",
       tags: ["manga", "kurgu"],
       pages: [
         {
-          id: "mn-acilis",
-          depth: ["all"],
-          fit: "contain",
-          bleed: "full",
-          bg: "img:assets/2026-09/kapali-kapilar/03.webp",
-          scene: "mask-wipe",
-          kind: "opener",
-          blocks: [
-            { t: "kicker", text: "Bu sayıya özel one-shot", invert: true },
-            { t: "h1", text: "Kapalı Kapılar", invert: true },
-            { t: "lead", invert: true, text: "7 kare · KARGAMANGA · aşağı kaydırarak okunur" },
-          ],
-        },
-        {
           id: "mn-1",
           depth: ["all"],
-          fit: "scroll",
+          fit: "contain",
           kind: "manga",
           scene: "panel-reveal",
           blocks: [
             {
               t: "manga",
               page: 1,
-              layout: "dikey",
+              layout: "plan",
               dir: "ltr",
+              title: "Kapalı Kapılar",
               panels: [
                 {
                   img: "assets/2026-09/kapali-kapilar/01.webp",
                   alt: "Şehrin önünde duran genç; arkasında soluk bir siluet.",
-                  text: "kapılarım kapalı…",
+                  text: [{ text: "kapılarım kapalı…", at: { bottom: "16%", left: "3%", width: "76%" } }],
                 },
                 {
                   img: "assets/2026-09/kapali-kapilar/02.webp",
                   alt: "Ardında gökkuşağı renginde bir halka olan genç kadın.",
-                  text: "neden herkese kapılarını kapatıyorsun?",
+                  text: [{ text: "neden herkese kapılarını kapatıyorsun?", at: { bottom: "-6%", left: "8%", width: "84%" } }],
                 },
                 {
                   img: "assets/2026-09/kapali-kapilar/03.webp",
                   alt: "Alacakaranlıkta üst geçitte birbirinden uzaklaşan iki siluet.",
-                  text: "Madem yalnız kalmaktan bu kadar korkuyorsun…",
+                  text: [{ text: "Madem yalnız kalmaktan bu kadar korkuyorsun…", at: { bottom: "4%", left: "6%", width: "88%" } }],
                 },
-              ],
-            },
-          ],
-        },
-        {
-          id: "mn-2",
-          depth: ["all"],
-          fit: "scroll",
-          kind: "manga",
-          scene: "panel-reveal",
-          blocks: [
-            {
-              t: "manga",
-              page: 2,
-              layout: "dikey",
-              dir: "ltr",
-              panels: [
                 {
                   img: "assets/2026-09/kapali-kapilar/04.webp",
                   alt: "Genç kadının yakın plan yüzü; arkasında halkanın bir parçası.",
                   text: [
-                    { text: "sadece gerçekten gelmek isteyenler gelebilir…" },
-                    { text: "ya kimse gelmezse?", at: "alt" },
+                    { text: "sadece gerçekten gelmek isteyenler gelebilir…", at: { top: "-13%", left: "10%", width: "104%" } },
+                    { text: "ya kimse gelmezse?", at: { bottom: "8%", left: "16%", width: "56%" } },
                   ],
                 },
                 {
@@ -585,30 +554,12 @@
                 {
                   img: "assets/2026-09/kapali-kapilar/06.webp",
                   alt: "Bir gözün çok yakın planı.",
-                  text: "kilitli değiller…",
+                  text: [{ text: "kilitli değiller…", at: { top: "6%", left: "8%", width: "62%" } }],
                 },
-              ],
-            },
-          ],
-        },
-        {
-          id: "mn-3",
-          depth: ["all"],
-          fit: "scroll",
-          kind: "manga",
-          scene: "panel-reveal",
-          blocks: [
-            {
-              t: "manga",
-              page: 3,
-              layout: "dikey",
-              dir: "ltr",
-              panels: [
                 {
                   img: "assets/2026-09/kapali-kapilar/07.webp",
                   alt: "Gece göğünde hilal ve pembe bulutlar.",
-                  text: "İşte o zaman istemeyeceğim kadar kafamı dinlerim.",
-                  kind: "narrate",
+                  text: [{ text: "İşte o zaman istemeyeceğim kadar kafamı dinlerim.", at: { top: "42%", left: "14%", width: "34%" } }],
                 },
               ],
             },

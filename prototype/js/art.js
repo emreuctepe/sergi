@@ -993,11 +993,21 @@
     var bubbles = list
       .map(function (b) {
         if (!b || !b.text) return "";
+        /* at: "alt" → hazır alt konum.  at: {top,left,right,bottom,width} →
+           serbest yerleşim (yüzde ya da herhangi bir CSS uzunluğu). Plan
+           düzeninde balonlar panel sınırlarını bilerek taşıyor. */
+        var cls = "", style = "";
+        if (b.at === "alt") cls = " manga-bubble--alt";
+        else if (b.at && typeof b.at === "object") {
+          cls = " manga-bubble--free";
+          style = ' style="' + ["top", "right", "bottom", "left", "width"]
+            .filter(function (k) { return b.at[k] != null; })
+            .map(function (k) { return k + ":" + b.at[k]; })
+            .join(";") + '"';
+        }
         return (
-          '<div class="manga-bubble' +
-          (b.kind ? " manga-bubble--" + b.kind : "") +
-          (b.at === "alt" ? " manga-bubble--alt" : "") +
-          '">' + U.escape(b.text) + "</div>"
+          '<div class="manga-bubble' + (b.kind ? " manga-bubble--" + b.kind : "") + cls + '"' + style + ">" +
+          U.escape(b.text) + "</div>"
         );
       })
       .join("");
