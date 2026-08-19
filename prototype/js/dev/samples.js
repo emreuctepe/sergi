@@ -82,9 +82,7 @@ window.MAG = window.MAG || {};
      doldurulur. İlk sıradaki varsayılan. Yeni tema: tokens.css'e bir blok +
      buraya bir satır — başka hiçbir yer değişmiyor. */
   DEV.palettes = [
-    /* Ad bilerek romaji: bu makinede kurulu Japonca yazı tipi yok, kanji
-       arayüzde tofu kutusu (□) olarak çıkıyor. Kanji kaynak yorumlarında. */
-    { slug: "2026-11", name: "№ 05 · Kotoba (Söz)" },
+    { slug: "2026-11", name: "№ 05 · Kotoba 言葉 (Söz)" },
     { slug: "2026-10", name: "№ 04 · Gürültü" },
     { slug: "2026-09", name: "№ 03 · Kızıl Mevsim" },
     { slug: "2026-08", name: "№ 02 · Mavi Saat" },

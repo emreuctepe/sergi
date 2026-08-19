@@ -21,7 +21,17 @@
   --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
-  --font-ja: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", "MS Mincho",
+  /* Japonca metin — bilinçli olarak MINCHO (明朝, tırnaklı): derginin Latin
+     gövdesi de tırnaklı, ikisi aynı kayıtta konuşsun. Gothic (ゴシック) istenirse
+     ayrı bir token açılır, bunun içine karıştırılmaz.
+
+     Linux adları ŞART: dağıtımlar bu aileyi "Noto Serif CJK JP" diye kurar,
+     "Noto Serif JP" (alt küme derlemesi) genelde yoktur. Yalnız ikincisi
+     yazılıysa hiçbir ad tutmaz, yığın var(--font-text)'e düşer ve tarayıcı
+     kendi yedeğini seçer — kanji çıkar ama GOTHIC çıkar, mincho değil. Sessiz
+     bir hata: metin görünür, yalnızca yanlış karakterde. */
+  --font-ja: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP",
+    "Source Han Serif JP", "Noto Serif JP", "IPAexMincho", "MS Mincho",
     var(--font-text);
 
   /* --- tuval tipografi ölçeği (1.25 modüler) ------------------------------ */
