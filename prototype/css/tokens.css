@@ -168,6 +168,50 @@
    Gerçek üründe bu, `content/issues/<yyyy-mm>/theme.css` dosyasından gelir.
    ========================================================================= */
 
+/* 2026-11 · "Kotoba" (言葉) — washi, sumi, ai, shu
+   Japon dili/edebiyatı sayısının paleti. Zor kısmı 2026-09'dan ayrışmaktı:
+   o da zaten kâğıt + mürekkep + torii kırmızısıydı. Ayrım üç yerden geliyor —
+   (1) mürekkep ve kâğıt SOĞUK (sumi is grafit siyahı, kâğıt kōzo grisi), 2026-09
+   sıcak kahve-krem; (2) --accent-3 çam yeşili değil 藍 (aizome indigo); (3) kırmızı
+   tuğladan gerçek 真朱'ya kaydı, daha turuncu ve daha diri.
+
+   --accent-2 (山吹 altın) bilerek AÇIK ve SICAK: `shoji` sahnesi kâğıdın
+   arkasındaki ışığı ondan karıştırıyor. Buraya koyu bir renk koyulursa
+   o sahne kararır. Yeni tema yazarken bu tokenı açık tut. */
+:root[data-issue="2026-11"] {
+  --accent: #d0451f;
+  --accent-soft: #f5dbd0;
+  --accent-ink: #fffaf7;
+  --accent-2: #c8952f;
+  --accent-3: #27496e;
+  --paper: #f0ebde;
+  --paper-raised: #fbf7ee;
+  --paper-sunken: #dfd8c6;
+  --line: #d3cbb8;
+  --line-soft: #e4dccb;
+  --ink: #15171c;
+  --ink-soft: #3f454e;
+  --ink-faint: #7c838d;
+  --backdrop: #141922;
+  --issue-display: var(--font-display);
+}
+:root[data-issue="2026-11"][data-theme="dark"] {
+  --accent: #e8613a;
+  --accent-soft: #4a2318;
+  --accent-ink: #1a0d08;
+  --accent-2: #e0ac4b;
+  --accent-3: #5b86b8;
+  --paper: #12141a;
+  --paper-raised: #1b1f27;
+  --paper-sunken: #0b0d12;
+  --line: #2b303a;
+  --line-soft: #1e232b;
+  --ink: #e8e3d6;
+  --ink-soft: #a9a698;
+  --ink-faint: #75736a;
+  --backdrop: #070910;
+}
+
 /* 2026-10 · "Gürültü" — karbon, neon, tarama çizgisi
    Açık modda cyberpunk'ı karanlığa değil SOĞUKLUĞA yaslıyor: kâğıt yerine ekran
    beyazı. Böylece tema düğmesi anlamını koruyor; sayı iki modda da kendisi.

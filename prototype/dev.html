@@ -24,6 +24,23 @@
          ================================================================ -->
     <header class="dev-bar">
       <span class="dev-bar__title">Yazım Kiti <small>dev · yalnızca yerel</small></span>
+
+      <!-- Palet seçici: kit arayüzü hep koyu (--d-*), bu yalnızca ÖNİZLEMELERİ
+           boyar. Sahneler CSS değişkeni kullandığı için yeniden çizim gerekmez. -->
+      <div class="dev-pal">
+        <label class="dev-pal__item">
+          <span>Palet</span>
+          <select class="dev-sel" id="dev-issue"></select>
+        </label>
+        <label class="dev-pal__item">
+          <span>Tema</span>
+          <select class="dev-sel" id="dev-theme">
+            <option value="dark">Koyu</option>
+            <option value="light">Açık</option>
+          </select>
+        </label>
+      </div>
+
       <nav class="dev-tabs" aria-label="Kit sekmeleri">
         <button class="dev-tab" type="button" data-tab="catalog" aria-selected="true">Katalog</button>
         <button class="dev-tab" type="button" data-tab="editor" aria-selected="false">Canlı editör</button>
