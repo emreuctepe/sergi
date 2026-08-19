@@ -817,6 +817,11 @@
   gap: var(--ui-sp-2);
 }
 .auth__code input {
+  /* Grid öğesinin varsayılan min-width'i "auto"dur ve input'un iç genişliği
+     (size niteliği, ~20 karakter) izgara sütununun tabanını belirler: altı kutu
+     1950px'e şişip modalı taşırıyordu. min-width: 0 olmadan 1fr küçülemez. */
+  min-width: 0;
+  width: 100%;
   aspect-ratio: 0.82;
   text-align: center;
   font-size: var(--ui-fs-xl);
