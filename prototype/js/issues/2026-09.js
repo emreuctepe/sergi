@@ -500,13 +500,15 @@
        05 · ONE-SHOT MANGA
        ----------------------------------------------------------------- */
     {
-      slug: "son-tren",
+      slug: "kapali-kapilar",
       type: "manga",
-      title: "Son Tren",
+      title: "Kapalı Kapılar",
       kicker: "One-shot",
-      author: "—",
-      minutes: 5,
-      direction: "rtl",
+      author: "KARGAMANGA",
+      minutes: 2,
+      /* Soldan sağa kurgulanmış bir dikey şerit — Japon one-shot'ı değil,
+         o yüzden rtl yok ve açılışta rtlhint gösterilmiyor. */
+      direction: "ltr",
       tags: ["manga", "kurgu"],
       pages: [
         {
@@ -514,33 +516,43 @@
           depth: ["all"],
           fit: "contain",
           bleed: "full",
-          bg: "scene:moon",
+          bg: "img:assets/2026-09/kapali-kapilar/03.webp",
           scene: "mask-wipe",
           kind: "opener",
           blocks: [
             { t: "kicker", text: "Bu sayıya özel one-shot", invert: true },
-            { t: "h1", text: "Son Tren", invert: true },
-            { t: "lead", invert: true, text: "8 sayfa · sağdan sola okunur" },
-            { t: "rtlhint" },
+            { t: "h1", text: "Kapalı Kapılar", invert: true },
+            { t: "lead", invert: true, text: "7 kare · KARGAMANGA · aşağı kaydırarak okunur" },
           ],
         },
         {
           id: "mn-1",
           depth: ["all"],
-          fit: "contain",
-          bleed: "full",
+          fit: "scroll",
           kind: "manga",
           scene: "panel-reveal",
           blocks: [
             {
               t: "manga",
               page: 1,
-              layout: "3-üst-1-alt",
+              layout: "dikey",
+              dir: "ltr",
               panels: [
-                { art: 0, text: "Yine kaçırdım.", kind: "think" },
-                { art: 4, text: "" },
-                { art: 2, text: "Son tren 00:41'de." },
-                { art: 1, text: "Şimdi 00:43.", kind: "narrate" },
+                {
+                  img: "assets/2026-09/kapali-kapilar/01.webp",
+                  alt: "Şehrin önünde duran genç; arkasında soluk bir siluet.",
+                  text: "kapılarım kapalı…",
+                },
+                {
+                  img: "assets/2026-09/kapali-kapilar/02.webp",
+                  alt: "Ardında gökkuşağı renginde bir halka olan genç kadın.",
+                  text: "neden herkese kapılarını kapatıyorsun?",
+                },
+                {
+                  img: "assets/2026-09/kapali-kapilar/03.webp",
+                  alt: "Alacakaranlıkta üst geçitte birbirinden uzaklaşan iki siluet.",
+                  text: "Madem yalnız kalmaktan bu kadar korkuyorsun…",
+                },
               ],
             },
           ],
@@ -548,61 +560,56 @@
         {
           id: "mn-2",
           depth: ["all"],
-          fit: "contain",
-          bleed: "full",
+          fit: "scroll",
           kind: "manga",
           scene: "panel-reveal",
           blocks: [
             {
               t: "manga",
               page: 2,
-              layout: "2-üst-2-alt",
+              layout: "dikey",
+              dir: "ltr",
               panels: [
-                { art: 3, text: "Peron boş." },
-                { art: 5, text: "" },
-                { art: 1, text: "— Sen de mi kaçırdın?" },
-                { art: 0, text: "Dönüp baktım.", kind: "narrate" },
+                {
+                  img: "assets/2026-09/kapali-kapilar/04.webp",
+                  alt: "Genç kadının yakın plan yüzü; arkasında halkanın bir parçası.",
+                  text: [
+                    { text: "sadece gerçekten gelmek isteyenler gelebilir…" },
+                    { text: "ya kimse gelmezse?", at: "alt" },
+                  ],
+                },
+                {
+                  img: "assets/2026-09/kapali-kapilar/05.webp",
+                  alt: "Gencin profilden görünüşü; arkada raylar ve gün batımı.",
+                },
+                {
+                  img: "assets/2026-09/kapali-kapilar/06.webp",
+                  alt: "Bir gözün çok yakın planı.",
+                  text: "kilitli değiller…",
+                },
               ],
             },
           ],
         },
         {
           id: "mn-3",
-          depth: ["mid", "full"],
-          fit: "contain",
-          bleed: "full",
+          depth: ["all"],
+          fit: "scroll",
           kind: "manga",
           scene: "panel-reveal",
           blocks: [
             {
               t: "manga",
               page: 3,
-              layout: "1-buyuk-2-kucuk",
+              layout: "dikey",
+              dir: "ltr",
               panels: [
-                { art: 4, text: "Her cuma buradayım.", kind: "" },
-                { art: 2, text: "Neden?" },
-                { art: 5, text: "Çünkü sabahın ilk treni saat beşte." },
-              ],
-            },
-          ],
-        },
-        {
-          id: "mn-4",
-          depth: ["all"],
-          fit: "contain",
-          bleed: "full",
-          kind: "manga",
-          scene: "panel-reveal",
-          blocks: [
-            {
-              t: "manga",
-              page: 4,
-              layout: "3-üst-1-alt",
-              panels: [
-                { art: 3, text: "Dört saat." },
-                { art: 1, text: "Dört saat.", kind: "think" },
-                { art: 0, text: "" },
-                { art: 5, text: "Şehir o dört saatte başka bir şehir oluyor.", kind: "narrate" },
+                {
+                  img: "assets/2026-09/kapali-kapilar/07.webp",
+                  alt: "Gece göğünde hilal ve pembe bulutlar.",
+                  text: "İşte o zaman istemeyeceğim kadar kafamı dinlerim.",
+                  kind: "narrate",
+                },
               ],
             },
           ],
@@ -724,7 +731,7 @@
                 { term: "Emre Üçtepe", def: "Editör · söyleşi — [@emreuctepe](https://example.com)" },
                 { term: "Deniz Kaya", def: "Foto-öykü: Gece Hattı — [@denizkaya](https://example.com)" },
                 { term: "Selin Aydın", def: "Kızıl Mevsim yazısı — [@selinaydin](https://example.com)" },
-                { term: "Mert Doğan", def: "One-shot: Son Tren — [@mertdogan](https://example.com)" },
+                { term: "KARGAMANGA", def: "One-shot: Kapalı Kapılar — izinle yayımlandı · [PIGMENT](https://www.youtube.com/shorts/XaK1Acfo8ZE)" },
                 { term: "Aslı Ün", def: "Sözlük · illüstrasyon — [@asliun](https://example.com)" },
               ],
             },
@@ -738,6 +745,7 @@
               t: "list",
               style: "dict",
               items: [
+                { term: "One-shot", def: "Kapalı Kapılar, 7 kare — KARGAMANGA / PIGMENT · telif sahibinde, izinle" },
                 { term: "Kapak", def: "Fushimi Inari torii — Balon Greyjoy · [CC0](https://creativecommons.org/publicdomain/zero/1.0/)" },
                 { term: "Kızıl yaprak", def: "Enko-ji, Kyoto — lumoplank · [CC0](https://creativecommons.org/publicdomain/zero/1.0/)" },
                 { term: "Taş fener", def: "Kenroku-en, Kanazawa — DimiTalen · [CC0](https://creativecommons.org/publicdomain/zero/1.0/)" },
@@ -826,12 +834,12 @@
     {
       id: "panel-sirala",
       name: "Panel Sırala",
-      blurb: "One-shot'ın panelleri karıştı. Sağdan sola doğru sırala.",
+      blurb: "One-shot'ın kareleri karıştı. Okuma sırasına göre diz.",
       tags: ["görsel", "içerik-bağlı"],
       difficulty: 1,
       estMinutes: 2,
       icon: "🀄",
-      config: { panels: 5 },
+      config: { panels: 7 },
       stats: { plays: 980, solves: 861, firstTryRate: 0.52, avgSeconds: 96 },
     },
   ];

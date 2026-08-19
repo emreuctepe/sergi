@@ -489,6 +489,16 @@
 .page[data-kind="manga"] .page__inner {
   height: 100%;
 }
+/* kaydırmalı manga sayfası tuvale sığmak zorunda değil: yükseklik
+   panellerin kendi oranından gelir, %100 dayatması şeridi eziyordu. */
+.page[data-kind="manga"][data-fit="scroll"],
+.page[data-kind="manga"][data-fit="scroll"] .page__inner,
+.page[data-kind="manga"][data-fit="scroll"] .manga-page {
+  height: auto;
+}
+.page[data-kind="manga"][data-fit="scroll"] .manga {
+  flex: none;
+}
 
 .manga-page {
   position: relative;
@@ -522,6 +532,18 @@
   grid-column: 1 / -1;
 }
 
+/* dikey — 9:16 kareler tek sütunda, webtoon/shorts mantığı.
+   3:4 tuvale kırpmak yerine sayfa kaydırılır (page.fit: "scroll"), böylece
+   kompozisyon tam kalır ve tuval oranı bozulmaz (bkz. PROJE.md §5.3). */
+.manga[data-layout="dikey"] {
+  grid-template-columns: 1fr;
+  grid-auto-rows: max-content;
+  gap: 2.4cqi;
+}
+.manga[data-layout="dikey"] .manga-panel {
+  aspect-ratio: 9 / 16;
+}
+
 .manga-panel {
   position: relative;
   overflow: hidden;
@@ -535,9 +557,12 @@
   position: absolute;
   inset: 0;
 }
-.manga-panel__art svg {
+.manga-panel__art svg,
+.manga-panel__art img {
   width: 100%;
   height: 100%;
+  display: block;
+  object-fit: cover;
 }
 .manga-bubble {
   position: absolute;
@@ -554,6 +579,13 @@
   line-height: 1.35;
   text-align: center;
   box-shadow: 2px 2px 0 color-mix(in oklab, var(--ink) 30%, transparent);
+}
+/* aynı karedeki ikinci balon — karşı taraf konuşuyor */
+.manga-bubble--alt {
+  top: auto;
+  right: auto;
+  bottom: 7%;
+  left: 6%;
 }
 .manga-bubble--think {
   border-radius: var(--radius-full);

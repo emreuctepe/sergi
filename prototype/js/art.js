@@ -979,14 +979,30 @@
    * layout: panel dikdörtgenleri [x,y,w,h] — 300x400 alanda
    * Panel sırası SAĞDAN SOLA okunur; `order` bunu zaten yansıtır.
    */
-  A.mangaPanel = function (index, text, kind) {
-    var art = mangaArt[index % mangaArt.length]();
-    var bubble = "";
-    if (text) {
-      bubble =
-        '<div class="manga-bubble' + (kind ? " manga-bubble--" + kind : "") + '">' + U.escape(text) + "</div>";
-    }
-    return '<div class="manga-panel__art">' + art + "</div>" + bubble;
+  /* p.img verilirse çizilmiş sahne yerine gerçek kare kullanılır (bkz.
+     2026-09 one-shot). Balon katmanı ikisinde de aynı — balonlar HTML,
+     görselin içine gömülü değil: seçilebilir, çevrilebilir, yorumlanabilir. */
+  A.mangaPanel = function (index, text, kind, img, alt) {
+    var art = img
+      ? '<img src="' + U.escape(img) + '" alt="' + U.escape(alt || "") + '" loading="lazy" decoding="async">'
+      : mangaArt[index % mangaArt.length]();
+
+    /* text bir dizi olabilir: tek karede birden çok balon (karşılıklı konuşma,
+       ya da kadraj dışından gelen ses). {text, kind, at:"alt"} → alt balon. */
+    var list = Array.isArray(text) ? text : text ? [{ text: text, kind: kind }] : [];
+    var bubbles = list
+      .map(function (b) {
+        if (!b || !b.text) return "";
+        return (
+          '<div class="manga-bubble' +
+          (b.kind ? " manga-bubble--" + b.kind : "") +
+          (b.at === "alt" ? " manga-bubble--alt" : "") +
+          '">' + U.escape(b.text) + "</div>"
+        );
+      })
+      .join("");
+
+    return '<div class="manga-panel__art">' + art + "</div>" + bubbles;
   };
 
   /* ------------------------------------------------------------------------

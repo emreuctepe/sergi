@@ -156,16 +156,19 @@
 
     /* --- manga sayfası ----------------------------------------------------- */
     manga: function (b) {
+      /* Okuma yönü artık bloktan geliyor. Japon one-shot'ları sağdan sola
+         okunur, ama her manga öyle değil — 2026-09'un "Kapalı Kapılar"ı
+         soldan sağa kurgulanmış bir dikey şerit. Sabit rtl yanlış cevaptı. */
       var wrap = el("div.manga" + ".manga--" + (b.layout || "3-üst-1-alt").replace(/[^a-z0-9-]/gi, ""), {
         "data-layout": b.layout,
-        dir: "rtl",
+        dir: b.dir === "ltr" ? "ltr" : "rtl",
       });
       b.panels.forEach(function (p, i) {
         var panel = el("figure.manga-panel", {
           style: { "--i": i },
           "data-panel": i,
           "data-sub": i,
-          html: A.mangaPanel(p.art, p.text, p.kind),
+          html: A.mangaPanel(p.art, p.text, p.kind, p.img, p.alt),
         });
         wrap.appendChild(panel);
       });
