@@ -510,6 +510,23 @@
       direction: "ltr",
       tags: ["manga", "kurgu"],
       pages: [
+        /* Kapak — KARGAMANGA'nın karga figürü. Hikâyeden bir kare değil,
+           stüdyonun imzası: sert siyah-beyaz, panellerin pastelinden ayrı
+           duruyor ve one-shot'ın başladığını bir eşik gibi bildiriyor. */
+        {
+          id: "mn-kapak",
+          depth: ["all"],
+          fit: "contain",
+          bleed: "full",
+          kind: "opener",
+          bg: "img:assets/2026-09/kapali-kapilar/kapak.webp",
+          scene: "mask-wipe",
+          blocks: [
+            { t: "kicker", text: "Bu sayıya özel one-shot", invert: true },
+            { t: "h1", text: "Kapalı Kapılar", invert: true, big: true },
+            { t: "lead", invert: true, text: "KARGAMANGA · 7 kare · soldan sağa" },
+          ],
+        },
         {
           id: "mn-1",
           depth: ["all"],
