@@ -1,57 +1,20 @@
 # Yorum Sistemi — Yeniden Tasarım Planı
 
-> **Durum:** §2 ve §3.1 **uygulandı** (adım B1), §4'ün stres testi hazır (B2),
-> **Yol B — Fısıltı** (B3) ve **Yol A — Kenar** (B4) ikisi de ayakta, menüden
-> geçiliyor. Sırada karar (B5): ekrana bakarak, kaybeden yollar silinir.
+> **Durum:** §2 (ankraj modeli) ve §3.1 (temsilci ses) **uygulandı**, stres testi
+> ayakta (§2 sonundaki ölçümler). Sunum tarafında karar verildi: birkaç biçim
+> denendi, hepsi elendi — geriye **baloncuk + pop-up** kaldı (§4). Metne dokunan
+> hiçbir işaret yok. Sırada **B6 — Mektuplar sayfası** (§3.3).
 > İlgili: [PROJE.md §5.9](PROJE.md), [PROTOTIP-TODO.md](PROTOTIP-TODO.md)
 
-> **B1'de ölçülen:** 250 yorumla en yoğun blokta 36 yorum birikti ve sayfada yine
-> tek ses göründü; bir sayfadaki en fazla işaret 9 oldu (6 pin + 3 blok çentiği),
-> çizim 7 ms sürdü. §0.1'deki "aynı cümleye ikinci yorum imkânsız" hatası
-> tohum veride bilerek kurulan bir örnekle doğrulandı: `km-3:3` bloğundaki
-> cümleye üç ayrı ses bağlı, sayfada tek bir alıntı işareti var.
+> **Stres testinde ölçülen (250 sentetik yorum):** en yoğun blokta 36 yorum birikti
+> ve sayfa düzeni bozulmadı; çizim 7 ms sürdü. §0.1'deki "aynı cümleye ikinci yorum
+> imkânsız" hatası tohum veride bilerek kurulan bir örnekle doğrulandı: `km-3:3`
+> bloğundaki cümleye üç ayrı ses bağlı, üçü de yerinde duruyor.
 
-> **B2.5'te ölçülen (elle yazılmış dolu sayı, 248 yorum):** akıştaki 29 sayfanın
-> hepsinde yorum var, en yoğun blokta 21 ses birikti, en sıcak cümleyi 16 kişi
-> alıntıladı — sayfada yine **tek işaret**, yalnızca daha koyu. Bir sayfadaki en
-> fazla işaret 7, temsilcisiz blok 0, çizim 3.6 ms. Eş okuma kapalıyken 31 yorumlu
-> `km-1` sayfasında yalnızca 2 soluk iz kalıyor: ilk okuyuş hâlâ yazarın.
->
-> Bu ölçüm bir hata da buldu: ısı ölçeği kalabalıkta **ayırt etmiyordu** (her
-> işarete zemin dolgusu → sayfa şeritleniyor, ısı 4 ile ısı 2 aynı görünüyor).
-> Ağırlık altı çizginin kalınlığına taşındı, dolgu ısı 3'te başlıyor. Sentetik
-> stres modunda görünmeyen, ancak *gerçek* dolu sayıda görünen bir hataydı.
-
-> **B4'te ölçülen (Kenar, `js/kenar.js`):** 11 metin sayfasında ray/dokuma
-> çalışıyor. **Ray tuvalin dışında** (v2): dergi tam 3:4/tam genişlikte, kartlar
-> sağ boşlukta. 1280px, dock kapalı → dergi 370–910px, ray 934–1234px (300px),
-> çakışma yok, yatay taşma yok; kart üstleri bloğun görsel üstüne birebir (0–1px)
-> oturuyor (yerleşince; geçiş anında ~13px, o an zaten her şey oynuyor).
-> Kaydırmada kartlar bloklarını takip ediyor, görüş dışı gizleniyor. Çakışma
-> çözümü ve "+N daha" hapı doğrulandı (contain sayfada; scroll sayfada kaydırınca
-> geliyor). Dock açıkken sağ boşluk daralıyor: 1280'de ray sığıyor (~162px),
-> 980'de sığmıyor → dokumaya düşüyor. Telefonda (390px) dokuma: şerit bloğun
-> ardında, dokun → 3 satır (42→81px), tekrar dokun → thread; sayfa uzuyor (sz-1:
-> 720 → 948px), alt bloklar şeridi içine alıyor. Metin-dışı sayfalarda (foto,
-> manga) ray gizli. Tüm sunum geçişleri temiz, `comments:decorated` üzerinden
-> otomatik tazeliyor. Ray düzeni 500 yorumda 40 ms (aç/kapa ve decorate'te;
-> kaydırmada yalnız hafif yeniden-konumlama).
-
-> **B3'te ölçülen (Fısıltı, `js/whisper.js`):** 29 sayfanın hepsinde şerit bir ses
-> buluyor, hepsi farklı okur, çoğu alıntısıyla birlikte. Sayfa DOM'una tek bir
-> düğüm eklenmiyor (odak bloğa yalnızca bir öznitelik). 498 yorumla (tohum +
-> stres) çizim + fısıltı 14.5 ms.
->
-> **Asıl ölçüm ekranın kaç pikselini yediği:** şerit 66 px, bant 50 → 129 px.
-> Telefonda (390×844) tuval, 3:4'ün üstündeki *taşma payından* borç alıyor:
-> 720 → 588 px, örtme **1 px** — yani sayfanın kurgulanmış içeriğinden hiçbir şey
-> kapanmıyor. Payın bittiği yerlerde bedel görünür oluyor: basık telefonda
-> (390×620) alt %15, kısa masaüstü penceresinde (1280×800) alt %14 örtülüyor;
-> uzun pencerede (1280×1000) 8 px. Bu, yolun kendi maliyeti — gizlenmedi.
->
-> Ayrıca: şerit **ses olmasa da yer tutuyor** (sessiz hâl). İlk denemede sayfa
-> değişince bant büyüyüp küçülüyordu, telefonda bu tuvali yeniden ölçtürüp okuma
-> yerini oynatıyordu.
+> **Dolu sayıda ölçülen (elle yazılmış 248 yorum):** akıştaki 29 sayfanın hepsinde
+> yorum var, en yoğun blokta 21 ses birikti, en çok alıntılanan cümleyi 16 kişi
+> seçmiş. Çizim 3.6 ms. Eş okuma kapalıyken 31 yorumlu `km-1` sayfası tertemiz
+> kalıyor: ilk okuyuş hâlâ yazarın.
 
 ---
 
@@ -76,7 +39,8 @@ okumak asla aynı anda olmuyor. Her yorum bir bağlam değişimi.
 
 ### 0.3 Ölçek sorunu — ve sistemin sessizce yalan söylemesi
 
-Bunlar kozmetik değil, koddaki gerçek sınırlar (`js/comments.js`):
+Bunlar kozmetik değil, o günün kodundaki gerçek sınırlardı (`js/comments.js`;
+adı geçen fonksiyonlar bu yeniden tasarımla kaldırıldı):
 
 | Sınır | Nerede | 300 yorumda ne olur |
 |---|---|---|
@@ -105,7 +69,7 @@ Bundan sonraki her karar bunlara karşı test edilecek.
    Okur yine cümle seçer — ama seçtiği cümle yorumun *içinde* alıntı olarak durur,
    sayfada bir `<mark>` olarak değil. Aynı jest, dayanıklı depolama.
 
-3. **Bir blokta kaç ses varsa olsun, sayfada tek ses görünür.**
+3. **Bir yerde kaç ses varsa olsun, sayfada tek ses görünür.**
    Ölçeği yaşanabilir kılan tek kural bu. 3 yorum da olsa 300 yorum da olsa sayfa
    düzeni değişmez: bir temsilci + sayaç.
 
@@ -116,8 +80,8 @@ Bundan sonraki her karar bunlara karşı test edilecek.
 
 ## 2. Temel değişiklik: ankraj modeli
 
-Aşağıdaki üç yolun **hepsi** bu temeli paylaşır. Önce bu kurulur, sonra sunum
-biçimleri denenir.
+Sunum biçiminden bağımsız olan kısım budur: hangi sunum seçilirse seçilsin bu
+temel aynı kalır. Önce bu kuruldu, sunum sonra denendi.
 
 ### 2.1 Blok kimliği
 
@@ -142,26 +106,27 @@ gereken yeni bir sorumluluk — şimdiden not düşülmeli.
 | Metin seçme | ankraj olur | Yine mümkün — ama seçilen cümle **alıntı** olarak gövdeye girer, ankraj yine bloktur |
 | Görsele uzun basma | pin | Aynen kalır. Görselde konum gerçekten anlam taşır ("şu adamın şapkası") |
 
-### 2.3 Alıntı ısısı — işaretler toplulaşır
+### 2.3 Alıntı ısısı — denendi, kaldırıldı
 
-`<mark>` tamamen kaybolmuyor, **anlamı değişiyor.** Artık "burada bir yorum var"
-demiyor; **"bu cümleyi kaç kişi alıntıladı"** diyor.
+Ara bir aşamada `<mark>` korunmuş, anlamı değiştirilmişti: "burada bir yorum var"
+yerine **"bu cümleyi kaç kişi alıntıladı"**. Kalınlık alıntı sayısıyla artıyordu
+(1 alıntı → çok hafif alt çizgi, 20 → tam vurgu).
 
-```
-1 alıntı   → çok hafif alt çizgi
-5 alıntı   → belirgin
-20 alıntı  → tam vurgu + dokununca "23 okur bu cümleyi alıntıladı"
-```
+**2.x sadeleştirmesinde kaldırıldı.** Gerekçe: metnin üstündeki her işaret, ne
+kadar hafif olursa olsun, sayfanın dizgisine karışan bir arayüz öğesi. Isı ölçeği
+kalabalıkta zaten ayırt etmiyordu ve ölçeği düzeltmek sayfayı daha da şeritli
+yapıyordu. Metne dokunmayan bir sunuma (§4) geçilince gerekçesi de kalmadı.
 
-Bu tek hamle 0.3'teki dört sınırın üçünü birden siliyor: çakışma yok (cümle başına
-tek işaret), ikinci yorum kaybolmuyor, ve işaret **yorum arttıkça daha bilgilendirici
-oluyor, daha gürültülü değil.** Kindle'ın "popular highlights"ı yıllardır bunu böyle
-çözüyor; kanıtlanmış bir örüntü.
+Önemli olan şu: **ankraj kazanımı ısıya bağlı değildi.** §0.3'teki "aynı cümleye
+ikinci yorum imkânsız" hatası, alıntının ankraj olmaktan çıkıp gövdeye taşınmasıyla
+(§2.2) çözüldü; `<mark>` bunun yalnızca görsel tarafıydı. Isı kalktı, çözüm durdu.
 
 ### 2.4 Pin kümelenmesi
 
-Görsel pinleri kalıyor ama birbirine %8'den yakın pinler tek bir küme pinine
-dönüşüyor (`3` sayacıyla). Yakınlaştırılınca ayrışıyor. Haritaların otuz yıllık
+Görsel pinleri kalıyor ama birbirine **0.14'ten** yakın pinler tek bir küme pinine
+dönüşüyor (`3` sayacıyla). Mesafe tuval **genişliği** biriminde ölçülüyor
+(`dy × 4/3`, 3:4 *tasarım* oranı) — böylece aynı iki yorum her cihazda aynı şekilde
+birleşiyor. `MAG.pins()` bu çekim alanlarını çiziyor. Haritaların otuz yıllık
 çözümü; burada da doğru çözüm.
 
 ### 2.5 Düşme zinciri (yenisi)
@@ -176,7 +141,8 @@ sürekli** oluyor. Yorum yine asla kaybolmuyor, ama artık nadiren düşüyor.
 
 ### 3.1 Temsilci ses
 
-Her blok için tek bir yorum sayfada görünür. Seçim şeffaf ve açıklanabilir:
+Her baloncuk için tek bir yorum görünür — bir baloncuk bir bloğu da temsil edebilir,
+üst üste binmiş birkaç pinden oluşan bir kümeyi de. Seçim şeffaf ve açıklanabilir:
 
 ```
 puan = 2 × tepki  +  1 × cevap sayısı  +  100 × editör seçimi
@@ -204,158 +170,52 @@ sayfa içi sunum "yanımdaki ses"i çözer, mektuplar sayfası "bu sayıda ne ko
 
 ---
 
-## 4. Üç yol — prototipe değer üç sunum biçimi
+## 4. Sunum: baloncuk ve pop-up
 
-Hepsi §2'nin temelini kullanır, hepsi aynı veriyi gösterir. Fark: **ses nerede
-duruyor.**
+Birkaç sunum biçimi yazılıp yan yana denendi — alt bantta konuşan bir şerit, sayfanın
+sağındaki boşlukta hizalı kartlar, sayfa altına dizilen dipnotlar. Hepsi elendi.
+Ortak sorunları aynıydı: her biri ya sayfanın dizgisine karışıyordu, ya belirli bir
+ekran genişliğine muhtaçtı, ya da "aynı anda" sözünü tutamayıp "bir dokunuş uzakta"da
+kalıyordu. Üçünü aynı anda menüde tutmak da bir maliyetti: aynı veriyi üç ayrı
+şekilde çizen üç ayrı dosya.
 
----
+Geriye §1'in dört yasasını en ucuza tutan model kaldı: **her yorum bir baloncuk.**
 
-### Yol A — “Kenar” (kenar rayı / dokuma)
-
-Eş okuma modunda metin sütunu daralır, açılan şeritte yorumlar **hizalı** durur:
-her kart, ait olduğu bloğun tam yanında.
-
-- **Geniş ekranda:** metin %64, ray %36. Kartlar blokların `offsetTop`'una
-  hizalanır, çakışanlar aşağı itilir (Google Docs'un klasik yerleştirme geçişi,
-  ~25 satır). Sayfaya sığmayan kartlar altta `+5 daha` hapına toplanır.
-- **Telefonda:** ray yok, çünkü kenar yok. Aynı veri **dokuma** olarak iner:
-  bloğun hemen ardına tek satırlık ince bir şerit — `🦩 "Kaynak var mı acaba?" +3`.
-  Dokunulunca yerinde 3 satıra açılır, tekrar dokunulunca thread. Sayfa bu modda
-  `fit: scroll`'a geçer (zaten desteklenen bir davranış).
-- **Kanıtladığı şey:** kullanıcının tarif ettiği şeyin *birebir* karşılığı —
-  cümleyi ve ona iliştirilen sesi aynı anda okumak.
-- **Maliyet:** orta-yüksek. Ölçüm + çakışma çözümü + iki ayrı sunum.
-- **Risk:** dar ekranda 240 px'lik metin sütunu tipografiyi zorlar; dokuma
-  biçiminde sayfa uzar, "sığan sayfa" kimliği bu modda esner.
-
-#### Yazıldıktan sonra (B4) — tahminden farklı çıkanlar
-
-| Tahmin | Gerçek |
+| Ne | Nasıl |
 |---|---|
-| Ray/dokuma kararı letterbox'a | **Tuval genişliğine** (≥520px → ray). Letterbox dikey boşluk demek; telefon portrede dikeyde bol boşluk olur ama kenar yine yoktur — ilk deneme 390px tuvalde ray açıp metni 197px'e sıkıştırdı |
-| metin %64, ray %36 | metin %60, ray %36, arada %4 boşluk. Ray, sütunla **aynı içerik kutusu** yüzdesiyle ölçülüyor; pageWidth yüzdesiyle verince iki kenar 2px çakışıyordu |
-| Telefonda `fit: scroll`'a geçer | Registration'a dokunmadan: yorumlu sayfa CSS ile uzuyor (`height:auto`), `p.fit` "contain" kalıyor. prev/next o sayfada içeriği atlayabilir — kabul, "sığan sayfa esner" zaten deniyordu |
-| Kapsam: her sayfa | Yalnızca **metin sayfaları**. Tam kanama görsel, kapak, manga, bulmaca, sayı sonu dışarıda: blok yorumları eski rozet+thread'e düşüyor, nokta pinleri her yerde çalışıyor |
+| Baloncuk | Yorumun yaşadığı yer. Blok yorumu bloğun sol üstüne, nokta yorumu bıraktığı koordinata, sayfa yorumu köşeye oturur |
+| Salınım | Baloncuklar boşta hafifçe yüzer — sayfa donuk durmasın, "burada biri var" duygusu kalsın diye |
+| Sürükleme | Basılı tut ve taşı. Konum yoruma yazılır, yeniden çizimde orada kalır — okur kendi işaretinin yerini seçebiliyor |
+| Dokunma | Tuvalin **üstünde** pop-up: o baloncuktaki bütün sesler, kaydırmalı, cevaplarıyla birlikte |
+| Eş okuma kapalı | Baloncuklar tamamen gizli. İlk okuyuş yazarın |
 
-**v2 — ray tuvalin İÇİNDEN DIŞINA taşındı (kullanıcı isteği).** İlk sürümde
-kartlar tuvalin içindeydi, metni %60'a daraltıyordu — okuma sütunu daralıyor,
-kartlar metnin üstüne biniyordu. Kullanıcı "balonları derginin sağındaki boşluğa
-taşıyalım" dedi. Artık ray tuvalin **dışında**, sağ letterbox boşluğunda; dergi
-tam 3:4 ve temiz kalıyor, kartlar gerçek bir dergi kenar notu gibi yanında.
+**Dört yasaya karşı:** (1) ankraj hâlâ blok — baloncuk yalnızca onun görünen yüzü.
+(2) Alıntı gövdede, sayfada değil. (3) Bir baloncuk = bir temsilci ses + sayaç,
+kalabalık kümelenmeyle emiliyor (§2.4). (4) Baloncuk metnin üstünde değil, metnin
+*yanında* duruyor ve hiçbir harfi kapatmıyor.
 
-| v2'de değişen | Nasıl |
-|---|---|
-| Metin daralması | **Kaldırıldı.** Dergi tam genişlikte |
-| Ray konumu | `#shell` çocuğu, `left:100%` ile tuvalin sağ boşluğunda; genişlik/konum js ölçüyor. Dock kayması dâhil tuvalle birlikte kayar |
-| Hizalama | Ray artık ölçekli tuvalin dışında → `getBoundingClientRect` (görsel koordinat) doğru. Kartlar tuvalle kaymadığından **kaydırmada js yeniden konumluyor**; `scale(0.965)` geçişi bitince de bir kez |
-| Görünürlük | Bir sayfa gösterilir; scroll sayfada görüş dışına çıkan kart gizlenir, kaydırınca gelir. contain sayfada sığmayan "+N daha" hapına |
-| Bedel | Metin artık daralmıyor; yeni bedel: ray **sağ boşluğa** muhtaç. Dock (sol menü) açıkken sağ boşluk daralıyor — dar pencerede ray sığmazsa dokumaya düşüyor. Dock kapalıyken (Sade görünüm) simetrik: solda menü, ortada dergi, sağda ray |
-
-Yol tek dosya + tek CSS bölümünde (`js/kenar.js`, `css/comments.css` sonu).
+**Bedeli — dürüstçe:** "cümle ve sesi aynı anda" sözü tam olarak tutulmuyor. Baloncuk
+sesin *var olduğunu* gösteriyor, içeriğini bir dokunuş sonra. Elenen sunumlardan biri
+(sağdaki hizalı kartlar) bunu gerçekten çözüyordu ama yalnızca geniş ekranda ve
+derginin sağında boşluk kaldığı sürece. Telefonda — asıl hedef cihazda — hiçbiri
+baloncuktan daha iyisini yapamadı.
 
 ---
-
-### Yol B — “Fısıltı” (alt bant konuşur)
-
-Hiçbir düzen değişmiyor. Zaten var olan **alt bant** iki satıra açılıyor ve o an
-odaktaki bloğun temsilci sesini gösteriyor.
-
-- Odak = son dokunulan blok; dokunulmadıysa sayfanın en yüksek puanlı yorumu.
-  Kaydırmalı sayfalarda ekranın dikey ortasına en yakın blok.
-- Bir paragrafa dokun → bant o paragrafın sesine geçer, blok hafifçe aydınlanır.
-  Banda dokun → thread.
-- **Kanıtladığı şey:** yorumların içeriğe *hiç dokunmadan* okuma akışına
-  karışabileceği. Tasarım bütünlüğü açısından en temiz seçenek.
-- **Maliyet:** düşük. Tahminen ~120 satır, mevcut bant ve panel yeniden kullanılır.
-- **Risk:** "aynı anda" değil "bir dokunuş uzakta". Kullanıcının istediğinin tam
-  karşılığı olmayabilir. Buna karşılık her ekranda kusursuz çalışır.
-
-#### Yazıldıktan sonra (B3) — tahminden farklı çıkanlar
-
-| Tahmin | Gerçek |
-|---|---|
-| ~120 satır | 250 satır (`js/whisper.js`) + 150 satır CSS |
-| "Hiçbir düzen değişmiyor" | Sayfa düzeni gerçekten değişmiyor, ama şerit **66 px yer istiyor**. Telefonda tuvalin taşma payından alıyor (örtme 1 px), pay yoksa sayfanın altına biniyor (%14-15) |
-| Odak üç kuralla belirlenir | Aynen öyle; ek olarak şeridin **ses olmasa da yer tutması** gerekti (yoksa bant sayfa başına büyüyüp küçülüyor) |
-| Banda dokun → thread | Buna bir adım eklendi: yorumlu bloğa **ilk dokunuş sesi banda taşır, ikinci dokunuş konuşmayı açar**. "Önce duy, istersen aç" — okuma bölünmüyor |
-
-Yolun tamamı tek dosyada + tek CSS bölümünde duruyor (`js/whisper.js`,
-`css/comments.css` sonu). Kaybederse silmek: bir dosya, bir bölüm, bir betik
-etiketi, bir menü satırı, `state.js`'te bir alan.
-
----
-
-### Yol C — “Karşı sayfa” (spread)
-
-Derginin kullanmadığı bir eksen var: **yatay.** Dikey = akış. Yatay boş.
-
-Her içerik sayfasının bir **karşı sayfası** olur: aynı 3:4 ölçüsünde, ama içeriği
-o sayfanın konuşması — dizilmiş, tasarlanmış, alıntılarıyla birlikte.
-
-- **Geniş ekranda:** eş okuma modunda tuval 3:4'ten 3:2'ye açılır ve **gerçek bir
-  açık dergi olur**: solda yazı, sağda okurlar. Kelimenin tam anlamıyla aynı anda.
-- **Telefonda:** sola kaydır → karşı sayfa gelir, sağa kaydır → geri. Tek jest.
-- **Kanıtladığı şey:** yorumun *dergiye ait* olabileceği — arayüz katmanı değil,
-  sayfanın kendisi. Marka açısından en güçlü fikir bu.
-- **Maliyet:** yüksek. Yatay eksen, geçiş tasarımı, tuval geometrisinin ikinci
-  bir hâli (yeni bitirdiğimiz responsive işine dokunur).
-- **Risk:** telefonda "aynı anda" yine değil, "bir kaydırma uzakta". Yatay jest
-  manga bölümündeki sağdan-sola okumayla çakışabilir.
-
----
-
-### Yol D — “Şerh” (dipnot / haşiye)
-
-Yorum bir arayüz balonu değil, **kitabın kendi diziliş dili**. Metinde bloğun
-sonuna küçük bir üst-simge numara (¹ ² ³) düşer; yorumun kendisi sayfanın altında,
-numaralı bir "haşiye" bloğunda dizilir. Osmanlı yazma geleneğindeki *şerh/haşiye*
-budur: metnin kenarına düşülmüş okur notu. Dipnot okuma alışkanlığının aynısı.
-
-- Metinde `[1]` üst-simge, sayfa altında `1. Okur — "alıntı" → yorum`.
-- Numaraya dokun → notuna kayar (dipnot gezinmesi). Nota dokun → thread.
-- Sayfa notlar için **uzar** (dokuma gibi); her şey in-flow olduğu için Kenar'ın
-  gutter/hizalama/kaydırma derdi yok — en basit sunum bu.
-- **Kanıtladığı şey:** yorum "arayüz katmanı" değil, sayfanın tipografisi olabilir.
-  Kenar'ın kartları "uygulama" gibi durur; şerh "kitap" gibi durur.
-- **Maliyet:** düşük. `js/serh.js` + bir CSS bölümü.
-- **Risk:** "aynı anda" değil "aşağıda"; okur numarayı görüp aşağı bakmalı.
-  Yoğun sayfada dipnot listesi uzar. Yalnızca metin sayfalarında.
-
-**Yazıldıktan sonra (B4.2):** Beklendiği gibi çıktı — 11 metin sayfasında numara +
-haşiye. sz-1 gibi listede alt satırlar (dict) tek tek numaralanıyor (1 liste-üstü +
-5 satır = 6 not). Numara→not kaydırma + kısa "flash", not→thread çalışıyor.
-Telefonda da aynı (in-flow), sayfa uzuyor. Liste/sözlük kabına üst-simge geçersiz
-olduğu için son satırına oturuyor.
-
----
-
-### Nasıl deneriz
-
-Yolların hepsi **aynı anda kodda durur**, menüdeki "Yorum sunumu" anahtarıyla
-değiştirilir (Menü → Ayarlar → Yorum sunumu). Aynı sayı, aynı yorumlar, farklı
-sunum. Karar ekrana bakarak verilir, tarif okuyarak değil.
-
-> **Yaklaşım değişti (kullanıcı kararı):** yolları eleyerek değil, **biriktirerek**
-> ilerliyoruz — "sağlam bir yorum sistemi bulana kadar". Her yol ayrı dosya
-> (`whisper.js` / `kenar.js` / `serh.js` …) olduğu için kod temizliği baskısı yok;
-> burası prototip alanı. Şerh ile başladık, sırayla diğerleri de gelecek
-> (Uğultu, Mektuplar, Yönetmen yorumu — §"başka neler" aşağıda). Eleme, ancak
-> hepsini görüp "bu" dediğimizde yapılır; o zaman kaybedenler tek dosya + tek
-> CSS bölümü silinerek gider.
-
-**Stres testi zorunlu:** `data.js`'e tek bir bayrakla ~250 sahte yorum üreten bir
-mod. Her yol 14 yorumla güzel görünür; ayrım 250'de ortaya çıkar. Bu testi
-gerçekten yapacağız.
 
 ### Sırada denenecek yollar (fikir havuzu)
 
-Aynı temeli (blok ankrajı, temsilci ses, ısı, `comments:decorated`) kullanan,
-her biri menüye bir seçenek olarak eklenecek adaylar:
+Aynı temeli (blok ankrajı, temsilci ses, kümelenme, `comments:decorated`) kullanan,
+hiçbiri henüz yazılmamış adaylar:
 
+- **Karşı sayfa (spread)** — derginin kullanmadığı bir eksen var: **yatay**. Her
+  içerik sayfasının bir karşı sayfası olur: aynı 3:4 ölçüsünde, ama içeriği o
+  sayfanın konuşması. Geniş ekranda tuval 3:2'ye açılır ve gerçek bir açık dergi
+  olur — solda yazı, sağda okurlar. Telefonda sola kaydır → karşı sayfa. Marka
+  açısından en güçlü fikir; maliyeti de en yüksek (yatay eksen + tuval geometrisinin
+  ikinci hâli). Risk: yatay jest manga bölümünün okuma yönüyle çakışabilir.
 - **Uğultu** — satır arasında hiç yorum metni yok; yalnızca *nerede* konuşulduğu:
-  ısının büyütülmüş hâli, yığılmış minik yüzler, bir "mırıltı" dokusu. Okuma
-  tertemiz kalır, sosyallik ortam ışığı gibi. "İlk okuyuş yazarın"a en sadık.
+  yığılmış minik yüzler, bir "mırıltı" dokusu. Okuma tertemiz kalır, sosyallik
+  ortam ışığı gibi. "İlk okuyuş yazarın"a en sadık.
 - **Mektuplar sistemi** — satır arasında hiçbir şey; yorum bloğa dokununca yazılır
   ama yalnızca bölüm/sayı sonundaki editöryel dizilmiş "Okur Mektupları" sayfasında
   okunur. En marka-doğal, en az gürültü (§3.3 zaten planlı).
@@ -365,49 +225,25 @@ her biri menüye bir seçenek olarak eklenecek adaylar:
 - **Yönetmen yorumu** — yorumları editöre sorulan sorular olarak çerçevele, senin
   cevapların birinci sınıf; marj bir soru-cevap / commentary bandına döner.
 
----
 
-## 5. Önerim
+## 5. Prototipte nereye dokunuldu
 
-**Önce temel (§2 + §3.1), sonra B, sonra A. C'yi ertele.**
-
-Gerekçe:
-
-- **§2 pazarlık konusu değil.** Sunumdan bağımsız olarak bugünkü ankraj modeli
-  ölçekte bozuluyor ve bunu *sessizce* yapıyor. Hangi yolu seçersek seçelim bu iş
-  yapılacak; en riskli parça da bu, o yüzden ilk o.
-- **B ucuz ve karşılaştırma zemini kuruyor.** Bir gün içinde ayakta olur ve
-  "aslında yeterliymiş" ihtimali gerçek. Bunu bilmeden A'ya yatırım yapmak
-  pahalı.
-- **A senin tarif ettiğin şeyin birebir karşılığı.** B'nin yanında görünce
-  aradaki farkın gerçekten hissedilip hissedilmediği anlaşılır.
-- **C en güzel fikir ama en pahalısı ve "aynı anda"lık konusunda A'dan zayıf.**
-  Geniş ekranda büyüleyici, telefonda — asıl hedef cihazda — B ile aynı mesafede.
-  A ile B arasında karar verilmeden buna girmek erken.
-
----
-
-## 6. Prototipte nereye dokunulur
-
-| Dosya | Ne olur |
+| Dosya | Ne oldu |
 |---|---|
-| `js/render.js` | Her bloğa `data-block-id` (`pageId:index`) basılır |
-| `js/comments.js` | Ankraj çözümleme baştan yazılır: `markText()` gider, yerine blok eşleme + alıntı ısısı toplama + pin kümeleme + temsilci puanlama gelir |
-| `js/data.js` | 14 tohum yorumun ankrajları `block`'a taşınır, mevcut `exact` metinleri `quote` alanına iner (kayıpsız). `+ MAG.debug.floodComments(250)` stres modu |
-| `js/overlays.js` | Thread paneli aynı kalır, artık **blok** başlığıyla açılır |
-| `css/comments.css` | `.anno` ısı ölçeğine döner; ray/dokuma/fısıltı stilleri eklenir |
-| `js/canvas.js` | (yalnız C seçilirse) yatay eksen |
-| `js/state.js` | `commentUI` tercihi |
-| `js/whisper.js` | **(B3, yeni)** Fısıltı'nın tamamı: odak seçimi, şerit, sessiz hâl |
-| `js/kenar.js` | **(B4, yeni)** Kenar'ın tamamı: ray (hizalama+çakışma+hap) ve dokuma |
-| `js/comments.js` | **(B4)** `decorate()` bitince `comments:decorated` yayıyor: sunum katmanlarının tek tazeleme kapısı |
+| `js/render.js` | Her bloğa `data-block-id` (`pageId:index`) basılıyor |
+| `js/comments.js` | Ankraj çözümleme baştan yazıldı: `markText()` gitti, yerine blok eşleme + pin kümeleme + temsilci puanlama geldi. `decorate()` bitince `comments:decorated` yayıyor — yeniden çizimin tek kapısı |
+| `js/data-comments.js` | Tohum yorumların ankrajları `block`'a taşındı, `exact` metinleri `quote` alanına indi (kayıpsız) |
+| `js/debug.js` | `MAG.flood(250)` stres modu — sentetik yorum, yalnızca bellekte |
+| `js/popup.js` | Baloncuğa dokununca tuvalin üstünde açılan kart |
+| `js/overlays.js` | Thread paneli aynı kaldı, artık **blok** başlığıyla açılıyor |
+| `css/comments.css` | Baloncuk, sayfa rozeti, pop-up ve thread stilleri |
 
 Geriye dönük uyum: eski `text` ankrajlı yorumlar açılışta bir kez bloklara
 eşlenir, eşleşmeyen kalırsa sayfa seviyesine düşer. Kimse bir yorumunu kaybetmez.
 
 ---
 
-## 7. Gerçek ürüne etkisi (PROJE.md'de güncellenecek yerler)
+## 6. Gerçek ürüne etkisi (PROJE.md'de güncellenecek yerler)
 
 - **§5.4 içerik derleyicisi:** yeni sorumluluk — kararlı blok kimliği üretmek
   (`{#kimlik}` ile elle sabitlenebilir). Bu bir *şema* değişikliği, ertelenirse
@@ -420,13 +256,14 @@ eşlenir, eşleşmeyen kalırsa sayfa seviyesine düşer. Kimse bir yorumunu kay
   comments.quote         jsonb null  -- {exact, prefix}  YENİ
   comments.featured      bool        -- editör öne çıkardı  YENİ
   ```
-  Alıntı ısısı ayrı tablo istemiyor: `count(*) group by quote->>'exact'`.
+  `quote` ayrı tablo istemiyor; "bu cümleyi kaç kişi alıntıladı" sorusu ileride
+  gerekirse `count(*) group by quote->>'exact'` ile cevaplanır.
 - **§5.9:** üç seviyeli ankraj → iki seviyeli; "yorum katmanı aç/kapa" → "eş okuma
-  modu"; temsilci ses ve ısı çubuğu eklenir.
+  modu"; temsilci ses eklenir, sunum baloncuk + pop-up olarak tarif edilir.
 
 ---
 
-## 8. Karar bekleyen sorular
+## 7. Karar bekleyen sorular
 
 1. **Eş okuma varsayılan mı, kapalı mı?** Öneri: **kapalı**. İlk okuyuş yazarın,
    ikinci okuyuş okurların. Ama tersini de savunabilirim — sosyalliği gizlemek
@@ -447,26 +284,3 @@ eşlenir, eşleşmeyen kalırsa sayfa seviyesine düşer. Kimse bir yorumunu kay
    telefonda da masaüstünde de aynı şekilde kümeleniyor; alternatifte küme
    cihazdan cihaza değişir ve "aynı pin herkeste aynı yerde" sözü bozulur.
    Ama ekranda göze dairesel görünmediği de doğru.
-6. **Fısıltı şeridinin bedeli kabul edilebilir mi?** (B3'ten sonra.) Şerit 66 px
-   istiyor. Telefonda bunu tuvalin taşma payından alıyor, yani içerikten hiçbir
-   şey kapanmıyor (örtme 1 px). Ama basık ekranda ve kısa masaüstü penceresinde
-   sayfanın alt ~%14'ünün üstüne biniyor. Seçenekler: (a) böyle kalsın — bedel
-   görünsün; (b) şerit tek satıra insin (~44 px, ses kırpılır); (c) şerit açıkken
-   tuval her ekranda küçülsün — düzen gerçekten değişir, "hiç dokunmuyor" sözü
-   biter. **Önerim (a):** kararı Kenar'la yan yana görünce vermek daha doğru.
-7. **B5 — Karar: Fısıltı mı Kenar mı?** (Artık ikisi de menüde, aynı sayı, aynı
-   yorumlar.) İkisinin ayrıldığı yer:
-   - **Fısıltı** düzene hiç dokunmuyor, her ekranda birebir çalışıyor, ama "aynı
-     anda" değil "bir dokunuş uzakta" — tek seferde tek ses gösteriyor.
-   - **Kenar** kullanıcının tarif ettiği şeyin birebir karşılığı: cümle ve sesi
-     *aynı anda*, hepsi birden. **v2'de ray tuvalin dışına, sağ boşluğa taşındı**
-     — dergi artık tam genişlikte ve temiz kalıyor, metin daralmıyor. Yeni bedel:
-     ray sağ boşluğa muhtaç; sol menü (dock) açıkken o boşluk daralıyor, dar
-     pencerede ray sığmayıp dokumaya düşüyor. Telefonda sayfa uzuyor. Yalnızca
-     metin sayfalarında; görsel/manga eski davranışta.
-   Karar ekrana bakarak verilecek. Olası sonuç melez de olabilir: telefonda
-   Fısıltı (bedava, temiz), geniş ekranda Kenar rayı (dergi tam genişlikte, "aynı
-   anda" sağ boşlukta). Not: geniş ekranda ray + sol dock aynı anda isteniyorsa
-   simetrik bir düzen için dock kayması ile ray boşluğu arasındaki gerilim (§4 v2
-   tablosu) çözülmeli — şimdilik dock kapalıyken simetrik, açıkken 1280+ ekranda
-   çalışıyor. Bu, iki yolu da menüde tutup şu an denemekle görülür.
