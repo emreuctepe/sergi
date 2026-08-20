@@ -497,7 +497,96 @@
     },
 
     /* --------------------------------------------------------------------
-       05 · ONE-SHOT MANGA
+       05 · KISA SÖZLÜK
+       ----------------------------------------------------------------- */
+    {
+      slug: "sozluk",
+      type: "list",
+      title: "Beş Kelime",
+      kicker: "Sözlük",
+      author: "Emre",
+      minutes: 3,
+      tags: ["dil"],
+      pages: [
+        {
+          id: "sz-1",
+          depth: ["all"],
+          fit: "contain",
+          scene: "stagger",
+          bg: "img:assets/2026-09/dalga.webp",
+          blocks: [
+            { t: "kicker", text: "Sözlük" },
+            { t: "h1", text: "Bu ayın beş kelimesi" },
+            { t: "rule" },
+            { t: "lead", text: "Tek kelimeyle söylenip cümlelerle çevrilen beşli." },
+          ],
+        },
+        {
+          id: "sz-2",
+          depth: ["all"],
+          fit: "contain",
+          scene: "fade-up",
+          blocks: [
+            {
+              t: "list",
+              style: "dict",
+              items: [
+                { term: "Mono no aware", def: "Şeylerin geçiciliğinden doğan tatlı hüzün. Yaprağın döküleceğini bilerek ona bakmak." },
+                { term: "Komorebi", def: "Yaprakların arasından süzülen ışık. Işığın kendisi değil, yaprakla arasındaki iş." },
+                { term: "Shinrin-yoku", def: "Orman banyosu. Yürümek değil, sadece ormanda bulunmak." },
+                { term: "Yūgen", def: "Anlatılamayacak kadar derin olanın verdiği his. Sisin ardındaki dağ." },
+                { term: "Wabi-sabi", def: "Kusurun, eskimenin ve eksikliğin içindeki güzellik." },
+              ],
+            },
+          ],
+        },
+        {
+          id: "sz-3",
+          depth: ["mid", "full"],
+          fit: "contain",
+          scene: "fade-up",
+          blocks: [
+            { t: "h2", text: "Bir not" },
+            {
+              t: "p",
+              text: "Bu kelimelerin çevrilemez olduğu söylenir. Doğru değil — çevrilebilirler, sadece uzun sürer. Tek kelimeyle söylenen bir şeyi üç cümleyle söylemek, çevirememek değildir; pahalıya çevirmektir.",
+            },
+            { t: "pull", text: "Çevrilemez diye bir şey yok. Sadece pahalı çeviri var." },
+          ],
+        },
+      ],
+    },
+
+    /* --------------------------------------------------------------------
+       06 · BULMACA
+       ----------------------------------------------------------------- */
+    {
+      slug: "bulmaca",
+      type: "puzzle",
+      title: "Bulmaca",
+      kicker: "Oyun",
+      minutes: 8,
+      tags: ["oyun"],
+      pages: [
+        {
+          id: "bl-1",
+          depth: ["all"],
+          fit: "scroll",
+          scene: "fade-up",
+          bg: "scene:paper",
+          kind: "puzzle",
+          blocks: [
+            { t: "kicker", text: "Oyun" },
+            { t: "h1", text: "Bu ayın bulmacası" },
+            { t: "lead", text: "Bu ayın bulmacası. Çöz, sonucunu okurlarla karşılaştır." },
+            { t: "puzzleSlots" },
+          ],
+        },
+      ],
+    },
+
+    /* --------------------------------------------------------------------
+       07 · ONE-SHOT MANGA
        ----------------------------------------------------------------- */
     {
       slug: "kapali-kapilar",
@@ -588,95 +677,6 @@
                 },
               ],
             },
-          ],
-        },
-      ],
-    },
-
-    /* --------------------------------------------------------------------
-       06 · KISA SÖZLÜK
-       ----------------------------------------------------------------- */
-    {
-      slug: "sozluk",
-      type: "list",
-      title: "Beş Kelime",
-      kicker: "Sözlük",
-      author: "Emre",
-      minutes: 3,
-      tags: ["dil"],
-      pages: [
-        {
-          id: "sz-1",
-          depth: ["all"],
-          fit: "contain",
-          scene: "stagger",
-          bg: "img:assets/2026-09/dalga.webp",
-          blocks: [
-            { t: "kicker", text: "Sözlük" },
-            { t: "h1", text: "Bu ayın beş kelimesi" },
-            { t: "rule" },
-            { t: "lead", text: "Tek kelimeyle söylenip cümlelerle çevrilen beşli." },
-          ],
-        },
-        {
-          id: "sz-2",
-          depth: ["all"],
-          fit: "contain",
-          scene: "fade-up",
-          blocks: [
-            {
-              t: "list",
-              style: "dict",
-              items: [
-                { term: "Mono no aware", def: "Şeylerin geçiciliğinden doğan tatlı hüzün. Yaprağın döküleceğini bilerek ona bakmak." },
-                { term: "Komorebi", def: "Yaprakların arasından süzülen ışık. Işığın kendisi değil, yaprakla arasındaki iş." },
-                { term: "Shinrin-yoku", def: "Orman banyosu. Yürümek değil, sadece ormanda bulunmak." },
-                { term: "Yūgen", def: "Anlatılamayacak kadar derin olanın verdiği his. Sisin ardındaki dağ." },
-                { term: "Wabi-sabi", def: "Kusurun, eskimenin ve eksikliğin içindeki güzellik." },
-              ],
-            },
-          ],
-        },
-        {
-          id: "sz-3",
-          depth: ["mid", "full"],
-          fit: "contain",
-          scene: "fade-up",
-          blocks: [
-            { t: "h2", text: "Bir not" },
-            {
-              t: "p",
-              text: "Bu kelimelerin çevrilemez olduğu söylenir. Doğru değil — çevrilebilirler, sadece uzun sürer. Tek kelimeyle söylenen bir şeyi üç cümleyle söylemek, çevirememek değildir; pahalıya çevirmektir.",
-            },
-            { t: "pull", text: "Çevrilemez diye bir şey yok. Sadece pahalı çeviri var." },
-          ],
-        },
-      ],
-    },
-
-    /* --------------------------------------------------------------------
-       07 · BULMACA
-       ----------------------------------------------------------------- */
-    {
-      slug: "bulmaca",
-      type: "puzzle",
-      title: "Bulmaca",
-      kicker: "Oyun",
-      minutes: 8,
-      tags: ["oyun"],
-      pages: [
-        {
-          id: "bl-1",
-          depth: ["all"],
-          fit: "scroll",
-          scene: "fade-up",
-          bg: "scene:paper",
-          kind: "puzzle",
-          blocks: [
-            { t: "kicker", text: "Oyun" },
-            { t: "h1", text: "Bu ayın bulmacası" },
-            { t: "lead", text: "Bu ayın bulmacası. Çöz, sonucunu okurlarla karşılaştır." },
-            { t: "puzzleSlots" },
           ],
         },
       ],
