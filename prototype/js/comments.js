@@ -248,6 +248,38 @@
     return comment;
   };
 
+  /* ------------------------------------------------------------------------
+     PRESTİJ ROZETİ — Doomreader
+     ------------------------------------------------------------------------
+     `full` modunu tamamlayan okurun adının yanında duruyor. Mod tamamlamanın
+     okura görünen İKİNCİ izi (birincisi altın mod kartı) — ve tek sosyal izi.
+
+     Tohum okurların bir kısmına da veriliyor: rozet yalnızca okurun kendi
+     adında çıksaydı ödül gibi değil hata gibi görünürdü. Dağılım id'den
+     türetiliyor, yani her açılışta aynı kişilerde.
+     --------------------------------------------------------------------- */
+
+  function hashId(id) {
+    var h = 0;
+    for (var i = 0; i < String(id).length; i++) h = (h * 31 + String(id).charCodeAt(i)) >>> 0;
+    return h || 1;
+  }
+
+  C.hasPrestige = function (author) {
+    if (!author) return false;
+    if (author.mine) return MAG.streak ? MAG.streak.hasPrestige() : false;
+    /* Tohum okurların `id`'si YOK (data-comments.js onları yalnızca
+       name/emoji/color ile kuruyor) — id'ye bakan bir hash otuz kişinin
+       hepsinde aynı sonucu verir. Ad hem var hem benzersiz. */
+    return U.rng(hashId(author.id || author.name))() < 0.2;
+  };
+
+  /** Rozet düğümü ya da null — çağıran yerde `&&` ile eklenebilsin diye. */
+  C.prestigeMark = function (author) {
+    if (!C.hasPrestige(author)) return null;
+    return el("span.prestige", { title: "Doomreader", "aria-label": "Doomreader", text: "🧠" });
+  };
+
   C.react = function (commentId, emoji) {
     var c = C.byId(commentId);
     if (!c) return;

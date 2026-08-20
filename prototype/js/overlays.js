@@ -109,7 +109,10 @@
   O.modal = function (node, opts) {
     opts = opts || {};
     U.clear(modalHost);
-    var box = el("div.modal" + (opts.wide ? ".modal--wide" : ""), { role: "dialog", "aria-modal": "true" });
+    var box = el("div.modal" + (opts.wide ? ".modal--wide" : "") + (opts.full ? ".modal--full" : ""), {
+      role: "dialog",
+      "aria-modal": "true",
+    });
     if (opts.title) {
       box.appendChild(
         el("header.modal__head", null, [
@@ -522,9 +525,15 @@
     body.appendChild(el("h3.menu__h", { text: "Dergi" }));
     body.appendChild(
       el("div.menu__rows", null, [
+        /* Arşiv YEREL: bu derginin kendi sayıları. Keşfet BAŞKA dergiler —
+           onların da kendi arşivleri var. İkisi bilerek ayrı satır. */
         row("Arşiv", D.archive.length + " sayı", function () {
           dismiss();
           O.openArchive();
+        }),
+        row("Keşfet", MAG.streak.left() > 0 ? MAG.streak.left() + " açılabilir" : "başka dergiler", function () {
+          dismiss();
+          MAG.explore.open();
         }),
         row("Tanıtımı tekrar izle", "", function () {
           O.closeAll();
@@ -827,6 +836,7 @@
       el("div.cmt__main", null, [
         el("div.cmt__head", null, [
           el("span.cmt__name", { text: c.author.name }),
+          C.prestigeMark(c.author),
           el("span.cmt__time", { text: U.timeAgo(c.createdAt) }),
           isMine ? el("span.cmt__tag.cmt__tag--mine", { text: "sen" }) : null,
           c.featured ? el("span.cmt__tag.cmt__tag--featured", { text: "editör seçimi" }) : null,

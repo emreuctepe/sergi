@@ -31,7 +31,7 @@
     /* --- mod tamamlama (streak.js doldurur) -------------------------------- */
     modeTime: {}, // { [issueSlug + ':' + depth]: okunan ms }
     modeDone: {}, // { [issueSlug + ':' + depth]: timestamp }
-    keys: {}, // { [issueSlug]: timestamp }  üç modu da bitirenin anahtarı
+    unlocked: {}, // { [magazineId]: { at, grade, modes } }  keşfette açılan dergiler
 
     /* --- sosyal ------------------------------------------------------------ */
     comments: [], // kullanıcının yazdıkları (sahte veriye eklenir)
@@ -142,7 +142,11 @@
     /* --- mod tamamlama -----------------------------------------------------
        Kural streak.js'te; burası yalnızca depo. Süre yazımı saniyede bir
        geliyor, o yüzden saveProgress gibi olay YAYMIYOR — yoksa her saniye
-       tüm dinleyiciler tetiklenirdi. Tamamlanma ve anahtar seyrek, onlar yayar.
+       tüm dinleyiciler tetiklenirdi. Tamamlanma seyrek, o yayıyor.
+
+       Jetonun ayrı bir alanı YOK, bilerek: `modeDone` zaten "bu sayı tamamlandı
+       mı, hangi dereceyle" sorusunun tek cevabı (streak.js `tokens()`/`grade()`).
+       Ayrı bir sayaç tutulduğunda ikisi çelişebiliyordu.
        ---------------------------------------------------------------------- */
 
     modeKey: function (issueSlug, depth) {
@@ -173,23 +177,6 @@
       saveSoon();
       U.emit("mode:done", { issue: issueSlug, depth: depth });
       return true;
-    },
-
-    hasKey: function (issueSlug) {
-      return !!data.keys[issueSlug];
-    },
-
-    grantKey: function (issueSlug) {
-      if (data.keys[issueSlug]) return false;
-      data.keys[issueSlug] = Date.now();
-      saveSoon();
-      U.emit("key:earned", { issue: issueSlug });
-      return true;
-    },
-
-    /** Kazanılmış tüm anahtarlar — keşfet sayfası bunu okuyacak. */
-    keyList: function () {
-      return Object.keys(data.keys);
     },
 
     /* --- bulmaca etiket puanları (öneri algoritması) ------------------------ */

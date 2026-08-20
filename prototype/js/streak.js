@@ -16,9 +16,17 @@
    gitmek modu tamamlatmıyor. Süre sayı+mod çiftine yazılıyor; mod değiştirince
    sayaç kendiliğinden öteki kovaya geçer, biriken kaybolmaz.
 
-   ANAHTAR
-   Şimdilik yalnızca durumda duruyor (`State.keys`) ve `key:earned` olayını
-   yayıyor. Bir sonraki aşamada dergi keşfet sayfasının kilidini o açacak.
+   JETON (eski adıyla "anahtar")
+   Tamamlanan her SAYI bir jeton veriyor — jetonu ilk tamamlanan mod açıyor,
+   sonraki modlar yeni jeton eklemiyor, o jetonun DERECESİNİ yükseltiyor.
+   Derece keşfette açılan derginin kaç modunu okuyabileceğini belirliyor:
+
+     min tamamlandı  → açılan dergide min + mid
+     mid tamamlandı  → üç mod da
+     full tamamlandı → üç mod da + yorumlarda prestij rozeti
+
+   Bir jeton bir DERGİYİ açıyor (keşfetteki kapağı ve o an akışta o dergiye
+   bağlı bütün kareleri birden — kilit dergi bazında).
    ========================================================================= */
 
 (function (MAG) {
@@ -59,12 +67,92 @@
     return U.clamp(S.spentMs(depth, slug) / S.targetMs(depth || State.depth()), 0, 1);
   };
 
-  S.hasKey = function (slug) {
-    return State.hasKey(slug || D.issue.slug);
+  /* ========================================================================
+     JETON, DERECE, KİLİT
+     ===================================================================== */
+
+  /* Derece → açılan dergide okunabilecek modlar. mid ile full aynı üç modu
+     açıyor; full'ün fazlası mod değil, yorumlardaki prestij rozeti. */
+  var GRADE_MODES = {
+    min: ["min", "mid"],
+    mid: ["min", "mid", "full"],
+    full: ["min", "mid", "full"],
   };
 
-  S.keys = function () {
-    return State.keyList();
+  S.modesFor = function (grade) {
+    return (GRADE_MODES[grade] || []).slice();
+  };
+
+  /** Bu sayıda tamamlanan EN İYİ mod — jetonun derecesi. Yoksa null. */
+  S.grade = function (slug) {
+    var s = slug || D.issue.slug;
+    for (var i = D.depths.length - 1; i >= 0; i--) {
+      if (State.isModeDone(s, D.depths[i])) return D.depths[i];
+    }
+    return null;
+  };
+
+  /** Kazanılmış jetonlar — tamamlanmış her sayı için bir tane, derecesiyle. */
+  S.tokens = function () {
+    var out = [];
+    D.archive.forEach(function (a) {
+      var g = S.grade(a.slug);
+      if (g) out.push({ issue: a.slug, grade: g });
+    });
+    return out;
+  };
+
+  S.spent = function () {
+    return Object.keys(State.get("unlocked", {})).length;
+  };
+
+  S.left = function () {
+    return Math.max(0, S.tokens().length - S.spent());
+  };
+
+  /* Harcanacak jeton: elde kalanların EN İYİSİ. Okurdan "hangi jetonu
+     harcamak istersin" diye sormuyoruz — o soru mekaniği görünür kılardı. */
+  S.nextGrade = function () {
+    var rank = D.depths;
+    var grades = S.tokens()
+      .map(function (t) {
+        return t.grade;
+      })
+      .sort(function (a, b) {
+        return rank.indexOf(b) - rank.indexOf(a);
+      });
+    return grades[S.spent()] || null;
+  };
+
+  S.isUnlocked = function (magId) {
+    return !!State.get("unlocked", {})[magId];
+  };
+
+  S.unlockInfo = function (magId) {
+    return State.get("unlocked", {})[magId] || null;
+  };
+
+  /**
+   * Bir dergiyi açar. Jeton yoksa ya da zaten açıksa false döner.
+   * Kilit dergi bazında: kapağı ve akıştaki kareleri birlikte açılır.
+   */
+  S.unlock = function (magId) {
+    if (!magId || S.isUnlocked(magId)) return false;
+    var grade = S.nextGrade();
+    if (!grade || S.left() < 1) return false;
+
+    var map = State.get("unlocked", {});
+    map[magId] = { at: Date.now(), grade: grade, modes: S.modesFor(grade) };
+    State.set("unlocked", map);
+    U.emit("magazine:unlocked", { magazine: magId, grade: grade });
+    return true;
+  };
+
+  /** Doomreader rozeti: herhangi bir sayıda `full` tamamlandıysa. */
+  S.hasPrestige = function () {
+    return D.archive.some(function (a) {
+      return State.isModeDone(a.slug, "full");
+    });
   };
 
   /* ========================================================================
@@ -92,13 +180,11 @@
     if (State.addModeTime(slug, depth, delta) >= S.targetMs(depth)) tamamla(slug, depth);
   }
 
+  /* Jeton ayrıca kaydedilmiyor: `modeDone` işaretlendiği an S.tokens() onu
+     zaten sayıyor. İlk tamamlanan mod jetonu veriyor, sonrakiler yeni jeton
+     eklemiyor — S.grade()'i, yani jetonun derecesini yükseltiyor. */
   function tamamla(slug, depth) {
-    if (!State.markModeDone(slug, depth)) return;
-
-    var hepsi = D.depths.every(function (d) {
-      return State.isModeDone(slug, d);
-    });
-    if (hepsi) State.grantKey(slug);
+    State.markModeDone(slug, depth);
   }
 
   function basla() {
@@ -148,7 +234,13 @@
         };
       })
     );
-    return { issue: slug, anahtar: S.hasKey(slug), anahtarlar: S.keys() };
+    return {
+      issue: slug,
+      derece: S.grade(slug),
+      jeton: { kazanilan: S.tokens().length, harcanan: S.spent(), kalan: S.left(), sirada: S.nextGrade() },
+      acilanDergiler: Object.keys(State.get("unlocked", {})),
+      prestij: S.hasPrestige(),
+    };
   };
 
   /** Sayacı ileri sarar (yalnızca test için). */

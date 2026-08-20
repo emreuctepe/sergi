@@ -144,6 +144,26 @@
 }
 
 /* --------------------------------------------------------------------------
+   PRESTİJ ROZETİ — Doomreader (bir sayıyı `full` modunda tamamlayan okur)
+   ------------------------------------------------------------------------
+   Adın hemen sağında, küçük ve altın halkalı. Metin yok: "Doomreader" yazsaydı
+   ad satırını ikiye böler ve yorumun önüne geçerdi; başlıkta (title) duruyor.
+   -------------------------------------------------------------------------- */
+.prestige {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 1.15em;
+  height: 1.15em;
+  font-size: 0.82em;
+  line-height: 1;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--gold) 26%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--gold) 55%, transparent);
+  cursor: help;
+}
+
+/* --------------------------------------------------------------------------
    SAYFA SEVİYESİ ROZET — ankrajı bulunamayan yorumlar buraya düşer
    -------------------------------------------------------------------------- */
 .comment-badge {

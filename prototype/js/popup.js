@@ -133,6 +133,7 @@
       el("div.cpop__head", null, [
         el("span.cpop__dot", { style: { "--c": c.author.color }, text: c.author.emoji }),
         el("b.cpop__name", { text: c.author.name }),
+        C.prestigeMark(c.author),
         el("span.cpop__time", { text: U.timeAgo(c.createdAt) }),
         c.status === "pending" ? el("i.cpop__pending", { text: "onayda" }) : null,
       ]),

@@ -201,6 +201,12 @@
 .modal--wide {
   width: min(100%, 620px);
 }
+/* Keşfet bir liste değil bir AKIŞ: dar bir kutuda üç sütun sığmıyor, ızgara
+   şerit gibi okunuyordu. Tam ekrana yakın tek yüzey. */
+.modal--full {
+  width: min(100%, 1100px);
+  max-height: 92svh;
+}
 .modal__head {
   position: sticky;
   top: 0;

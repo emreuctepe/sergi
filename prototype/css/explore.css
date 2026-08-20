@@ -1,0 +1,242 @@
+/* ============================================================================
+   EXPLORE — keşfet ızgarası
+   Pinterest/Instagram kaydı: 3:4 kapaklar ve 1:1 kareler karışık akıyor.
+   ========================================================================= */
+
+.exp {
+  padding: var(--ui-sp-4);
+}
+
+/* --------------------------------------------------------------------------
+   ARAMA ÇUBUĞU
+   -------------------------------------------------------------------------- */
+.exp__bar {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: var(--ui-sp-3);
+  flex-wrap: wrap;
+  padding-bottom: var(--ui-sp-3);
+  background: var(--paper-raised);
+}
+.exp__search {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: var(--ui-sp-3) var(--ui-sp-4);
+  font: inherit;
+  font-size: var(--ui-fs-sm);
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+.exp__search:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.exp__note {
+  font-size: var(--ui-fs-xs);
+  color: color-mix(in oklab, var(--gold) 80%, var(--ink));
+  white-space: nowrap;
+}
+.exp__note[data-on="false"] {
+  display: none;
+}
+.exp__empty {
+  padding: var(--ui-sp-5) 0;
+  font-size: var(--ui-fs-sm);
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   IZGARA — CSS columns (grid değil, bkz. explore.js başlığı)
+   -------------------------------------------------------------------------- */
+.exp__grid {
+  columns: 4;
+  column-gap: var(--ui-sp-3);
+}
+@container (max-width: 880px) {
+  .exp__grid {
+    columns: 3;
+  }
+}
+@media (max-width: 880px) {
+  .exp__grid {
+    columns: 3;
+  }
+}
+@media (max-width: 560px) {
+  .exp__grid {
+    columns: 2;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   KART
+   -------------------------------------------------------------------------- */
+.exp-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin-bottom: var(--ui-sp-3);
+  padding: 0;
+  overflow: hidden;
+  text-align: left;
+  background: var(--paper-sunken);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  break-inside: avoid;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-spring);
+}
+.exp-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.exp-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.exp-card__art {
+  display: block;
+  width: 100%;
+}
+.exp-card__art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Künye görselin üstünde: kart bir dergi kapağı gibi dursun, altına yazı
+   şeridi eklenmiş bir liste öğesi gibi değil. */
+.exp-card__meta {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: grid;
+  gap: 1px;
+  padding: var(--ui-sp-5) var(--ui-sp-3) var(--ui-sp-3);
+  color: #fff;
+  /* Perde güçlü: açık temada Lodos/Mercek gibi PARLAK kapaklarda zayıf bir
+     gradyan beyaz yazıyı yutuyordu. Gölge, gradyanın bittiği üst kenarda
+     taşan uzun sloganlar için ikinci güvence. */
+  background: linear-gradient(to top, rgb(0 0 0 / 0.88), rgb(0 0 0 / 0.6) 48%, transparent);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.55);
+}
+.exp-card__meta b {
+  font-family: var(--font-display);
+  font-size: var(--ui-fs-sm);
+  font-weight: 600;
+}
+.exp-card__meta span {
+  font-size: var(--ui-fs-xs);
+  opacity: 0.82;
+}
+.exp-card__tag {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.exp-card__line {
+  font-family: var(--font-text);
+  font-size: var(--ui-fs-sm);
+  line-height: 1.35;
+  opacity: 1 !important;
+}
+
+/* --------------------------------------------------------------------------
+   KİLİT
+   ------------------------------------------------------------------------
+   Kilitli kart KARARTILMIYOR, doygunluğu düşürülüyor. Karartınca akış donuk
+   bir kilit duvarına dönüyordu; oysa keşfetin işi cezbetmek — görsel görünsün,
+   sadece "henüz senin değil" desin.
+   -------------------------------------------------------------------------- */
+.exp-card[data-locked="true"] .exp-card__art {
+  filter: saturate(0.55);
+  opacity: 0.82;
+}
+.exp-card[data-locked="true"]:hover .exp-card__art {
+  filter: saturate(0.85);
+  opacity: 0.95;
+}
+.exp-card__lock {
+  position: absolute;
+  top: var(--ui-sp-2);
+  right: var(--ui-sp-2);
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
+  line-height: 1;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(4px);
+}
+
+/* --- açılmış --- */
+.exp-card:not([data-locked]) {
+  border-color: color-mix(in oklab, var(--gold) 55%, var(--line));
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--gold) 22%, transparent);
+}
+.exp-card__open {
+  position: absolute;
+  top: var(--ui-sp-2);
+  right: var(--ui-sp-2);
+  padding: 2px 7px;
+  font-size: var(--ui-fs-xs);
+  color: #1a1206;
+  background: color-mix(in oklab, var(--gold) 88%, white);
+  border-radius: 999px;
+}
+
+/* --------------------------------------------------------------------------
+   AÇMA ONAYI — kartın içinde
+   -------------------------------------------------------------------------- */
+.exp-ask {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: var(--ui-sp-2);
+  padding: var(--ui-sp-3);
+  text-align: center;
+  color: #fff;
+  background: rgb(12 9 5 / 0.86);
+  backdrop-filter: blur(3px);
+}
+.exp-ask b {
+  font-family: var(--font-display);
+  font-size: var(--ui-fs-sm);
+  line-height: 1.3;
+}
+.exp-ask > span {
+  font-size: var(--ui-fs-xs);
+  opacity: 0.8;
+}
+.exp-ask__row {
+  display: flex;
+  gap: var(--ui-sp-2);
+  margin-top: var(--ui-sp-2);
+}
+.exp-ask__yes,
+.exp-ask__no {
+  padding: 5px 12px;
+  font-size: var(--ui-fs-xs);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.exp-ask__yes {
+  color: #1a1206;
+  font-weight: 600;
+  background: var(--gold);
+}
+.exp-ask__no {
+  color: #fff;
+  background: rgb(255 255 255 / 0.14);
+}
