@@ -695,7 +695,7 @@
           depth: ["all"],
           fit: "contain",
           scene: "fade-up",
-          bg: "img:assets/2026-09/yaprak.webp",
+          bg: "scene:sumi",
           blocks: [
             { t: "kicker", text: "Künye" },
             { t: "h2", text: "Bu sayıda emeği geçenler" },

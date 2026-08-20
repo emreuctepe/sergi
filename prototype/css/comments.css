@@ -1,12 +1,12 @@
 /* ============================================================================
-   COMMENTS — ankraj işaretleri, pinler, yorum katmanı, thread paneli
+   COMMENTS — baloncuklar (pin), sayfa rozeti, yorum katmanı, thread paneli
    ========================================================================= */
 
 /* --------------------------------------------------------------------------
    YORUM YAZI ÖLÇEĞİ
-   Bütün sunumlar (Fısıltı, Kenar, Şerh) ve thread paneli buradan besleniyor —
-   tek yerden büyütülüp küçültülür. Gövde arayüz "sm"inin 1.5 katı: yorumlar
-   dergi metniyle yarışacak kadar değil ama rahat okunacak kadar iri.
+   Baloncuk, pop-up ve thread paneli buradan besleniyor — tek yerden büyütülüp
+   küçültülür. Gövde arayüz "sm"inin 1.5 katı: yorumlar dergi metniyle
+   yarışacak kadar değil ama rahat okunacak kadar iri.
    -------------------------------------------------------------------------- */
 :root {
   --fs-cmt: calc(var(--ui-fs-sm) * 1.5); /* yorum gövdesi */
@@ -14,116 +14,6 @@
   --fs-cmt-name: var(--ui-fs-sm); /* ad / künye */
 }
 
-/* --------------------------------------------------------------------------
-   ALINTI ISISI
-   Bu işaret artık "burada bir yorum var" demiyor — "bu cümleyi kaç kişi
-   alıntıladı" diyor. Bir cümle başına TEK işaret olduğu için üst üste binme
-   diye bir şey yok, ve yorum sayısı arttıkça işaret gürültülenmiyor: koyulaşıyor.
-   Kalınlık ısıyla artar, böylece renk körlüğünde de okunur.
-   -------------------------------------------------------------------------- */
-.anno {
-  --heat-a: 30%;
-  --heat-h: 0.09em;
-  background: none;
-  color: inherit;
-  cursor: pointer;
-  padding-bottom: 0.06em;
-  background-image: linear-gradient(
-    to top,
-    color-mix(in oklab, var(--accent) var(--heat-a), transparent) 0 var(--heat-h),
-    transparent var(--heat-h)
-  );
-  transition:
-    background-color var(--dur-base) var(--ease-out),
-    background-image var(--dur-base) var(--ease-out);
-  border-radius: 2px;
-}
-.anno[data-heat="2"] { --heat-a: 50%; --heat-h: 0.15em; }
-.anno[data-heat="3"] { --heat-a: 78%; --heat-h: 0.24em; }
-.anno[data-heat="4"] { --heat-a: 100%; --heat-h: 0.34em; }
-
-/* Eş okuma KAPALIYKEN ilk okuyuş yazarındır: tek tük alıntılar tamamen çekilir,
-   yalnızca gerçekten çok alıntılanan cümleler hafif bir iz bırakır. Görünmeyen
-   işaret tıklanabilir de değil — okurken yanlışlıkla panel açılmasın. */
-:root[data-comment-layer="off"] .anno {
-  --heat-a: 0%;
-  pointer-events: none;
-}
-:root[data-comment-layer="off"] .anno[data-heat="3"] {
-  --heat-a: 24%;
-  --heat-h: 0.1em;
-  pointer-events: auto;
-}
-:root[data-comment-layer="off"] .anno[data-heat="4"] {
-  --heat-a: 40%;
-  --heat-h: 0.13em;
-  pointer-events: auto;
-}
-
-.anno:hover {
-  background-color: color-mix(in oklab, var(--accent) 16%, transparent);
-}
-
-/* Eş okuma AÇIKKEN zemin dolgusu yalnızca gerçekten kalabalık cümlelere ait.
-   Önce her işarete dolgu veriyorduk: 170 yorumluk bir sayıda tek bir sayfada
-   yedi işaret olabiliyor ve sayfa şeritli bir bloğa dönüşüyordu — dahası, ısı 4
-   ile ısı 2 aynı görünüyordu, yani "koyulaşır" sözü tutulmuyordu. Ağırlığı artık
-   altı çizginin kalınlığı taşıyor; dolgu 3. seviyede başlıyor. */
-:root[data-comment-layer="on"] .anno[data-heat="3"] {
-  background-color: color-mix(in oklab, var(--accent) 14%, transparent);
-}
-:root[data-comment-layer="on"] .anno[data-heat="4"] {
-  background-color: color-mix(in oklab, var(--accent) 22%, transparent);
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 18%, transparent);
-}
-
-/* --------------------------------------------------------------------------
-   BLOK İŞARETİ
-   Ankraj artık bloğun kendisi. Blok kenarındaki ince çentik "burada N ses var"
-   der; kaç yorum olursa olsun sayfa düzeni değişmez. Sunum yolları (Fısıltı,
-   Kenar) bunun üstüne kurulacak — bu, işaretin en sade hâli.
-   -------------------------------------------------------------------------- */
-[data-block-id][data-comments] {
-  position: relative;
-}
-[data-block-id][data-comments]::before {
-  content: attr(data-comments);
-  position: absolute;
-  inset-inline-start: calc(var(--pad-page) * -0.62);
-  top: 0.15em;
-  display: grid;
-  place-items: center;
-  min-width: 4.2cqi;
-  height: 4.2cqi;
-  padding: 0 0.8cqi;
-  border-radius: var(--radius-full);
-  background: var(--accent);
-  color: var(--paper);
-  font-family: var(--font-ui);
-  font-size: 2.4cqi;
-  font-weight: 800;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  opacity: 0;
-  transform: translateX(-3px);
-  transition:
-    opacity var(--dur-base) var(--ease-out),
-    transform var(--dur-base) var(--ease-out);
-  pointer-events: none;
-  /* manga paneli gibi konumlandırılmış içeriği olan blokların üstünde kalsın */
-  z-index: 2;
-}
-:root[data-comment-layer="on"] [data-block-id][data-comments]::before {
-  opacity: 1;
-  transform: none;
-}
-/* Manga panelleri kırpılmış kutulardır — çentik kenar boşluğuna konursa komşu
-   panelin altında kalıyor. Panelin kendi içine, köşesine oturuyor. */
-[data-block-kind="manga-item"][data-comments]::before {
-  inset-inline-start: 1.6cqi;
-  top: 1.6cqi;
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--ink) 30%, transparent);
-}
 /* --------------------------------------------------------------------------
    PİNLER — normalize (x,y) koordinatlarda
    -------------------------------------------------------------------------- */

@@ -325,61 +325,6 @@
   }
 
   /* ------------------------------------------------------------------------
-     ALINTI ISISI — bir cümleyi kaç kişi alıntıladıysa o kadar koyu
-     --------------------------------------------------------------------- */
-
-  function textNodesIn(root) {
-    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-      acceptNode: function (n) {
-        if (!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
-        if (n.parentElement.closest(".anno, .pin, .comment-badge")) return NodeFilter.FILTER_REJECT;
-        return NodeFilter.FILTER_ACCEPT;
-      },
-    });
-    var out = [];
-    var n;
-    while ((n = walker.nextNode())) out.push(n);
-    return out;
-  }
-
-  /**
-   * Alıntıyı KENDİ BLOĞU içinde ara ve tek bir <mark> ile sar.
-   * Arama bloğa kapalı olduğu için "sayfadaki ilk eşleşme yanlış yere düşüyor"
-   * sorunu ortadan kalkıyor. Aynı cümleyi 40 kişi alıntılasa da işaret tektir.
-   */
-  function markQuote(scope, exact, count, blockId) {
-    var nodes = textNodesIn(scope);
-    for (var i = 0; i < nodes.length; i++) {
-      var at = nodes[i].nodeValue.indexOf(exact);
-      if (at < 0) continue;
-      var range = document.createRange();
-      range.setStart(nodes[i], at);
-      range.setEnd(nodes[i], at + exact.length);
-      var mark = el("mark.anno", {
-        "data-quote": exact,
-        "data-block-id": blockId || null,
-        "data-heat": heatLevel(count),
-        "data-count": count,
-        tabindex: "0",
-        role: "button",
-        "aria-label": count + " okur bu cümleyi alıntıladı: " + exact.slice(0, 40),
-      });
-      try {
-        range.surroundContents(mark);
-        return true;
-      } catch (e) {
-        return false; /* öğe sınırını aşan alıntı — işaretlenmez, yorum yine yerinde */
-      }
-    }
-    return false;
-  }
-
-  function heatLevel(n) {
-    return n >= 15 ? 4 : n >= 5 ? 3 : n >= 2 ? 2 : 1;
-  }
-  C.heatLevel = heatLevel;
-
-  /* ------------------------------------------------------------------------
      PİN KÜMELENMESİ — üst üste binen işaret yok
      --------------------------------------------------------------------- */
 
@@ -631,14 +576,6 @@
     /* baloncuğu basılı tutup sürükleme — kendi konumunda "yüzer" */
     pagesEl.addEventListener("pointerdown", onPinDown);
 
-    pagesEl.addEventListener("keydown", function (e) {
-      if (e.key !== "Enter" && e.key !== " ") return;
-      var anno = e.target.closest(".anno");
-      if (!anno) return;
-      e.preventDefault();
-      openForMark(anno);
-    });
-
     /* --- metin seçimi → balon --- */
     document.addEventListener("selectionchange", U.debounce(onSelection, 180));
     U.$("#selection-bubble").addEventListener("click", function (e) {
@@ -740,18 +677,6 @@
     }
   }
 
-  function openForMark(mark) {
-    var pageEl = mark.closest(".page");
-    MAG.popup.open(
-      {
-        blockId: mark.dataset.blockId || null,
-        quote: mark.dataset.quote,
-        pageId: pageEl ? pageEl.dataset.pageId : null,
-      },
-      mark
-    );
-  }
-
   /* --- metin seçimi ------------------------------------------------------- */
 
   var lastSelection = null;
@@ -814,7 +739,7 @@
    * demek gerçekten gerekiyor.
    */
   function pointAllowed(target) {
-    if (target.closest(".pin, .anno, .comment-badge, button, a, input, textarea, .puzzle")) return false;
+    if (target.closest(".pin, .comment-badge, button, a, input, textarea, .puzzle")) return false;
     var block = target.closest("[data-block-id]");
     if (!block) return true; /* sayfa zemini / tam kanama görsel */
     var kind = block.getAttribute("data-block-kind") || "";
