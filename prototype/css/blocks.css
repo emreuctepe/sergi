@@ -484,6 +484,10 @@
 .page[data-kind="manga"] {
   background: var(--paper-sunken);
   padding: calc(var(--pad-page) * 0.5);
+  /* Güvenli alan padding'e giriyor, ortalamaya bırakılmıyor: justify-content
+     center olduğu için boşluk üst/alt eşit bölünür ve altta yalnızca yarısı
+     kalırdı. Kutunun kendisi folio şeridini dışarıda bırakmalı. */
+  padding-bottom: calc(var(--pad-page) * 0.5 + var(--safe-bottom));
   justify-content: center;
 }
 .page[data-kind="manga"] .page__inner {
@@ -585,7 +589,7 @@
      dersek genişlik kapsayıcıyı aşıyor ve tuval onu kırpıyor; yalnızca
      "width:100% + oran" dersek bu kez taşan yükseklik oluyor. İkisinin
      küçüğü alınıyor — kullanılabilir yükseklik = tuval boyu eksi sayfa payı. */
-  width: min(100%, calc((var(--canvas-h) - var(--pad-page)) * 9 / 16));
+  width: min(100%, calc((var(--canvas-h) - var(--pad-page) - var(--safe-bottom)) * 9 / 16));
   height: auto;
   aspect-ratio: 9 / 16;
   margin-inline: auto;

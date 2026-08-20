@@ -134,12 +134,14 @@
 }
 
 /* fit: scroll — sayfa uzayabilir, sonunda bir sonrakine snap olur.
-   Alt boşluk folio'nun altına metin girmesini engeller. */
+   Alt boşluk folio'nun altına metin girmesini engeller: güvenli alan +
+   okuma payı. Sabit çarpan yerine --safe-bottom'dan türüyor, böylece
+   folio'nun boyu değişirse burası da kendiliğinden ayarlanır. */
 .page[data-fit="scroll"] {
   height: auto;
   justify-content: flex-start;
   scroll-snap-stop: normal;
-  padding-bottom: calc(var(--pad-page) * 2.4);
+  padding-bottom: calc(var(--safe-bottom) + var(--pad-page) * 1.6);
 }
 
 /* tam kanama (görsel) sayfalar */
@@ -174,7 +176,7 @@
 .folio {
   position: absolute;
   inset-inline: var(--pad-page);
-  bottom: calc(var(--pad-page) * 0.42);
+  bottom: var(--folio-bottom);
   z-index: 5;
   display: flex;
   justify-content: space-between;

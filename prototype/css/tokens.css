@@ -81,6 +81,17 @@
   --sp-8: 15cqi;
   --pad-page: 8cqi; /* sayfa iç kenar boşluğu */
 
+  /* --- güvenli alan (tuval altı) ------------------------------------------
+     Tuvalin altında folio'nun (sayfa künyesi + kâğıt perdesi) yaşadığı şerit.
+     GÖRÜNMEZ: çizgi çizmez, yer kaplamaz — yalnızca "buraya içerik koyma"
+     diyen bir ölçü. Folio'nun kendi konumu da aynı değişkenden türüyor ki
+     ikisi zamanla birbirinden kaymasın.
+
+     Neden gerekli: tam sayfayı dolduran içerik (manga karesi, tam kanamalı
+     görsel) folio'nun arkasından geçiyordu — ölçülen çakışma 15px. */
+  --folio-bottom: calc(var(--pad-page) * 0.42);
+  --safe-bottom: calc(var(--folio-bottom) + 3.4cqi);
+
   /* --- arayüz ölçeği (tuval dışı) ----------------------------------------- */
   --ui-fs-xs: clamp(10px, 2.6vmin, 12px);
   --ui-fs-sm: clamp(12px, 3vmin, 14px);
