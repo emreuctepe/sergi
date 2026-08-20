@@ -8,7 +8,10 @@ sorularına saniyede yanıt bulması içindir. Mimari anlatı için
 - **Ad alanı:** her şey `window.MAG` altında. ES modül yok (prototip `file://`
   ile açılabilsin diye), her dosya IIFE ile `MAG`'a yazar.
 - **Yükleme sırası** (`prototype/index.html`, anlamlı):
-  `util → art → issues/*.js → data → *.comments.js → data-comments → data-analytics → state → render → canvas → comments → popup → identity → puzzles → overlays → analytics → debug → app`
+  `util → art → content → issues/*.js → data → *.comments.js → data-comments → data-analytics → state → render → canvas → comments → popup → identity → puzzles → overlays → analytics → debug → app`
+  İki zorunluluk: `content.js` bölünmüş sayı dosyalarından **önce** (`defineSection`'ı
+  o tanımlıyor), içerik dosyaları `data.js`'ten **önce** (`data.js` `MAG.issues`'un
+  anlık kopyasını alıyor; sıra bozulursa `throw` ediyor).
 
 ---
 
@@ -18,13 +21,13 @@ sorularına saniyede yanıt bulması içindir. Mimari anlatı için
 |---|---|---|
 | Tek global ad alanı | `window.MAG` | tüm modüller buraya asılır (`util.js:5`) |
 | **Kalıcı durum** (okur, tercihler, ilerleme, yorumlar, tepkiler, bulmaca koşuları) | `MAG.state.data` → `js/state.js` | `localStorage["mag:state:v1"]`; alan adları Supabase şemasıyla birebir |
-| Durum varsayılanları (şema) | `DEFAULTS`, `js/state.js:15` | `reader, depth, locale, theme, motion, progress, finished, comments, reactions, puzzleRuns, tagScores, stats…` |
+| Durum varsayılanları (şema) | `DEFAULTS`, `js/state.js:15` | `reader, depth, locale, theme, motion, dock, progress, finished, seenIntro, comments, reactions, loginOffer, puzzleRuns, tagScores, coldStartAnswer, stats` |
 | **Aktif sayı içeriği** | `MAG.data` → `js/data.js` | `issue, intro, sections, puzzles`; hangi sayı? URL `?sayi=` → `pickSlug()` |
 | Sayı kayıt defteri (çok sayılılık) | `MAG.issues` | tek dosya kendini doğrudan yazar; **bölünmüş** sayı `js/content.js` ile toplanır |
 | Bölünmüş sayı ara belleği | `MAG.content.pending` → `js/content.js` | `defineSection`/`defineIssue` parçaları burada birikir, `order`'a göre `MAG.issues`'a toplanır |
 | Yazım kiti (dev, üretime girmez) | `MAG.dev` → `js/dev/*`, `dev.html` | `samples` (blok/sahne örnekleri) · `catalog` · `editor` |
 | Tohum yorumlar (aktif sayı) | `MAG.data.comments` | `js/data-comments.js` doldurur |
-| Sahte editör analitiği | `js/data-analytics.js` | slug ile tohumlu, tutarlı |
+| Sahte editör analitiği | `MAG.analyticsData` → `js/data-analytics.js` | slug ile tohumlu, tutarlı; `A.build()` üretir |
 | Okurun yazdığı yorumlar | `State.get("comments")` | `C.all()` = tohum + flood + bunlar |
 | Kimlik (anonim okur) | `State.get("reader")` | `js/identity.js` doldurur, `reader.id` sabit kalır |
 | Olay veri yolu | gizli DOM düğümü, `js/util.js:85` | `U.emit` / `U.listen` |
@@ -45,8 +48,8 @@ sorularına saniyede yanıt bulması içindir. Mimari anlatı için
 | `state` | `js/state.js` | Merkezi durum + localStorage + sekmeler arası eşitleme |
 | `render` | `js/render.js` | İçerik ağacı → DOM; `BLOCKS` tablosu |
 | `canvas` | `js/canvas.js` | 3:4 tuval, snap gezinme, ilerleme, klavye, sahne gözlemcisi |
-| `comments` | `js/comments.js` | Yorum ankraj/pin/alıntı ısısı/katman |
-| `popup` | `js/popup.js` | Pine dokununca açılan yorum kartı |
+| `comments` | `js/comments.js` | Yorum ankrajı, baloncuk (pin), kümelenme, katman |
+| `popup` | `js/popup.js` | Baloncuğa dokununca tuvalin üstünde açılan yorum kartı |
 | `identity` | `js/identity.js` | Anonim kimlik + e-posta/kod ile kalıcılaştırma |
 | `puzzles` | `js/puzzles.js` | Custom element bulmacalar + host (kayıt/öneri/istatistik) |
 | `overlays` | `js/overlays.js` | Tuval dışı UI: tanıtım, menü, thread, yazma, giriş, arşiv, sayı sonu, admin |
@@ -91,13 +94,13 @@ API; küçük harfli adlar dosya-içi yardımcıdır.
 `onScroll, measureLetterbox, onKey, setupObserver` (iç: ilerleme, letterbox, klavye, sahne)
 
 ### `js/comments.js` → `MAG.comments` (C)
-`all, visible, forPage, roots, replies, byId, total` (okuma) ·
+`all, visible, forPage, roots, replies, byId, total` (okuma) · `setFlood` (stres modu) ·
 `blockIdOf, quoteOf, blockLabel` (ankraj) ·
 `score, representative, rootsFor` (temsilci ses) ·
 `add, react, myReactions` (yazma) ·
-`decorate` (sayfa süsleme/pin bas) · `clusterPoints, pinDist` (pin kümeleme) ·
-`setLayer, toggleLayer, layerOn, updateCount` (katman) · `heatLevel` (alıntı ısısı) ·
-`init` · iç: `migrateLegacy, markQuote, decoratePage, onSelection, onPressStart…`
+`decorate` (baloncukları bas) · `clusterPoints, pinDist` (pin kümeleme) ·
+`setLayer, toggleLayer, layerOn, updateCount` (katman) · `clearGhost` ·
+`init` · iç: `migrateLegacy, decoratePage, blockPoint, pinNode, onSelection, onPressStart, onPinDown…`
 
 ### `js/popup.js` → `MAG.popup` (P)
 `open(sel, anchorEl), close, isOpen` · iç: `buildCard, commentBlock, position`

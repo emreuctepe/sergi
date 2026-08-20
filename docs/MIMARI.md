@@ -27,6 +27,9 @@ Kod içi marka adı `MAG` (magazine) — tek global ad alanı.
 
 ```
 sErgi/
+├── AI_GUIDE.md              ← Makine-okur harita: hangi fonksiyon nerede
+├── .gitignore               ← Ham görsel kaynakları depoya girmez
+├── .github/workflows/       ← deploy.yml: prototype/ → GitHub Pages
 ├── docs/                    ← Tasarım kararları (kod değil, "neden")
 │   ├── PROJE.md             ← Ana mimari plan, 10 bölüm
 │   ├── PROTOTIP-TODO.md     ← Canlı ilerleme listesi
@@ -37,7 +40,10 @@ sErgi/
     ├── index.html           ← Okuyucu. Tüm DOM iskeleti + script sırası
     ├── dev.html             ← Yazım Kiti (dev): blok kataloğu + canlı editör
     ├── css/                 ← katman katman (+ dev.css, yalnız dev.html)
-    ├── assets/2026-10/       ← Gerçek görsel yeri (şu an boş; SVG kullanılıyor)
+    ├── assets/
+    │   ├── animeace2_reg.ttf     ← Projenin tek gömülü fontu (manga balonu)
+    │   ├── 2026-09/              ← 8 sayfa fotoğrafı + kapali-kapilar/ (one-shot, 9 kare)
+    │   └── 2026-10/              ← Boş: bu sayının tamamı çizilmiş SVG sahne
     └── js/
         ├── content.js       ← Bölünmüş sayıları toplar (defineIssue/defineSection)
         ├── issues/          ← İÇERİK — iki biçim bir arada:
@@ -48,6 +54,10 @@ sErgi/
         ├── dev/             ← Yazım Kiti betikleri (samples/catalog/editor/boot)
         └── *.js             ← ÇEKİRDEK MOTOR (içerikten bağımsız)
 ```
+
+Görsel iki yoldan gelebiliyor: `js/art.js`'teki çizilmiş sahneler (`scene:` öneki)
+ya da `assets/` altındaki gerçek dosyalar (`img:` öneki). 2026-10 tamamen birinciyi,
+2026-09 ikisini karışık kullanıyor.
 
 Yeni sayı hazırlama akışı (Yazım Kiti, `dev.html`) için: [prototype/README.md](../prototype/README.md#yeni-sayı-hazırlama--yazım-kiti-devhtml).
 
@@ -74,9 +84,17 @@ Her JS dosyası `(function (MAG) { … MAG.x = … })(window.MAG)` kalıbıyla k
    eşitleme de var.
 
 **Kritik yükleme sırası** (`index.html`):
-`util → art → issues/*.js → data → comments-data → state → render → canvas → … → app`.
-Sayı dosyaları kendini `MAG.issues`'a kaydeder, `data.js` **sonra** hangisini
-açacağına karar verir — bu yüzden içerik `data.js`'ten **önce** gelmeli.
+`util → art → content → issues/*.js → data → *.comments.js → data-comments →
+data-analytics → state → render → canvas → … → app`.
+
+İki kural sırayı bağlıyor:
+
+1. **İçerik `data.js`'ten önce.** Sayı dosyaları kendini `MAG.issues`'a kaydeder,
+   `data.js` okuma anında bu defterin bir kopyasını alır (`var REG = MAG.issues`) —
+   sonra gelen bir sayı görünmez olur. Sıra bozulursa `data.js` sessizce değil,
+   açıkça `throw` eder.
+2. **`content.js` bölüm dosyalarından önce.** `defineIssue`/`defineSection`'ı o
+   tanımlıyor; bölünmüş biçimdeki her bölüm dosyası açılır açılmaz onu çağırıyor.
 
 ---
 
@@ -86,7 +104,7 @@ açacağına karar verir — bu yüzden içerik `data.js`'ten **önce** gelmeli.
 flowchart TB
     subgraph HTML["index.html — script sırası"]
         direction LR
-        H1["util.js<br/>(olay yolu)"] --> H2["issues/*.js<br/>(içerik)"] --> H3["data.js<br/>(sayı seçer)"] --> H4["state.js"] --> H5["render / canvas /<br/>comments / …"] --> H6["app.js<br/>(boot)"]
+        H1["util.js<br/>(olay yolu)"] --> H0["content.js<br/>(defineSection)"] --> H2["issues/*.js<br/>(içerik)"] --> H3["data.js<br/>(sayı seçer)"] --> H4["state.js"] --> H5["render / canvas /<br/>comments / …"] --> H6["app.js<br/>(boot)"]
     end
 
     H6 --> BOOT{boot}
@@ -144,7 +162,7 @@ sequenceDiagram
 
     BUS-->>AP: listen("comment:added")
     AP->>CM: decorate() + updateCount()
-    CM->>DOM: Pini yeniden çiz<br/>(kümele, alıntıyı <mark>'la)
+    CM->>DOM: Baloncukları yeniden çiz<br/>(yakın olanları kümele)
     DOM-->>U: Yeni baloncuk ekranda
 
     U->>DOM: Baloncuğa dokunur

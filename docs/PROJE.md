@@ -2,7 +2,9 @@
 
 ## 1. Bağlam
 
-`~/Desktop/socialMagazinePlan.md` dosyasındaki 7 maddelik fikir taslağını, uygulanabilir bir ürün ve mimari planına dönüştürüyoruz. Çalışma dizini (`/home/bazzite/sErgi`) şu an boş — proje sıfırdan kurulacak.
+`~/Desktop/socialMagazinePlan.md` dosyasındaki 7 maddelik fikir taslağını, uygulanabilir bir ürün ve mimari planına dönüştürüyoruz.
+
+> **Bu belgenin durumu:** aşağıdaki mimari **henüz kurulmadı** — Faz 0 başlamadı, `apps/`, `packages/`, `supabase/` klasörleri yok. Bunun yerine `prototype/` altında derlemesiz, saf HTML/CSS/JS bir **prototip** çalışıyor: iki dolu sayı, yorum sistemi, kimlik, bulmacalar, arşiv — hepsi sahte veriyle ama uçtan uca. Prototip bu planın *kanıtı*, yerine geçeni değil; asıl build başladığında referans olarak kalır. Prototipin mimarisi için [MIMARI.md](MIMARI.md), ilerleme için [PROTOTIP-TODO.md](PROTOTIP-TODO.md).
 
 **Ne yapıyoruz:** Sosyal medyanın anlık katılım hissiyle, aylık derginin editöryel ağırlığını birleştiren, mobil öncelikli bir web dergisi. Aylık tek bir "sayı" yayımlanır; okur siteye girdiği anda hiçbir engel olmadan akışa girer, istediği yere yorum bırakır, o sayıya özel bulmacaları oynar.
 
@@ -474,14 +476,14 @@ Site 1.0 canlıya çıktıktan sonra, gerçek kullanıcı ve gerçek veri varken
 
 ## 8. Açık Sorular (ilerledikçe netleşecek)
 
-1. **One-shot manga içeriğini kim çizecek?** Aylık bir one-shot ciddi bir üretim yükü — sen mi çizeceksin, davetli çizer mi, yoksa lisanslı/kamuya açık eser mi? (Mimariyi etkilemez, takvimi etkiler.)
+1. **One-shot manga içeriğini kim çizecek?** — *ilk örnek için çözüldü.* 2026-09'un one-shot'ı **KARGAMANGA**'nın "Kapalı Kapılar" eseri; **izinle** yayımlandı, telif sahibinde kaldı, künyede ve sayfa filigranında (PIGMENT) kaynak gösteriliyor. Yani model belli: davetli/işbirliği yapılan çizer + açık künye. Açık kalan kısım **süreklilik** — aylık bir one-shot ciddi bir üretim yükü; her sayıda mı, iki ayda bir mi, yoksa arada kamuya açık eserle mi dönülecek? (Mimariyi etkilemez, takvimi etkiler.) İlgili teknik borç: manga balonları için gömülen Anime Ace fontunun lisansı yayın öncesi çözülmeli.
 2. **Manga formatı:** tam sayfa görselleri mi, yoksa panel panel mi teslim edilecek? (Panel bölgeleri tanımlanırsa "rehberli görünüm" ve panel bazlı yorum mümkün olur.)
 3. **Niş** henüz net değil — bölüm şablonları genel tutuluyor, netleşince nişe özel şablon eklenecek.
 4. **Marka adı** — kod içi ad `magazine`, tek yerden değiştirilebilir şekilde kurulacak.
 5. **Tanıtım ("about") sahnesi** her yeni ziyaretçiye mi, yoksa sadece ilk sayıda mı? (Öneri: cihazda bir kez, menüden tekrar izlenebilir.)
-6. **Sayfalama: elle mi, otomatik sayfalayıcı mı? (KARAR BEKLİYOR)** İçerik artık "her sayfa ≤ 1 ekran, temiz snap" ilkesine göre kurgulanıyor (uzun sayfa = kaydırınca okumadan atlama derdi). Uzun içeriği contain snap-sayfalara bölmenin iki yolu var:
+6. **Sayfalama: elle mi, otomatik sayfalayıcı mı? — *asıl build'e ertelendi.*** Prototipte otomatik sayfalayıcının getirisi görünmüyordu (içerik zaten donmuş ve elle kurgulanmış), o yüzden karar Faz 1'e — içerik derleyicisinin yazılacağı yere — bırakıldı. Prototipte yalnızca Sözlük bölümü örnek olsun diye elle üç `fit:contain` sayfaya bölündü. Kararın kendisi hâlâ verilmedi, sadece yeri değişti. İçerik "her sayfa ≤ 1 ekran, temiz snap" ilkesine göre kurgulanıyor (uzun sayfa = kaydırınca okumadan atlama derdi). Uzun içeriği contain snap-sayfalara bölmenin iki yolu var:
    - **Elle:** her uzun sayfayı data'da parçalara böl + yorum ankrajlarını taşı. Basit ama tekrarlı, token yoğun, ve "hangi ekrana sığar" derdi (en kısa telefona göre bölünür, masaüstünde boşluk kalır). *Prototipte Sözlük bölümü şimdilik elle bölündü.*
-   - **Otomatik sayfalayıcı (öneri):** render sırasında içerik viewport'a sığmıyorsa kendisi contain parçalara böler. Tek seferlik motor; her ekranda + gelecekteki her içerikte otomatik, minimum sayfa, elle bölme/ankraj derdi yok. Bedeli: yorum ankrajını "sayfa-bağımsız" (bloğa göre) yapmak için küçük bir refactor. **Gerçek ürünün içerik-derleyici modeli de zaten bu** — Faz 1'de derleyici bunu üstlenmeli. Kalan 7 uzun sayfaya (km-1/3/4/5, sy-1/2/3) geçmeden önce buna karar verilecek.
+   - **Otomatik sayfalayıcı (öneri):** render sırasında içerik viewport'a sığmıyorsa kendisi contain parçalara böler. Tek seferlik motor; her ekranda + gelecekteki her içerikte otomatik, minimum sayfa, elle bölme/ankraj derdi yok. Bedeli: yorum ankrajını "sayfa-bağımsız" (bloğa göre) yapmak için küçük bir refactor. **Gerçek ürünün içerik-derleyici modeli de zaten bu** — Faz 1'de derleyici bunu üstlenmeli, karar orada verilecek.
 7. **Bir derginin toplam boyutu ne kadar, saklama nasıl verimli olur?** Bir sayı = metin (derleyici çıktısı) + görseller (şimdilik satır içi SVG, ileride gerçek foto/manga) + yorumlar. Ölçülecek: tipik bir sayının yayımlanmış toplam ağırlığı (KB/MB), en ağır parça hangisi (büyük olasılıkla görseller). Değerlendirilecek verim yolları: görsel için modern format (AVIF/WebP) + duyarlı boyutlar + tembel yükleme, uzun/ağır sayfalar için kod bölme (yalnız açılan bölümü indir), metin/yorumu ayrı yükleme (zaten `js/issues/<slug>.js` + `.comments.js` ayrık), CDN/edge önbelleği, arşivdeki eski sayıların soğuk saklaması. Amaç: yeni sayı eklendikçe ilk açılış maliyeti sabit kalsın, okur her seferinde tüm arşivi indirmesin.
 
 ## 9. Bilinçli Olarak Kapsam Dışı
@@ -491,7 +493,8 @@ takip/profil/DM · bildirim merkezi · ödeme ve abonelik · otomatik içerik mo
 
 ---
 
-## 10. İlk Adım (onay sonrası)
+## 10. Nerede kaldık
 
-1. Bu dokümanı `~/sErgi/docs/PROJE.md` olarak projeye yaz ve `~/Desktop/socialMagazinePlan.md`'yi ona işaret eden kısa bir nota indir.
-2. Faz 0'ı başlat: depo iskeleti + 3:4 tuval + snap motoru.
+Planın kendisi yazıldı ve onaylandı. Ardından, doğrudan Faz 0'a girmek yerine, tüm ürünü uçtan uca görmek için `prototype/` kuruldu — bu plandaki her ekran orada çalışıyor (sahte veriyle). Prototipin sorduğu soruların cevapları bu belgeye işlendi: yorum ankrajı bloğa taşındı (§5.12 şeması güncellenmeli, bkz. [YORUM-SISTEMI.md](YORUM-SISTEMI.md) §6), sayfalama kararı Faz 1'e ertelendi (§8.6), one-shot üretim modeli belirlendi (§8.1).
+
+**Sıradaki adım — Faz 0:** pnpm workspace + SvelteKit iskeleti + 3:4 tuval ve snap motorunun gerçek karşılığı. Prototip o noktada silinmez; blok blok neyin nasıl görüneceğinin referansı olarak kalır.

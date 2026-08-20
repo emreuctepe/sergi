@@ -102,7 +102,7 @@ window.MAG = window.MAG || {};
   DEV.bgForms = [
     { form: 'bg: "scene:paper"', note: "Satır içi SVG sahne (yukarıdaki adlar)." },
     { form: 'bg: "photo:101"', note: "Tohumlu sahte fotoğraf (sayı = tohum)." },
-    { form: 'bg: "img:assets/2026-10/kapak.webp"', note: "Gerçek görsel dosyası (prototipte kullanılmıyor, kapı açık)." },
+    { form: 'bg: "img:assets/2026-09/tren.webp"', note: "Gerçek görsel dosyası — sayı klasörüne göreli yol." },
   ];
 
   /* --- SAYFA ANİMASYONLARI (scene: "<ad>") ---------------------------------

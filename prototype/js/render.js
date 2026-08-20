@@ -263,9 +263,10 @@
   /* Sayfa arka planı üç biçimde verilebilir:
        scene:torii                    → art.js'teki satır içi SVG sahne
        photo:101                      → art.js'in ürettiği sahte "fotoğraf"
-       img:assets/2026-10/kapak.webp  → gerçek dosya
-     Üçüncüsü prototipte hiç kullanılmıyor ama kapı açık duruyor: çizilmiş bir
-     sahneyi gerçek görselle değiştirmek tek satırlık bir iş olsun diye. */
+       img:assets/2026-09/tren.webp   → gerçek dosya
+     Üçü de kullanımda: 2026-10 tamamen çizilmiş sahnelerle, 2026-09 karışık
+     (10 sayfa arka planı + one-shot'ın kareleri gerçek dosya). Çizilmiş bir
+     sahneyi gerçek görselle değiştirmek bilerek tek satırlık bir iş. */
   function backgroundFor(spec) {
     if (!spec) return null;
     var m = /^(scene|photo|img):(.+)$/.exec(spec);

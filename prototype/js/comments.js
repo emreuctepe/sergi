@@ -412,7 +412,7 @@
   C.decorate = function () {
     invalidate();
     MAG.canvas.pages().forEach(decoratePage);
-    /* Süsleme bittiğinde sunum katmanları (Fısıltı, Kenar) kendini tazeler.
+    /* Çizim bittiğinde tek olay: yorumu dinleyen her yüzey buradan tazelenir.
        Tek kapı: yorum eklensin, tepki gelsin, stres modu bassın, moderasyon
        onaylasın — hepsi decorate'ten geçer, hepsi buradan haber alır. */
     U.emit("comments:decorated", {});
