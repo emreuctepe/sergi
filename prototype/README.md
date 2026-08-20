@@ -61,17 +61,14 @@ sıfırdan yazarken boğulmamak için `dev.html` var (yalnızca yerel, üretime 
 |---|---|
 | Tanıtım sahnesi | İlk açılışta gelir. Tekrar izlemek için: Menü → “Tanıtımı tekrar izle” |
 | Sabit menü | Geniş pencerede menü kendiliğinden açık durur. “Sade görünüm” ile kapanır, hamburger ile geri gelir; tercih hatırlanır |
-| Okuma derinliği | Üst çubuktaki üç çubuklu rozet. **İçerik gerçekten değişir** (18 / 25 / 29 sayfa) |
+| Okuma derinliği | Üst çubuktaki üç çubuklu rozet. **İçerik gerçekten değişir** (güncel sayıda 16 / 23 / 26 sayfa; 2026-09'da 18 / 24 / 28) |
 | Bloğa yorum | Eş okuma açıkken **bir paragrafa dokun**. Hedef koca bir paragraf, ıskalanmaz |
 | Alıntılı yorum | Bir cümleyi seç → “Yorum yaz”. Cümle yorumun **içine** girer, ankraj yine bloktur |
 | Görsele yorum | Görselde ya da manga panelinde **uzun bas** → tam o noktaya pin bırakılır |
-| Eş okuma | Alt çubuktaki “yorumlar” düğmesi. Tuval geri çekilir, blok çentikleri ve alıntı ısısı belirir |
-| **Fısıltı** | Eş okuma açılınca alt bant iki satıra açılır ve o an odaktaki bloğun sesini söyler. Bir paragrafa dokun → bant o sese geçer; **aynı yere ikinci kez** dokun (ya da banda dokun) → konuşma açılır |
-| **Kenar** | Menü → Yorum sunumu → Kenar. Geniş pencerede kartlar **derginin sağındaki boşlukta** (ray), dergi tam genişlikte kalır — en temizi “Sade görünüm” ile. Pencereyi telefon boyuna daralt → **dokuma**: şerit bloğun ardında, dokun → açılır, tekrar dokun → thread |
-| **Şerh** | Menü → Yorum sunumu → Şerh. Dipnot gibi: metinde bloğun sonunda üst-simge numara `[1]`, sayfa altında numaralı **haşiye**. Numaraya dokun → notuna kayar, nota dokun → thread |
-| Sunum değiştirme | Menü → Ayarlar → “Yorum sunumu”. Fısıltı / Kenar / Şerh / Yok. Aynı sayı, aynı yorumlar, farklı sunum — sağlamı bulana dek biriktiriyoruz |
-| Alıntı ısısı | Çok alıntılanan cümlenin altı kalınlaşır. Dokun → o cümleye yazılmış bütün sesler |
-| Dolu sayı | Sayı 248 yorumla geliyor. En sıcak cümle: `km-1`'de “renk her gün yaklaşık yirmi metre iner” — 16 alıntı, tek işaret |
+| Eş okuma | Alt çubuktaki “yorumlar” düğmesi. Tuval geri çekilir, yorum baloncukları belirir |
+| Baloncuğu taşı | Baloncuğu **basılı tutup sürükle**. Konum yoruma yazılır, yeniden çizimde orada kalır |
+| One-shot manga | `?sayi=2026-09` → “Kapalı Kapılar” bölümü. KARGAMANGA'nın 7 kareli one-shot'ı, **soldan sağa** okunuyor; sağ altındaki PIGMENT filigranına dokun → YouTube Shorts |
+| Dolu sayı | Güncel sayı (2026-10) 98 tohum yorumla, 2026-09 ise 248 yorumla geliyor |
 | Stres testi | Konsolda `MAG.flood(250)` → 250 sahte yorum daha (yalnızca bellekte). `MAG.flood(0)` temizler |
 | Pin kümelenmesi | Konsolda `MAG.pins()` → her pinin **çekim alanı** çizilir. Görselde uzun bas: nokta hangi pine katılacağını söyler |
 | Giriş | İlk yorumdan sonra teklif gelir. Kod **konsola** yazılır ve ekranda da gösterilir |
@@ -86,14 +83,13 @@ Klavye: `↑ ↓` / `PgUp PgDn` / `Space` sayfa gezinme, `Home` `End` uçlar, `E
 | Prototip | Gerçek proje |
 |---|---|
 | `js/data.js` | `packages/content` derleyicisinin Markdown'dan ürettiği JSON |
-| `js/data-comments.js` | Supabase `comments` tablosunun içeriği (248 tohum yorum) |
+| `js/data-comments.js` | Supabase `comments` tablosunun içeriği (sayı başına tohum yorumlar) |
 | `js/art.js` | `content/issues/<ay>/sections/*/images/` altındaki AVIF/WebP dosyaları |
+| `assets/<ay>/` | Aynı klasörün gerçek hâli — 2026-09'un fotoğrafları ve one-shot kareleri şimdiden burada |
 | `js/render.js` | `apps/web/src/lib/blocks/<tip>/` — her blok tipi kendi klasöründe |
 | `js/canvas.js` | `apps/web/src/lib/canvas/` — 3:4 tuval, snap motoru |
 | `js/comments.js` | `apps/web/src/lib/comments/` + Supabase `comments` tablosu |
-| `js/whisper.js` | `apps/web/src/lib/comments/whisper/` — yorum sunumu “Fısıltı” (deneniyor) |
-| `js/kenar.js` | `apps/web/src/lib/comments/rail/` — yorum sunumu “Kenar” (ray/dokuma, deneniyor) |
-| `js/serh.js` | `apps/web/src/lib/comments/footnote/` — yorum sunumu “Şerh” (dipnot/haşiye, deneniyor) |
+| `js/popup.js` | `apps/web/src/lib/comments/popup/` — baloncuğa dokununca açılan kart |
 | `js/identity.js` | Supabase anonim giriş + `updateUser({email})` / `verifyOtp()` |
 | `js/puzzles.js` | `packages/puzzle-sdk` + `puzzles/<id>/` klasörleri |
 | `js/state.js` | `localStorage` yerine `readers`, `reading_progress`, `puzzle_runs` |
@@ -127,14 +123,30 @@ Ayrıntılı gerekçe: [`docs/YORUM-SISTEMI.md`](../docs/YORUM-SISTEMI.md).
 
 `quote` bir ankraj **değil**, yorumun kendi alanıdır. Bu ayrım olmadan aynı cümleye
 ikinci bir yorum yazılamıyordu: ilk yorum cümleyi sarıyor, sonrakiler kendi metnini
-bulamayıp sessizce sayfa seviyesine düşüyordu. Artık sayfadaki işaret bir yorumu
-değil **kaç kişinin o cümleyi alıntıladığını** gösteriyor — bir cümle başına tek
-işaret, yorum arttıkça çoğalmıyor, koyulaşıyor.
+bulamayıp sessizce sayfa seviyesine düşüyordu. Alıntı artık metne dokunmuyor,
+yorumun **içinde** duruyor — aynı cümleye kaç kişi isterse yazabilir.
 
-Bir blokta kaç yorum olursa olsun sayfada tek **temsilci ses** görünür
-(`2×tepki + cevap sayısı + editör seçimi`), kalanlar sayaçta durur. Pinler
-kümelenir ve bir sayfa en fazla 6 pin gösterir; yoğunluk artınca pinler seyrelmez,
-kümeler kabalaşır. `MAG.flood(250)` ile bunların hepsi ölçekte denenebilir.
+Baloncuklar kümelenir ve bir sayfa en fazla 6 pin gösterir; yoğunluk artınca
+baloncuk seyrelmez, kümeler kabalaşır. Bir kümede kaç ses varsa sayaçta durur,
+dokununca hepsi pop-up'ta açılır. `MAG.flood(250)` ile bunların hepsi ölçekte
+denenebilir.
+
+### Yorum sunumu — baloncuk ve pop-up
+
+Yorum bir arayüz katmanı değil, sayfanın üstünde duran küçük bir **baloncuk**.
+Metin altı çizgisi, paragraf highlight'ı, kenar çentiği yok: eş okuma açıkken
+yorumlu her blok kendi baloncuğunu alır, görsele bırakılanlar zaten bıraktıkları
+noktada durur.
+
+| Ne | Nasıl |
+|---|---|
+| Baloncuk | Yorumun yaşadığı yer. Boşta hafifçe salınır |
+| Dokun | Tuvalin **üstünde** pop-up açılır: oradaki bütün sesler, kaydırmalı |
+| Basılı tut + sürükle | Baloncuğu taşı; konum yoruma yazılır, yeniden çizimde orada kalır |
+| Eş okuma kapalı | Baloncuklar gizli — ilk okuyuş yazarın |
+
+Sayfa düzeni yorum sayısından bağımsız: 3 yorum da olsa 300 yorum da olsa sayfa
+aynı kalır, değişen tek şey baloncuğun üstündeki sayaçtır.
 
 ### Pin kümelenmesini görmek — `MAG.pins()`
 
@@ -161,85 +173,40 @@ aynı şekilde birleşir. Görünüm bunu düzeltmez, olduğu gibi çizer.
 Sınır birleşmelerini (pembe) görmek için önce `MAG.flood(250)` çalıştır — tohum
 veride bir sayfa 6 pin sınırını aşmıyor.
 
-### Fısıltı — alt bant konuşur
-
-Üç sunum yolundan ilki (`docs/YORUM-SISTEMI.md` §4, Yol B). Eş okuma açıkken alt
-bant iki satıra açılır ve **o an odaktaki bloğun temsilci sesini** söyler.
-
-| Ne | Nasıl belirlenir |
-|---|---|
-| Odak | 1) son dokunulan blok · 2) kaydırmalı sayfada ekranın dikey ortasına en yakın yorumlu blok · 3) sayfanın en yüksek puanlı sesi |
-| Şeridin üst satırı | Kim + nerede. Yorumun alıntısı varsa **alıntının kendisi** yazar |
-| Şeridin alt satırı | Yorumun gövdesi, iki satır. Gerisi bir dokunuş uzakta |
-| `+7` | Aynı yerdeki diğer sesler (cevaplar dâhil) |
-| Sessiz sayfa | Şerit yerinde durur, “henüz sessiz” der — bant sayfa başına büyüyüp küçülmesin diye |
-
-Sayfanın kendisine **hiçbir düğüm eklenmez**; odaktaki blok yalnızca bir
-öznitelikle aydınlatılır. Yolun tamamı `js/whisper.js` + `css/comments.css`
-sonundaki tek bölümde durur.
-
-**Yer maliyeti** (bu yolun asıl tartışması): şerit 66 px ister. Telefonda tuval
-3:4'ün üstünde uzatıldığı için bunu **taşma payından** alır — 390×844'te tuval
-720 → 588 px iner, sayfadan kapanan yer 1 px. Payın olmadığı ekranlarda (basık
-telefon, kısa masaüstü penceresi) şerit sayfanın alt ~%14'ünün üstüne biner.
-
-### Kenar — kenar rayı / dokuma
-
-İkinci sunum yolu (`docs/YORUM-SISTEMI.md` §4, Yol A). Kullanıcının tarif ettiği
-şeyin birebir karşılığı: **cümle ve ona iliştirilen ses aynı anda, hepsi birden.**
-İki biçim, tuval genişliğine göre kendisi seçer.
-
-**Ray** (geniş ekran). Kartlar **tuvalin dışında**, derginin sağındaki boşlukta
-(letterbox gutter). Dergi objesi tam 3:4 ve tam genişlikte kalır — metin
-daralmaz; kartlar gerçek bir dergi kenar notu gibi yanında durur:
-
-| Çizim | Ne demek |
-|---|---|
-| Kart | Bloğun temsilci sesi: avatar, ad, yanıtladığı **alıntı**, gövde (3 satır), `+N ses` |
-| Hizalama | Kartın üstü bloğunun tam hizasında; kaydırdıkça kartlar bloklarını takip eder |
-| Aşağı itilen kartlar | İki blok birbirine yakınsa kartlar çakışmasın diye alttaki aşağı kayar |
-| `+N daha` (rayın dibinde) | Bir sayfaya sığmayan kartlar burada toplanır; dokun → hepsi thread'de |
-
-Sol menü (dock) açıkken sağ boşluk daralır; dar pencerede ray sığmazsa dokumaya
-düşer. **Sade görünüm** (dock kapalı) simetrik durur: solda menü, ortada dergi,
-sağda ray.
-
-**Dokuma** (telefon, tuval <520px). Kenar yok, çünkü ekranın kenarı yok. Aynı
-veri bloğun **hemen ardına** tek satırlık şerit olarak iner: `🦩 "…" +3`.
-Dokun → yerinde 3 satıra açılır. Tekrar dokun → thread. Yorumlu sayfa bu modda
-uzar ("sığan sayfa" kimliği bilerek esner).
-
-**Kapsam:** ray/dokuma yalnızca **metin sayfalarında**. Tam kanama görsel, kapak,
-manga, bulmaca, sayı sonu kendi düzenleriyle kalır; oralarda blok yorumu eski
-rozet+thread'e düşer, nokta pinleri her yerde çalışır. Yolun tamamı `js/kenar.js`
-+ `css/comments.css` sonundaki tek bölümde.
-
-### Şerh — dipnot / haşiye
-
-Üçüncü sunum yolu (`docs/YORUM-SISTEMI.md` §4, Yol D). Yorum bir arayüz balonu
-değil, **kitabın kendi diziliş dili**: metinde bloğun sonuna üst-simge numara
-`[1]`, yorumun kendisi sayfanın altında numaralı bir **haşiye** olarak dizilir.
-Osmanlı yazma geleneğindeki şerh/haşiye gibi — metnin kenarına düşülmüş okur notu.
-
-- Numaraya dokun → notuna kayar (dipnot gezinmesi, kısa bir parıltı).
-- Nota dokun → thread açılır.
-- Sayfa notlar için **uzar**; her şey akışın içinde olduğu için (Kenar'ın aksine)
-  gutter/hizalama/kaydırma derdi yok — en basit sunum bu. Her ekranda aynı.
-- Liste/sözlük satırları tek tek numaralanır.
-
-Yolun tamamı `js/serh.js` + `css/comments.css` sonundaki tek bölümde.
-
-> **Not — sunum yolları biriktiriliyor:** Fısıltı, Kenar, Şerh şu an menüde yan
-> yana. "Doğru" yorum sistemi bulunana kadar eleme yapmıyoruz; sırada Uğultu,
-> Mektuplar gibi başka yollar da var (`docs/YORUM-SISTEMI.md` §"Sırada denenecek").
-
 ## Bilinçli sadeleştirmeler
 
 - **Tek dil.** Dil seçici çalışır ama içerik yalnızca Türkçe. Çok dillilik altyapısı
   (yönlendirme, eksik çeviri notu) gerçek projede kurulacak.
-- **Tek sayı.** Arşivde üç sayı görünür, biri açılır.
+- **İki dolu sayı.** Arşivde dört sayı listelenir (№ 01–04), ikisi gerçekten açılır:
+  № 04 “Gürültü” (2026-10, güncel) ve № 03 “Kızıl Mevsim” (2026-09). № 02 ve № 01
+  bilerek içeriksiz — arşivin boş hâli de tasarımın parçası.
 - **Sahte OTP.** Kod istemcide üretilir. Gerçekte Supabase + Resend.
 - **İstatistikler sabit.** `puzzle_stats` yerine `data.js` içinde elle yazılmış sayılar.
+
+## Görseller ve gömülü font
+
+Prototip **ağa hiç çıkmaz** — CDN yok, dış istek yok. Ama "her şey satır içi SVG"
+de artık doğru değil: 2026-09 gerçek dosyalarla döşendi, hepsi depoda duruyor.
+
+| Ne | Nerede | Not |
+|---|---|---|
+| Sayfa fotoğrafları | `assets/2026-09/*.webp` (8 dosya) | Commons görselleri; künye sayfasında kaynakları yazılı |
+| One-shot kareleri | `assets/2026-09/kapali-kapilar/` (9 dosya, ~390 KB) | 7 kare + bölüm kapağı + stüdyo logosu |
+| Çizilmiş sahneler | `js/art.js` | 2026-10'un tamamı hâlâ satır içi SVG (`scene:` öneki) |
+| Gömülü font | `assets/animeace2_reg.ttf` (64 KB) | Projenin **tek** gömülü fontu; yalnız manga balonu ve başlığı |
+
+`render.js`'teki `backgroundFor()` üç öneki çözer: `scene:` (çizilmiş),
+`photo:` (tohumlu sahte fotoğraf), `img:` (gerçek dosya).
+
+**One-shot — “Kapalı Kapılar”.** 2026-09'un manga bölümü KARGAMANGA'ya ait,
+**izinle** yayımlandı; telif sahibinde kalıyor. 7 kare, tek sayfalık plan düzeni,
+soldan sağa okunuyor (Japon one-shot'ı değil, o yüzden `dir: "ltr"`). Sağ alttaki
+PIGMENT filigranı yorum baloncuklarıyla aynı dilde: dokununca stüdyonun YouTube
+Shorts sürümüne gider.
+
+> **Font lisans borcu:** Anime Ace şu an ham TTF olarak gömülü ve yalnızca
+> prototipte kullanılıyor. Yayın öncesi ya lisansı satın alınmalı ya da OFL bir
+> alternatifle değiştirilmeli. Gerçek build'de WOFF2'ye inecek (~30 KB).
 
 ## Bulmaca sözleşmesi
 
