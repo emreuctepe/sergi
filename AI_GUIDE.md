@@ -8,7 +8,7 @@ sorularına saniyede yanıt bulması içindir. Mimari anlatı için
 - **Ad alanı:** her şey `window.MAG` altında. ES modül yok (prototip `file://`
   ile açılabilsin diye), her dosya IIFE ile `MAG`'a yazar.
 - **Yükleme sırası** (`prototype/index.html`, anlamlı):
-  `util → art → content → issues/*.js → data → *.comments.js → data-comments → data-analytics → state → render → canvas → comments → popup → identity → puzzles → overlays → analytics → debug → app`
+  `util → art → content → issues/*.js → data → *.comments.js → data-comments → data-analytics → state → streak → render → canvas → comments → popup → identity → puzzles → overlays → analytics → debug → app`
   İki zorunluluk: `content.js` bölünmüş sayı dosyalarından **önce** (`defineSection`'ı
   o tanımlıyor), içerik dosyaları `data.js`'ten **önce** (`data.js` `MAG.issues`'un
   anlık kopyasını alıyor; sıra bozulursa `throw` ediyor).
@@ -21,7 +21,8 @@ sorularına saniyede yanıt bulması içindir. Mimari anlatı için
 |---|---|---|
 | Tek global ad alanı | `window.MAG` | tüm modüller buraya asılır (`util.js:5`) |
 | **Kalıcı durum** (okur, tercihler, ilerleme, yorumlar, tepkiler, bulmaca koşuları) | `MAG.state.data` → `js/state.js` | `localStorage["mag:state:v1"]`; alan adları Supabase şemasıyla birebir |
-| Durum varsayılanları (şema) | `DEFAULTS`, `js/state.js:15` | `reader, depth, locale, theme, motion, dock, progress, finished, seenIntro, comments, reactions, loginOffer, puzzleRuns, tagScores, coldStartAnswer, stats` |
+| Durum varsayılanları (şema) | `DEFAULTS`, `js/state.js:15` | `reader, depth, locale, theme, motion, dock, progress, finished, seenIntro, modeTime, modeDone, keys, comments, reactions, loginOffer, puzzleRuns, tagScores, coldStartAnswer, stats` |
+| **Mod tamamlama ve anahtar** | `State.modeTime / modeDone / keys` | anahtarlar `{ [slug]: ts }`; kural `js/streak.js`, tek görünür iz altın mod kartı |
 | **Aktif sayı içeriği** | `MAG.data` → `js/data.js` | `issue, intro, sections, puzzles`; hangi sayı? URL `?sayi=` → `pickSlug()` |
 | Sayı kayıt defteri (çok sayılılık) | `MAG.issues` | tek dosya kendini doğrudan yazar; **bölünmüş** sayı `js/content.js` ile toplanır |
 | Bölünmüş sayı ara belleği | `MAG.content.pending` → `js/content.js` | `defineSection`/`defineIssue` parçaları burada birikir, `order`'a göre `MAG.issues`'a toplanır |
@@ -46,6 +47,7 @@ sorularına saniyede yanıt bulması içindir. Mimari anlatı için
 | `content` | `js/content.js` | Bölünmüş sayıları toplar: `defineIssue`/`defineSection` → `MAG.issues[slug]` |
 | `issues` | `js/issues/*.js` · `js/issues/<slug>/` | Sayı içeriği (tek dosya **veya** issue.js + sections/*) |
 | `state` | `js/state.js` | Merkezi durum + localStorage + sekmeler arası eşitleme |
+| `streak` | `js/streak.js` | Okuma süresi sayacı; modun tahmini süresinin yarısı → mod tamam, üçü tamam → sayının anahtarı |
 | `render` | `js/render.js` | İçerik ağacı → DOM; `BLOCKS` tablosu |
 | `canvas` | `js/canvas.js` | 3:4 tuval, snap gezinme, ilerleme, klavye, sahne gözlemcisi |
 | `comments` | `js/comments.js` | Yorum ankrajı, baloncuk (pin), kümelenme, katman |
@@ -74,12 +76,22 @@ API; küçük harfli adlar dosya-içi yardımcıdır.
 ### `js/state.js` → `MAG.state` (State)
 `get, set, patch, save, reset` · `depth, isVerified` (kısayol) ·
 `saveProgress, getProgress, markFinished` (ilerleme) ·
+`modeKey, getModeTime, addModeTime, isModeDone, markModeDone` (mod tamamlama — depo; kural `streak.js`'te) ·
+`hasKey, grantKey, keyList` (anahtar) ·
 `bumpTags, tagScore` (bulmaca öneri puanı) ·
 `runKey, getRun, saveRun` (bulmaca koşuları) · `DEFAULTS` (şema, satır 15)
 
+### `js/streak.js` → `MAG.streak` (S)
+`init` (sayaç `flow:render`'da başlar) · `targetMs(depth)` (tahminin yarısı) ·
+`spentMs, progress, isDone` (okuma) · `hasKey, keys` (anahtar) ·
+iç: `tik` (saniyede bir; yalnız sekme görünür + son 3 dk hareket varsa sayar),
+`tamamla` (modu işaretle, üçü tamamsa anahtar) ·
+dev: `report()` (konsol tablosu), `forward(dk)` (sayacı ileri sar)
+
 ### `js/data.js` → `MAG.data` (D)
 `archive` (sayı listesi) · `hasIssue, currentSlug, issueHref` ·
-`sectionBySlug, puzzleById` · `pageVisible` (derinlik filtresi) ·
+`sectionBySlug, puzzleById` · `depths` (mod kimlikleri: `min, mid, full`) ·
+`pageVisible` (derinlik filtresi) ·
 `flow` (derinliğe göre sayfa dizisi) · `estimateMinutes` · `pickSlug` (iç, sayı seçer)
 
 ### `js/render.js` → `MAG.render` (R)
@@ -164,6 +176,8 @@ iç `assemble(slug)` (sıra-bağımsız; `order`'a göre `MAG.issues[slug]`'a to
 | `comments:decorated` | `comments.decorate` | sunum katmanları |
 | `comments:layer` | `comments.setLayer` | tuval modu |
 | `issue:finished` | `State.markFinished` | `app.js` (toast) |
+| `mode:done` | `State.markModeDone` | (yok — bilerek sessiz; iz yalnızca altın mod kartı) |
+| `key:earned` | `State.grantKey` | (yok — keşfet sayfası bunu okuyacak) |
 | `identity:upgraded` | `identity.verifyCode` | `app.js` (id sabit mi kontrol) |
 | `dock:fit` | `canvas.measureLetterbox` | `overlays` (sabit menü) |
 
@@ -173,4 +187,8 @@ iç `assemble(slug)` (sıra-bağımsız; `order`'a göre `MAG.issues[slug]`'a to
 
 `MAG.reset()` her şeyi sıfırla · `MAG.data` aktif sayı içeriği ·
 `MAG.flood(250)` 250 sahte yorum (bellek) · `MAG.flood(0)` temizle ·
-`MAG.pins()` pin çekim alanlarını çiz
+`MAG.pins()` pin çekim alanlarını çiz ·
+`MAG.streak.report()` mod tamamlama tablosu · `MAG.streak.forward(12)` sayacı 12 dk ileri sar
+
+Son ikisi açılış banner'ında bilerek duyurulmuyor: mod tamamlama okurdan
+gizli bir mekanizma, konsolu açan meraklı okur onu hazır bulmasın.

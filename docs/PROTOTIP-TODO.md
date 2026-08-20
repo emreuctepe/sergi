@@ -6,6 +6,10 @@
 
 ## Nerede kaldık?
 
+- **Mod tamamlama (K1) girdi.** Bir sayıyı bir modda tahmini sürenin **yarısı** kadar okuyan o modu
+  tamamlamış sayılıyor; üçünü de tamamlayan sayının **anahtarını** kazanıyor. Okura hiçbir şey
+  söylenmiyor — tek iz, mod seçim ekranındaki kartın **altın** zemine dönmesi. Anahtar şimdilik
+  yalnızca durumda bekliyor; **K2 (dergi keşfet sayfası)** onu okuyacak.
 - **Yorum sistemi 2.x — SADELEŞTİRİLDİ:** sunum denemeleri budandı; tek model kaldı:
   her yorum bir **baloncuk (pin)**, dokununca üstte **pop-up** (tüm yorumlar kaydırmalı). Metin/paragraf
   highlight'ları, alıntı ısısı ve blok kenarı çentiği tamamen kalktı — ilgili ölü kod (`markQuote`,
@@ -160,6 +164,7 @@
 | M1 | ✅ | **2026-09'a gerçek one-shot: "Kapalı Kapılar" (KARGAMANGA, izinle).** Sayının çizili sahneleri önce Commons görselleriyle değiştirildi (görsel künyesiyle birlikte), ardından manga bölümü geldi — sayı 8 bölümden 9'a çıktı. Yerleşim planın kendi sayfa kompozisyonu: 24 sütunlu grid, üç kuşak, 7 kare + başlık kutusu (`layout: "plan"`). Balonlar kare sınırlarını bilerek taşıyor (`overflow: visible`). Japon one-shot'ı olmadığı için **soldan sağa** (`dir: "ltr"`). Bölüm, sayı sonundan hemen önceye yerleşti; kendi kapak sayfası var (KARGAMANGA karga figürü). Ham 8.1 MB PNG → 392 KB WebP; ham kaynaklar `.gitignore`'da. `panel-sirala` bulmacası bu 7 kareyi kullanıyor. |
 | M2 | ✅ | **Projenin ilk gömülü fontu: Anime Ace.** Balon ve manga başlığı sistem fontlarıyla "çizgi roman" kaydında durmuyordu. `assets/animeace2_reg.ttf` (64 KB) `@font-face` ile gömüldü, `--font-manga` token'ına bağlandı; yedeği Comic Sans → `--font-ui`, yani font yüklenmezse balon yine çizgi roman kaydında kalıyor. **Tuzak:** fontta uzun tire (— –) yok, balon metninde kullanılırsa o karakter sessizce yedeğe düşüyor — `tokens.css`'e not düşüldü, 7 balonun hepsi kontrol edildi. Lisans borcu "sırada ne var" §4'te. |
 | M3 | ✅ | **PIGMENT filigranı + `--safe-bottom`.** One-shot sayfasının sağ altında stüdyo logosu; yorum baloncuklarıyla aynı dilde duruyor, dokununca sayının YouTube Shorts sürümüne gidiyor. Ayrıca tuval altına görünmez bir güvenli alan eklendi (`--safe-bottom`): folio, tam sayfa içeriğin üstüne 15px biniyordu. |
+| K1 | ✅ | **Mod tamamlama ve anahtar** (`js/streak.js`, yeni). Okur bir sayıyı bir modda o modun **tahmini süresinin yarısı** kadar okursa modu tamamlamış sayılıyor; üç modu da tamamlarsa sayının **anahtarını** kazanıyor. Hedef veri olarak yazılmadı, `D.estimateMinutes(mod)`'dan geliyor — sayı büyüyünce eşik kendiliğinden büyüyor. **Bilerek sessiz:** tamamlanma anında toast/rozet/ses yok, tek görünür iz mod seçim ekranındaki kartın altın zemine dönmesi; okur oraya kendi merakıyla dönüp fark etsin diye, "şunu da yap" diyen bir görev listesi olmasın. Sayaç duvar saatini değil okuma süresini sayıyor: yalnızca sekme görünürken **ve** okur son 3 dk içinde kıpırdamışken işliyor, yani sekmeyi açık bırakıp gitmek modu tamamlatmıyor; uyuyan sekmeden gelen dev `delta` bir tura kırpılıyor. Süre `sayı:mod` çiftine yazıldığı için mod değiştirince sayaç öteki kovaya geçiyor, biriken kaybolmuyor. Yazım saniyede bir olduğundan `addModeTime` olay **yaymıyor** (yoksa her saniye tüm dinleyiciler tetiklenirdi); seyrek olan `mode:done` ve `key:earned` yayıyor. **Renk tuzağı:** altın için `--accent-2`'ye bağlanmak yanlıştı — o token sayı temasının ikinci rengi ve her sayıda altın olmak zorunda değil (2026-10'da neon pembe `#ff54a3`), bağlansaydı "tamamladım" işareti sayıdan sayıya renk değiştirirdi. Sayı temalarından bağımsız ayrı bir `--gold` tokenı eklendi. Anahtar şimdilik yalnızca `State.keys` + `key:earned`; K2 onu okuyacak. Konsoldan `MAG.streak.report()` / `.forward(dk)` — açılış banner'ında bilerek duyurulmuyor. |
 | — | 🧭 | **Ortam notu — ölçüm nerede yapılıyor.** Geliştirme bir **Debian 12 distrobox konteynerinin** içinde; konteynerde toplam 6 font var, host'ta (Bazzite/Fedora) 787 font ve 32 Japonca aile. Yani konteynerden `fc-list` çalıştırmak **host'u ölçmez** — host için `distrobox-host-exec fc-list`. Ayrı bir tuzak: konteynerden `flatpak run` ile açılan headless Chromium host CJK fontlarını göremiyor (o sandbox'ta 言 tofu çıkıyor), uygulama içi tarayıcı görüyor. Font kararlarını ekran görüntüsüyle değil tuval üzerinde piksel sayarak doğrula. |
 
 ---
@@ -184,6 +189,9 @@ yazıyı ve ona iliştirilen sesleri aynı anda okuyabilsin.
 - [x] **B5 — Karar: BALONCUK.** Denenen sunumlar elendi; geriye tek model kaldı —
       her yorum bir baloncuk, dokununca pop-up. Metne dokunan hiçbir işaret yok.
 - [ ] **B6 — Mektuplar sayfası** (bölüm sonuna editöryel dizilmiş 6-8 yorum).
+- [x] **K1 — Mod tamamlama ve anahtar.** Sürenin yarısı okununca mod tamam (sessiz),
+      tek iz altın mod kartı; üç mod tamamsa sayının anahtarı.
+- [ ] **K2 — Dergi keşfet sayfası.** Onlarca derginin yolunu K1'in anahtarı açacak.
 
 ---
 
