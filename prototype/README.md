@@ -74,7 +74,10 @@ sıfırdan yazarken boğulmamak için `dev.html` var (yalnızca yerel, üretime 
 | Giriş | İlk yorumdan sonra teklif gelir. Kod **konsola** yazılır ve ekranda da gösterilir |
 | Bulmacalar | “Bulmaca” bölümü. İlk gelişte “hangisi kulağa hoş geliyor?” sorulur |
 | Moderasyon | Menü → “Moderasyon paneli”. Bekleyen 5 tohum yorum + anonim yazdıkların. Onayla → sayfada anında belirir |
-| Mod tamamlama | Bir modda tahmini sürenin **yarısı** kadar oku → o modun kartı mod seçim ekranında **altın** olur. Bilerek sessiz: bildirim yok. Üç mod da tamamsa sayının anahtarı verilir (şimdilik arka planda). Beklemeden görmek için konsolda `MAG.streak.forward(12)`, durumu görmek için `MAG.streak.report()` |
+| Mod tamamlama | Bir modda tahmini sürenin **yarısı** kadar oku → o modun kartı mod seçim ekranında **altın** olur. Bilerek sessiz: bildirim yok. Tamamlanan her sayı **1 jeton** verir; jetonu Keşfet'te bir dergiye harcarsın. Beklemeden görmek için konsolda `MAG.streak.forward(12)`, durumu görmek için `MAG.streak.report()` |
+| Keşfet | Menü → “Keşfet”. 24 **başka dergi**, 3:4 kapaklar ve 1:1 sayfa kareleri karışık; arama kutusu ad/slogan/etikette arar. Arşivle karıştırma: arşiv bu derginin kendi sayıları, keşfet başkaları |
+| Dergi açma | Keşfette kilitli bir karta dokun → kart içinde onay çıkar. 1 jeton harcanır ve o **derginin bütün kartları** (kapak + akıştaki kareleri) birden açılır, çerçevesi altın olur |
+| Prestij rozeti | Bir sayıyı **Doomreader** modunda tamamla → yorumlarda adının yanında altın halkalı 🧠. Tohum okurların da 4'ünde var |
 | Sıfırlama | Menü → “Prototipi sıfırla”, ya da konsolda `MAG.reset()` |
 
 Klavye: `↑ ↓` / `PgUp PgDn` / `Space` sayfa gezinme, `Home` `End` uçlar, `Esc` kapat.
@@ -94,7 +97,9 @@ Klavye: `↑ ↓` / `PgUp PgDn` / `Space` sayfa gezinme, `Home` `End` uçlar, `E
 | `js/identity.js` | Supabase anonim giriş + `updateUser({email})` / `verifyOtp()` |
 | `js/puzzles.js` | `packages/puzzle-sdk` + `puzzles/<id>/` klasörleri |
 | `js/state.js` | `localStorage` yerine `readers`, `reading_progress`, `puzzle_runs` |
-| `js/streak.js` | Aynı sayaç, süreyi sunucuya yazan hâli (`mode_reads` benzeri bir tablo) — anahtar istemcide doğrulanamaz |
+| `js/streak.js` | Aynı sayaç, süreyi sunucuya yazan hâli (`mode_reads` benzeri bir tablo) — jeton istemcide doğrulanamaz |
+| `js/data-explore.js` | `magazines` + `magazine_issues` tablolarından sayfalanmış keşfet sorgusu |
+| `js/explore.js` | `apps/web/src/routes/kesfet/` — kendi rotası olacak, modal değil |
 | `css/tokens.css` | `packages/ui` token'ları + `content/issues/<ay>/theme.css` |
 
 ## 3:4 tuval ve ekran boyutları
