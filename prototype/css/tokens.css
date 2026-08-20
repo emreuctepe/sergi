@@ -13,6 +13,19 @@
    Sayı teması (--issue-*) sadece renkleri ve yazı tiplerini ezer; düzen sabittir.
    ========================================================================= */
 
+/* Projenin ilk gömülü yazı tipi. Geri kalan her şey sistem yığını; bu bir
+   istisna, çünkü manga balonu sistem fontuyla manga balonu gibi durmuyor.
+   Türkçe kapsamı denetlendi: ç Ç ğ Ğ ı İ ö Ö ş Ş ü Ü ve … var. Uzun tire
+   (— –) YOK — balon metinlerinde kullanma, sessizce yedeğe düşer.
+   Prototipte ham TTF (62 KB); gerçek build'de WOFF2'ye inecek (~30 KB). */
+@font-face {
+  font-family: "Anime Ace";
+  src: url("../assets/animeace2_reg.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* --- yazı tipi yığınları ------------------------------------------------ */
   --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua",
@@ -21,6 +34,9 @@
   --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  /* Manga balonu ve sayfa başlığı. Yedek olarak --font-ui değil sans yığını:
+     font yüklenmezse balon yine çizgi roman kaydında kalsın. */
+  --font-manga: "Anime Ace", "Comic Sans MS", var(--font-ui);
   /* Japonca metin — bilinçli olarak MINCHO (明朝, tırnaklı): derginin Latin
      gövdesi de tırnaklı, ikisi aynı kayıtta konuşsun. Gothic (ゴシック) istenirse
      ayrı bir token açılır, bunun içine karıştırılmaz.
