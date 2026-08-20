@@ -1,0 +1,38 @@
+/* ============================================================================
+   APP.CSS — küresel stil katmanları
+   ----------------------------------------------------------------------------
+   Prototipte sıra `index.html`'deki <link> etiketlerinin sırasıyla tutuluyordu:
+   kırılgan bir sözleşme (bir satır yer değiştirse tema bozulurdu). Burada sıra
+   ARTIK BEYAN EDİLİYOR — aşağıdaki @layer satırı önceliği kaskadın kendisine
+   yazar, dosya sırasına değil. Aşağıdaki @import'lar yer değiştirse bile
+   öncelik değişmez.
+
+   (Not: derlemede beyan satırı, blokların sırası zaten ona uyduğu için
+   minifier tarafından gereksiz bulunup düşürülüyor — davranış aynı kalıyor.
+   Sıra bozulursa beyan korunur; koruma kaybolmuş değil, sadece görünmüyor.)
+
+   Katman sırası = önem sırası (sonraki öncekini ezer):
+     tokens   → değişkenler, tema, @font-face
+     base     → iskelet, tipografi sıfırlama
+     canvas   → 3:4 tuval, snap, letterbox, bantlar
+     blocks   → içerik blokları + animasyon presetleri
+     comments → baloncuk, pop-up, sayfa rozeti
+     overlays → paneller, modal, dock, toast
+     puzzles  → bulmaca yuvası ve çerçevesi
+
+   KATMANSIZ CSS HER ZAMAN KAZANIR — bu bilinçli: Svelte bileşenlerinin kendi
+   <style> blokları katmansız olduğu için buradaki küresel kuralları ezebilir.
+   Bileşen kendi görünümünün son sözünü söyler.
+
+   Neyin küresel kaldığı ve neyin bileşene taşındığı: docs/BUILD-TODO.md
+   ========================================================================= */
+
+@layer tokens, base, canvas, blocks, comments, overlays, puzzles;
+
+@import './lib/styles/tokens.css' layer(tokens);
+@import './lib/styles/base.css' layer(base);
+@import './lib/styles/canvas.css' layer(canvas);
+@import './lib/styles/blocks.css' layer(blocks);
+@import './lib/styles/comments.css' layer(comments);
+@import './lib/styles/overlays.css' layer(overlays);
+@import './lib/styles/puzzles.css' layer(puzzles);

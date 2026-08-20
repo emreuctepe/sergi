@@ -1,0 +1,32 @@
+# Paket yöneticileri
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+bun.lock
+bun.lockb
+
+# Çeşitli
+/static/
+
+# Üretilen dosya (wrangler types) — 573 KB, elle düzenlenmez
+worker-configuration.d.ts
+
+# Prototipten taşınan küresel CSS. Prettier'a bırakılmıyor ki
+# `diff prototype/css/x.css src/lib/styles/x.css` anlamlı kalsın: taşıma
+# sırasında istemeden değişen tek bir kural bile anında görünsün. Dosyalar
+# zaten elle özenle dizilmiş (2 boşluk, hizalı yorum blokları).
+# Bileşen içi <style> blokları bu kuralın dışında — onlar .svelte dosyası.
+/src/lib/styles/
+
+# --- DOKUNULMAZ ALANLAR ----------------------------------------------------
+# Prototip donmuş bir referans: derlemesiz, saf HTML/CSS/JS, kendi biçim
+# kuralları var (bkz. docs/MIMARI.md). Prettier buraya girerse 17 bin satırlık
+# anlamsız bir diff çıkar ve prototipin "file:// ile çift tıkla açılır" sözü
+# gereksiz yere riske girer.
+/prototype/
+
+# Belgeler elle dizilmiş: tablolar hizalı, satırlar 88 sütuna göre kırılmış.
+# Prettier bunları yeniden sararsa karar günlüğünün okunabilirliği bozulur.
+/docs/
+/AI_GUIDE.md
+/README.md

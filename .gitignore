@@ -2,11 +2,38 @@
 .DS_Store
 Thumbs.db
 *.swp
+.vscode/
 
-# Python (devserver.py çalışınca oluşabilir)
+# Python (prototype/tools/devserver.py çalışınca oluşabilir)
 __pycache__/
 *.pyc
 
 # Ham görsel kaynakları — depoya girmez, yalnızca üretilmiş WebP'ler izlenir.
 # (2026-09 one-shot: 8.1 MB PNG -> assets/2026-09/kapali-kapilar/ 360 KB)
 prototype/assets/**/kargaMangaKapalıKapılar/
+
+# --- Node / SvelteKit ------------------------------------------------------
+node_modules
+
+# Derleme çıktıları
+/.svelte-kit
+/build
+.output
+.wrangler
+.vercel
+.netlify
+
+# Ortam değişkenleri (Supabase/Resend anahtarları buraya girer, ASLA commit'lenmez)
+.env
+.env.*
+!.env.example
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Playwright
+test-results
+playwright-report
+/blob-report
+/playwright/.cache
