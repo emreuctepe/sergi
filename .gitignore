@@ -6,3 +6,7 @@ Thumbs.db
 # Python (devserver.py çalışınca oluşabilir)
 __pycache__/
 *.pyc
+
+# Ham görsel kaynakları — depoya girmez, yalnızca üretilmiş WebP'ler izlenir.
+# (2026-09 one-shot: 8.1 MB PNG -> assets/2026-09/kapali-kapilar/ 360 KB)
+prototype/assets/**/kargaMangaKapalıKapılar/
