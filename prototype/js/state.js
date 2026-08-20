@@ -28,6 +28,11 @@
     finished: {}, // { [issueSlug]: timestamp }  (issue_reads)
     seenIntro: false,
 
+    /* --- mod tamamlama (streak.js doldurur) -------------------------------- */
+    modeTime: {}, // { [issueSlug + ':' + depth]: okunan ms }
+    modeDone: {}, // { [issueSlug + ':' + depth]: timestamp }
+    keys: {}, // { [issueSlug]: timestamp }  üç modu da bitirenin anahtarı
+
     /* --- sosyal ------------------------------------------------------------ */
     comments: [], // kullanıcının yazdıkları (sahte veriye eklenir)
     reactions: {}, // { [commentId]: ['❤️','😂'] }
@@ -132,6 +137,59 @@
         saveSoon();
         U.emit("issue:finished", { issue: issueSlug });
       }
+    },
+
+    /* --- mod tamamlama -----------------------------------------------------
+       Kural streak.js'te; burası yalnızca depo. Süre yazımı saniyede bir
+       geliyor, o yüzden saveProgress gibi olay YAYMIYOR — yoksa her saniye
+       tüm dinleyiciler tetiklenirdi. Tamamlanma ve anahtar seyrek, onlar yayar.
+       ---------------------------------------------------------------------- */
+
+    modeKey: function (issueSlug, depth) {
+      return issueSlug + ":" + depth;
+    },
+
+    getModeTime: function (issueSlug, depth) {
+      return data.modeTime[State.modeKey(issueSlug, depth)] || 0;
+    },
+
+    /** Okunan süreyi biriktirir ve yeni toplamı döndürür. */
+    addModeTime: function (issueSlug, depth, ms) {
+      var key = State.modeKey(issueSlug, depth);
+      var total = (data.modeTime[key] || 0) + ms;
+      data.modeTime[key] = total;
+      saveSoon();
+      return total;
+    },
+
+    isModeDone: function (issueSlug, depth) {
+      return !!data.modeDone[State.modeKey(issueSlug, depth)];
+    },
+
+    markModeDone: function (issueSlug, depth) {
+      var key = State.modeKey(issueSlug, depth);
+      if (data.modeDone[key]) return false;
+      data.modeDone[key] = Date.now();
+      saveSoon();
+      U.emit("mode:done", { issue: issueSlug, depth: depth });
+      return true;
+    },
+
+    hasKey: function (issueSlug) {
+      return !!data.keys[issueSlug];
+    },
+
+    grantKey: function (issueSlug) {
+      if (data.keys[issueSlug]) return false;
+      data.keys[issueSlug] = Date.now();
+      saveSoon();
+      U.emit("key:earned", { issue: issueSlug });
+      return true;
+    },
+
+    /** Kazanılmış tüm anahtarlar — keşfet sayfası bunu okuyacak. */
+    keyList: function () {
+      return Object.keys(data.keys);
     },
 
     /* --- bulmaca etiket puanları (öneri algoritması) ------------------------ */

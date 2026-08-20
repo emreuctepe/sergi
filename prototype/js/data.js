@@ -103,6 +103,11 @@
     return null;
   };
 
+  /* Okuma modlarının kimlikleri — sıra "az"dan "çok"a. Etiketleri ve açıklama
+     metinleri overlays.js'te (mod seçim kartları); burada yalnızca liste var ki
+     "tüm modlar" üzerinde dönen kod (streak.js) tek kaynağı okusun. */
+  D.depths = ["min", "mid", "full"];
+
   /** Bir sayfa, verilen okuma derinliğinde görünür mü? */
   D.pageVisible = function (page, depth) {
     var d = page.depth || ["all"];

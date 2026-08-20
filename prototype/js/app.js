@@ -83,6 +83,7 @@
     MAG.identity.ensure();
 
     MAG.canvas.init();
+    MAG.streak.init();
     MAG.overlays.init();
     MAG.comments.init();
     MAG.puzzles.init();

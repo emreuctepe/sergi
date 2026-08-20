@@ -441,6 +441,29 @@
   border-color: var(--accent);
   background: color-mix(in oklab, var(--accent) 8%, transparent);
 }
+/* Tamamlanan mod. Seçili karttan SONRA geliyor ki ikisi üst üste geldiğinde
+   altın kazansın — "şu an buradasın" her zaman görünüyor, "bunu bitirdin"
+   ise okurun tek ödülü. Kenarlık seçiliyken daha diri (aşağıda). */
+.depth-card[data-done="true"] {
+  border-color: color-mix(in oklab, var(--gold) 50%, var(--line));
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--gold) 20%, transparent),
+    color-mix(in oklab, var(--gold) 7%, transparent)
+  );
+}
+.depth-card[data-done="true"][data-active="true"] {
+  border-color: var(--gold);
+}
+.depth-card[data-done="true"]:hover {
+  border-color: var(--gold);
+}
+.depth-card[data-done="true"] .depth-card__icon {
+  background: color-mix(in oklab, var(--gold) 22%, transparent);
+}
+.depth-card[data-done="true"] .depth-card__meta b {
+  color: color-mix(in oklab, var(--gold) 80%, var(--ink));
+}
 .depth-card__icon {
   display: grid;
   place-items: center;

@@ -166,6 +166,12 @@
   --warn: #b07a1e;
   --danger: #a6392c;
 
+  /* Tamamlanmış işin altını. Bilerek --accent-2'ye bağlı DEĞİL: o token sayı
+     temasının ikinci rengi ve her sayıda altın olmak zorunda değil (2026-10'da
+     neon pembe). Altın her sayıda aynı kalsın, yoksa "tamamladım" işareti
+     sayıdan sayıya renk değiştirir. */
+  --gold: #c08a24;
+
   color-scheme: light;
 }
 
@@ -195,6 +201,7 @@
   --ok: #6fbb85;
   --warn: #dfaa4a;
   --danger: #e0705f;
+  --gold: #e5bb5e;
 
   color-scheme: dark;
 }

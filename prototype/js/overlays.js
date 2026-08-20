@@ -279,6 +279,10 @@
           {
             type: "button",
             "data-active": current === d.id ? "true" : null,
+            /* Tamamlanan mod altın zemine döner — okurun bunu haber alacağı
+               tek yer burası. Bilerek metinsiz: rozet ya da "tamamlandı"
+               yazısı yok, yalnızca renk. (kural: streak.js) */
+            "data-done": MAG.streak.isDone(d.id) ? "true" : null,
             onclick: function () {
               choose(d.id);
             },
