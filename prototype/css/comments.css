@@ -723,3 +723,45 @@
   margin-top: 5px;
   font-size: var(--ui-fs-sm);
 }
+
+/* NOT HÂLİ — aynı pencere, içinde yorum yerine tek bir açıklama ve bir kapı.
+   (One-shot'ın PIGMENT filigranı bunu açıyor.) */
+.cpop--note {
+  width: min(280px, calc(100vw - 24px));
+}
+.cpop--note .cpop__count {
+  font-weight: 800;
+  letter-spacing: var(--tracking-caps);
+  color: var(--ink);
+}
+.cpop--note .cpop__list {
+  padding-top: 10px;
+}
+.cpop--note .cpop__body {
+  color: var(--ink-soft);
+}
+.cpop__link {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border-radius: var(--radius-full);
+  /* Bağlantı sayfadan çıkarıyor: YouTube'un kırmızısı burada, filigranda
+     değil. Rozet dergiye ait, kapı dışarıya. */
+  background: #ff0033;
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: var(--ui-fs-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+.cpop__link:hover {
+  background: color-mix(in oklab, #ff0033 84%, #000);
+}
+.cpop__link svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}

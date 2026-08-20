@@ -594,6 +594,82 @@
   aspect-ratio: 9 / 16;
   margin-inline: auto;
 }
+/* STÜDYO FİLİGRANI — sayfanın sağ altı, planda olduğu yer.
+   Bir imza olduğu kadar bir kapı: dokununca yorum penceresi açılıp hikâyenin
+   YouTube Shorts hâline götürüyor. Bu yüzden yorum pinleriyle aynı dilde
+   duruyor — yerinde hafifçe salınıyor, "bana dokunulabilir" diyor. */
+.manga-mark {
+  position: absolute;
+  right: 1.2cqi;
+  bottom: 1.2cqi;
+  z-index: 5;
+  width: 11cqi;
+  height: 11cqi;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  /* Filigran hikâyenin önüne geçmemeli: kısık duruyor, dokunmaya
+     yaklaşınca tam görünürlüğe çıkıyor. */
+  opacity: 0.82;
+  animation: mark-sway 4.2s var(--ease-in-out) infinite;
+  transition: opacity var(--dur-base) var(--ease-out), scale var(--dur-base) var(--ease-spring);
+}
+.manga-mark:hover,
+.manga-mark:focus-visible {
+  opacity: 1;
+  scale: 1.07;
+}
+.manga-mark:active {
+  scale: 0.95;
+}
+@keyframes mark-sway {
+  0%, 100% { transform: translateY(0.4cqi) rotate(-1.4deg); }
+  50%      { transform: translateY(-0.8cqi) rotate(1.4deg); }
+}
+:root[data-motion="off"] .manga-mark {
+  animation: none;
+}
+.manga-mark__logo {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 0.3cqi 0.8cqi rgb(0 0 0 / 0.35));
+}
+.manga-mark__label {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  font-family: var(--font-ui);
+  font-size: 2.6cqi;
+  font-weight: 800;
+  letter-spacing: var(--tracking-caps);
+  color: #fff;
+}
+/* Shorts rozeti logonun sağ alt köşesine oturuyor — pin'in sayı rozetiyle
+   aynı yer, aynı mantık: işaretin üstündeki küçük ikinci bilgi. */
+.manga-mark__badge {
+  position: absolute;
+  right: -0.4cqi;
+  bottom: -0.4cqi;
+  display: grid;
+  place-items: center;
+  width: 4.4cqi;
+  height: 4.4cqi;
+  border-radius: var(--radius-full);
+  background: #ff0033;
+  color: #fff;
+  box-shadow: 0 0 0 0.5cqi var(--paper), 0 0.3cqi 0.8cqi rgb(0 0 0 / 0.3);
+}
+.manga-mark__badge svg {
+  width: 2.8cqi;
+  height: 2.8cqi;
+  min-width: 9px;
+  min-height: 9px;
+  display: block;
+}
+
 /* tek sayfalık one-shot'ta folio numarası anlamsız, kompozisyonu da kırpıyor */
 .manga-page:has(.manga[data-layout="plan"]) .manga-page__no {
   display: none;

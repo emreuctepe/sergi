@@ -21,6 +21,48 @@
      BLOK ÇİZİCİLER
      ===================================================================== */
 
+  /* YouTube Shorts işareti — filigranın "burası video" demesinin en kısa yolu. */
+  var SHORTS_ICON =
+    '<svg class="ymark__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+    '<path fill="currentColor" d="M10 14.65v-5.3L15 12l-5 2.65zm7.77-4.33c-.77-.32-1.2-.5-1.2-.5L18 9.06c1.84-.96 2.53-3.23 1.56-5.06s-3.24-2.52-5.07-1.56L6 6.94c-1.29.68-2.07 2.04-1.99 3.49.07 1.42.93 2.67 2.22 3.25.03.01 1.2.5 1.2.5L6 15.94c-1.83.97-2.53 3.24-1.56 5.07.97 1.83 3.24 2.52 5.07 1.56l8.5-4.5c1.29-.68 2.06-2.04 1.98-3.49-.07-1.42-.93-2.67-2.22-3.26z"/>' +
+    "</svg>";
+
+  /* Sayfanın sağ altındaki stüdyo filigranı — planda da orada duruyor.
+     Yorum pinleri gibi hafifçe salınıyor ki dokunulabilir olduğu belli olsun;
+     dokununca yorumların penceresi açılıp nereye gittiğini söylüyor. */
+  function mangaMark(m) {
+    var btn = el(
+      "button.manga-mark",
+      {
+        type: "button",
+        "aria-label": m.label + " — " + (m.note || ""),
+        onclick: function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          MAG.popup.note(
+            {
+              title: m.label,
+              body: m.note,
+              href: m.href,
+              action: m.action || "YouTube Shorts'ta izle",
+              icon: SHORTS_ICON,
+            },
+            btn
+          );
+        },
+      },
+      [
+        m.img
+          ? el("img.manga-mark__logo", { src: m.img, alt: m.label, loading: "lazy", decoding: "async" })
+          : el("span.manga-mark__label", { text: m.label }),
+        /* Küçük Shorts rozeti: filigranın yalnızca imza değil, bir kapı da
+           olduğunu tek bakışta söyleyen şey. */
+        el("span.manga-mark__badge", { html: SHORTS_ICON }),
+      ]
+    );
+    return btn;
+  }
+
   var BLOCKS = {
     kicker: function (b) {
       return el("p.kicker", { text: b.text });
@@ -177,6 +219,7 @@
          Panel indeksleri kaymasın diye en sona ekleniyor. */
       if (b.title) wrap.appendChild(el("div.manga-title", { text: b.title }));
       var page = el("div.manga-page", null, [wrap, el("span.manga-page__no", { text: b.page })]);
+      if (b.mark) page.appendChild(mangaMark(b.mark));
       return page;
     },
 

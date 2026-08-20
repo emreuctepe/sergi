@@ -540,6 +540,14 @@
               layout: "plan",
               dir: "ltr",
               title: "Kapalı Kapılar",
+              /* Planın sağ altındaki stüdyo filigranı. Aynı hikâye YouTube'da
+                 Shorts olarak da var; filigran o kapıyı açıyor. */
+              mark: {
+                label: "PIGMENT",
+                img: "assets/2026-09/kapali-kapilar/logo.webp",
+                href: "https://www.youtube.com/shorts/XaK1Acfo8ZE",
+                note: "YouTube'da bu sayıyı Shorts olarak izlemek için tıklayabilirsin.",
+              },
               panels: [
                 {
                   img: "assets/2026-09/kapali-kapilar/01.webp",

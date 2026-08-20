@@ -35,6 +35,40 @@
     card = buildCard(roots);
     host.appendChild(card);
     position(card, anchorEl);
+    armOutside();
+  };
+
+  /* Aynı pencere, yorum yerine tek bir not: bir işaretin ne olduğunu
+     anlatmak için. (One-shot'ın PIGMENT filigranı bunu kullanıyor.)
+     Yeni bir kart tipi icat etmiyoruz — okur bu pencereyi zaten tanıyor. */
+  P.note = function (opts, anchorEl) {
+    P.close();
+    ensureHost();
+    card = el("div.cpop.cpop--note", { role: "dialog", "aria-label": opts.title || "Not" }, [
+      el("div.cpop__bar", null, [
+        el("b.cpop__count", { text: opts.title || "" }),
+        el("button.cpop__x", { type: "button", text: "✕", "aria-label": "Kapat", onclick: P.close }),
+      ]),
+      el("div.cpop__list", null, [
+        el("p.cpop__body", { text: opts.body }),
+        opts.href
+          ? el("a.cpop__link", {
+              href: opts.href,
+              target: "_blank",
+              rel: "noopener noreferrer",
+              html: (opts.icon || "") + "<span>" + (opts.action || "Aç") + "</span>",
+            })
+          : null,
+      ]),
+    ]);
+    host.appendChild(card);
+    position(card, anchorEl);
+    armOutside();
+  };
+
+  /* Dışarı dokunuş kartı kapatır. setTimeout: kartı açan dokunuşun kendisi
+     bu dinleyiciye düşüp kartı hemen kapatmasın. */
+  function armOutside() {
     setTimeout(function () {
       offOutside = U.on(
         document,
@@ -45,7 +79,7 @@
         true
       );
     }, 0);
-  };
+  }
 
   P.close = function () {
     if (offOutside) {
