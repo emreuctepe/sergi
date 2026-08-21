@@ -11,10 +11,10 @@ kararları için [YORUM-SISTEMI.md](YORUM-SISTEMI.md).
 
 | | |
 |---|---|
-| **Aktif adım** | Faz 1 — tuval, bloklar, içerik (**1a+1b bitti**, sırada 1c) |
-| **Son tamamlanan** | **1b — doğrulama**: `validate.ts`, kimlik kilidi, varlıklar `static/`e |
-| **Sonraki dosya** | `src/lib/blocks/` — 19 blok bileşeni (`render.js`'in Svelte karşılığı) |
-| **Çalışır durum** | `pnpm dev` → http://localhost:5173 · `pnpm run lint` · `pnpm run check` · `pnpm test:unit` (57 test) hepsi yeşil |
+| **Aktif adım** | Faz 1 — tuval, bloklar, içerik (**1a+1b+1c bitti**, sırada 1d) |
+| **Son tamamlanan** | **1c — bloklar**: 19 bileşen, `/dev/bloklar` kataloğu, satır içi biçimleme |
+| **Sonraki dosya** | `src/lib/canvas/` — letterbox, dock ölçüsü, snap, IntersectionObserver, klavye |
+| **Çalışır durum** | `pnpm dev` → http://localhost:5173/dev/bloklar · `pnpm run lint` · `pnpm run check` · `pnpm test:unit` (206 test) hepsi yeşil |
 
 **Ortam notu:** Node 22 LTS gerekiyor (Vite 8 Node 20+ istiyor). Konteynerde
 `/usr/local` altına kuruldu, `pnpm` corepack ile geldi. Node 18 ile çalışmaz.
@@ -77,13 +77,16 @@ Backend yok; sayı baştan sona okunuyor. **1.0'ın en büyük tek teslimatı.**
 - [x] **1b** `blockids.lock.json` — kimlik silinirse CI kırmızı yanar
 - [x] **1b** Varlıklar `static/assets/`e: 17 webp (3,6 MB) — *1e'den öne alındı,
       `img:` yolu denetimi ancak dosyalar oradayken gerçek oluyor*
-- [ ] **1c** 19 blok bileşeni (`term` ve `rtlhint` taşınmıyor — yalnız 2026-10'da)
+- [x] **1c** 19 blok bileşeni (`term` ve `rtlhint` taşınmıyor — yalnız 2026-10'da)
+- [x] **1c** `inline.ts` — `*italik*`, `**kalın**`, `` `kod` ``, `[bağ](url)`;
+      dizgi değil JETON döndürüyor, yani `{@html}` yok
+- [x] **1c** `/dev/bloklar` katalog rotası — 29 çeşit, küçültülmüş tuvallerde
 - [ ] **1d** `canvas/` — letterbox, dock ölçüsü, snap, IntersectionObserver, klavye
-- [ ] **1e** `art/` — 22 SVG sahne + `photo()` + `mangaPanel()`
+- [ ] **1e** `art/` — 22 SVG sahne + `photo()`
+      (`rule`, `leafMark`, Shorts rozeti ve manga karesinin işaretlemesi 1c'de geldi)
 - [ ] **1f** Derinlik: `estimateMinutes()`, mod seçici, konum koruma
       (`flow()`/`pageVisible()` 1b'de yazıldı — doğrulayıcının ihtiyacıydı)
 - [ ] **1f** Tanıtım (intro) 5 kartı
-- [ ] `/dev/bloklar` katalog rotası
 - [ ] `tokens.css`'ten kullanılmayan sayı temalarını (2026-08/10/11) ayıkla
 
 **Doğrulama:** 29 sayfa telefonda ve masaüstünde akıcı; min 18 / mid 24 / full 28
@@ -100,6 +103,15 @@ doğrulayıcının kendisi 11 bozuk örnekle sınandı (her kural için bir tane
 Derinlik sayıları vaadi tutuyor: **min 18 / mid 24 / full 28**. 17 görselin
 hepsi `static/assets/` altında. Kilit ve varlık testleri de bilerek bozulup
 kırmızı yandığı görülerek doğrulandı. Toplam 57 test, `check` 398 dosya 0 hata.
+
+**1c'de doğrulandı:** `/dev/bloklar` tarayıcıda ölçüldü — 29 çeşit kart, 29 blok,
+42 ankraj (29 blok + 13 alt birim), aydınlık ve koyu temada yatay taşma yok,
+kırık görsel yok, `contain` sayfaların hiçbiri taşmıyor (375px ve masaüstünde).
+`h1--big`, `para--drop`, `pull--big`, sözlük, numaralı liste, soru/cevap ve
+ters çevrilmiş 6 blok kataloğun içinde görünüyor. Testler 57 → **206**:
+prototiple satır içi biçimleme paritesi (87 metin + 20 kenar durumu) ve 19
+tipin sözleşmesi. İki bite testi yapıldı: dağıtıcıdan bir dal silinince hem
+`check` hem test kırmızı yanıyor, alt birim kimliği bir kayınca üç test düşüyor.
 
 ---
 
@@ -179,7 +191,9 @@ Kod değil, karar. İkisi de çözülmeden 1.0 çıkamaz.
 3. **Yorum düzenleme yok, silme var** — 1.0 sadeliği için kabul mü?
 4. **`fit:contain` taşma denetimi** derleyici yokken nasıl? Öneri: Playwright'ta iki
    ekran ölçüsünde 29 sayfayı gez, `scrollHeight > clientHeight` olan `contain`
-   sayfa varsa kırmızı.
+   sayfa varsa kırmızı. *(1c'de ölçüm elle yapıldı — katalogdaki 29 kartın hiçbiri
+   taşmıyor. Ama katalog sayfa başına TEK blok gösteriyor; asıl soru sayfanın
+   tamamı çizilince ne olduğu ve o 1d'nin işi.)*
 5. **`min` modun vaadi zayıf:** `sozluk`, `gece-hatti` ve manga hiç kısalmıyor;
    gerçek ayrışma yalnız `kizil-mevsim` + `soylesi`'de. Editöryel iş: ya min sürümleri
    yazılacak ya vaat dürüstleştirilecek.
@@ -210,3 +224,13 @@ Kod değil, karar. İkisi de çözülmeden 1.0 çıkamaz.
 | 1.8 | Doğrulayıcı 11 bozuk örnekle sınandı | Sadece "gerçek içerik temiz geçiyor" testi yazmak yeterli değil: her zaman boş liste döndüren bir fonksiyon da geçer. Her kuralın bilerek bozulmuş bir örneği var |
 | 1.9 | `blockids.lock.json` elle bakımlı bırakıldı | Üreteç script'i yazılabilirdi ama kilit tam da "otomatik tazelenmesin" diye var: bir kimliği silmek kilitten de silmeyi gerektiriyor, o da diff'te görünen bilinçli bir satır. CSS'teki `FORKED` listesiyle aynı mantık |
 | 1.10 | Varlıklar 1e'den öne alındı | `img:` yolunun geçerliliğini denetleyen bir test, dosyalar `static/` altında değilken ya yalan söyler ya kapalı durur. 17 webp (3,6 MB) `static/assets/`e kopyalandı; prototipteki kopya dokunulmaz kaldığı için ikizleme kaçınılmaz |
+| 1.11 | Satır içi biçimleme dizgi değil JETON döndürüyor | Prototipin `U.inline()`'ı HTML dizgisi üretiyordu ve `innerHTML`e basılıyordu. Aynı fonksiyon Faz 3'te okur yorumlarını biçimlendirecek — o gün `{@html}` ile basılan bir dizgi, sunucudan gelen metnin tarayıcıda HTML olarak çalışması demek. Jeton listesi o kapıyı hiç açmıyor |
+| 1.12 | Blok sarmalayıcısı yok, öznitelikler YAYILIYOR | `.blk` sınıfı bloğun kendi kök öğesinde olmak zorunda: CSS `.page__inner > .blk + .blk` (doğrudan çocuk) ve `.blk--invert.caption` (aynı öğe) diyor. Araya bir `<div>` koymak aralıkları ve ters çevirmeyi birden bozardı |
+| 1.13 | Dağıtıcının sonunda `bilinmeyenTip(block: never)` | Prototip bilinmeyen bir tipte konsola uyarı basıp bloğu ATLIYORDU: sayfada eksik bir paragraf, hiçbir yerde hata. Artık `types.ts`'e eklenip dağıtıcıya yazılmayan tip `pnpm run check`'i kırıyor. Bir dal silinerek denendi, iki yerden birden kırmızı yandı |
+| 1.14 | Kapak künyeyi küresel değil BAĞLAM'dan okuyor | Prototipte `MAG.data.issue` küreseldi. Sunucuda aynı anda iki isteğin iki farklı sayısı olabilir; küresel değişken ikisini karıştırır. Bağlamı 90 bloğa prop olarak geçirmek yerine `setIssueContext` — künyeye 19 tipten yalnız biri bakıyor |
+| 1.15 | Varlık yoluna baştaki eğik çizgi eklendi (`assetUrl`) | Prototipte `index.html` kökten açıldığı için `assets/…` çalışıyordu. Sayı `/sayi/2026-09` gibi bir rotada açılınca aynı yol `/sayi/assets/…` olur ve görsel SESSİZCE kırılır — yani kırıldığını ancak biri bakarsa anlarsınız |
+| 1.16 | İçerikteki bağların dış adres olması doğrulayıcıya bağlandı | Bloklar bağları `target="_blank"` ile basıyor; bu yalnız dış adres için doğru. ESLint'in `no-navigation-without-resolve` kuralı burada susturuldu ama garanti kaybolmadı, `validate.ts`'e taşındı: sayı içine giden bir bağ artık içerik doğrulamasında kırılıyor |
+| 1.17 | Manga filigranı pop-up yerine bağ oldu | Pop-up katmanı Faz 3'te geliyor. "Hiçbir şey yapmayan düğme" ile "doğrudan kaynağa giden bağ" arasında ikincisi dürüst: pop-up'ın SÖYLEDİĞİ şey (`aria-label` + `title`) duruyor, yalnızca sunum biçimi değişti. `href` yoksa filigran `<span>` — sahte tıklanabilirlik yok |
+| 1.18 | 🐞 `%sveltekit.body%` doğrudan `<body>` içindeydi | Katalog sayfası iframe'de çalışıyor, sekmenin kendisinde BOMBOŞ geliyordu. Sebep: `<body>`ye dışarıdan sokulan bir düğüm hidrasyon sırasını kaydırıyor, Svelte "hydration_mismatch" deyip ağacı temizliyor. Bu, eklentisi olan gerçek okurların da başına gelirdi. `<div style="display: contents">` ile sarıldı |
+| 1.19 | 🐞 Katalog kartı `--canvas-h`yi `auto` bırakmıştı | Manga "plan" sayfası kartta taşıyordu. `blocks.css` sayfanın boyunu `calc(var(--canvas-h) - …)` ile hesaplıyor; `auto` orada geçersiz bir calc üretiyor. Tuvalin sözleşmesi bir UZUNLUK vermek — `aspect-ratio` ile idare etmek onu bozdu. Bloklarda hata yoktu, ölçen kaptaydı |
+| 1.20 | Katalog "tip"e değil "ÇEŞİT"e göre kuruldu | İlk hâli her tipin sayıdaki ilk örneğini gösteriyordu ve sayıdaki ilk `h1` düz, ilk `list` madde listesiydi: `h1--big` ve sözlük katalogda hiç görünmüyordu. Yani kapsadığını sandığı yüzeyin yarısını kaçırıyordu. Artık ayırt edici bayrakların her bileşimi ayrı bir kart — 19 tip, 29 çeşit |

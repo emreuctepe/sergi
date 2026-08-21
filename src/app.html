@@ -29,6 +29,19 @@
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
-		%sveltekit.body%
+		<!--
+			Uygulama doğrudan <body>'ye değil, kendi kabına basılıyor.
+
+			Neden: hidrasyon, sunucudan gelen DOM'un beklendiği gibi olmasına
+			dayanıyor. Bir tarayıcı eklentisi (ya da bir önizleme aracı) <body>'nin
+			içine bir düğüm sokarsa sıra kayıyor, Svelte "hydration_mismatch" deyip
+			ağacı temizliyor ve okur BOŞ BİR SAYFA görüyor. Bu, geliştirirken
+			gerçekten başımıza geldi: sayfa iframe içinde açılınca çalışıyor,
+			sekmenin kendisinde bomboş geliyordu.
+
+			`display: contents` kabın kendisini düzenden çıkarır — sarmalayıcı
+			var ama hiçbir şeye mal olmuyor.
+		-->
+		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

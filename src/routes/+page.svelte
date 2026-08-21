@@ -6,6 +6,7 @@
 	   alacak. Tek işi gözle doğrulanabilir bir şey göstermek: tema token'ları
 	   yüklendi mi, katman sırası tuttu mu, sayı teması uygulanıyor mu.
 	   ========================================================================= */
+	import { resolve } from '$app/paths';
 	import { brand } from '$lib/brand';
 
 	const ISSUE = '2026-09';
@@ -93,6 +94,10 @@
 		<p>
 			Faz 1: 3:4 tuval + snap motoru, 19 blok tipi, 22 çizilmiş sahne ve Kızıl Mevsim'in 29 sayfası.
 			İlerleme: <code>docs/BUILD-TODO.md</code>
+		</p>
+		<p>
+			19 blok tipi hazır: <a href={resolve('/dev/bloklar')}>blok kataloğu</a> — sayının kendi içeriğinden
+			29 çeşit, küçültülmüş tuvallerde.
 		</p>
 	</section>
 </main>

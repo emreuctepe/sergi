@@ -61,6 +61,25 @@ const BG = /^(scene|photo|img):.+$/;
    ======================================================================= */
 
 /**
+ * Metin içindeki `[yazı](adres)` bağlarının hepsi DIŞARI çıkmalı.
+ *
+ * Blok bileşenleri bu bağları `target="_blank" rel="noopener"` ile basıyor:
+ * okurun sayfadaki yeri (ve Faz 2'den sonra okuma ilerlemesi) kaybolmasın diye.
+ * Bu davranış yalnızca dış adres için doğru — sayı içinde bir yere gitmek
+ * yeni sekme değil, tuvalde kaydırma işidir. İçerik dosyasına `/sayi/2026-10`
+ * gibi bir bağ yazılırsa sessizce yanlış davranış üretirdi; burada kırılıyor.
+ */
+function linkProblems(text: string, where: string): Problem[] {
+	const problems: Problem[] = [];
+	for (const m of text.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
+		if (!/^https?:\/\//.test(m[1])) {
+			problems.push({ where, message: `bağ adresi "https://" ile başlamalı: "${m[1]}".` });
+		}
+	}
+	return problems;
+}
+
+/**
  * Bloğun İÇİ dolu mu? Tip denetimi alanın VAR olduğunu söyler, dolu olduğunu
  * değil — `text: ''` bir tip hatası değil, bir dizgi hatasıdır.
  */
@@ -79,6 +98,7 @@ function validateBlock(block: Block, page: Page, index: number, where: string): 
 	}
 
 	if ('text' in block && !block.text.trim()) add('metni boş.');
+	if ('text' in block) problems.push(...linkProblems(block.text, where));
 	if (block.t === 'quote' && block.by !== undefined && !block.by.trim()) add('`by` boş.');
 	if (block.t === 'byline' && !block.author.trim()) add('yazar adı boş.');
 
@@ -94,6 +114,7 @@ function validateBlock(block: Block, page: Page, index: number, where: string): 
 		block.items.forEach((it, i) => {
 			const empty = typeof it === 'string' ? !it.trim() : !it.term.trim() || !it.def.trim();
 			if (empty) add(`${i}. satırı boş.`);
+			problems.push(...linkProblems(typeof it === 'string' ? it : it.def, where));
 		});
 	}
 

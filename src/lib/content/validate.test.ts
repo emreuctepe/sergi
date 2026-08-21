@@ -254,6 +254,29 @@ describe('doğrulayıcı bozuk içeriği yakalıyor', () => {
 		).toContain('"scene:", "photo:" ya da "img:"');
 	});
 
+	/* Blok bileşenleri bağları `target="_blank"` ile basıyor (bkz.
+	   $lib/blocks/Inline.svelte). Sayı içine giden bir bağ orada sessizce
+	   yanlış davranır: yeni sekmede yeni bir dergi açılır. */
+	it('sayı içine giden bağ', () => {
+		expect(
+			bozukta((c) => {
+				c.sections[0].pages[0].blocks[0].text = '[sonraki sayı](/sayi/2026-10)';
+			})
+		).toContain('"https://" ile başlamalı');
+	});
+
+	it('liste satırındaki bağ da denetleniyor', () => {
+		expect(
+			bozukta((c) => {
+				c.sections[0].pages[0].blocks.push({
+					t: 'list',
+					id: 'ed-1:2',
+					items: ['[kaynak](kaynaklar.html)']
+				} as never);
+			})
+		).toContain('"https://" ile başlamalı');
+	});
+
 	it('alt metni olmayan manga karesi', () => {
 		expect(
 			bozukta((c) => {

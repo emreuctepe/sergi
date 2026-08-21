@@ -111,5 +111,35 @@ olmalı, otomatik tazelenen bir kilit hiçbir şey korumaz.
 Tipin yakalayamadığı tutarsızlıkları
 [`validate.ts`](src/lib/content/validate.ts) denetliyor: yinelenen kimlik,
 sayfasıyla uyuşmayan blok kimliği, `text: ''`, tanımsız bulmaca referansı,
-olmayan görsel dosyası. Sorun listesi döndürüyor — `throw` etmiyor ki bir sayı
-hazırlanırken bütün hatalar tek seferde görülsün.
+olmayan görsel dosyası, sayı içine giden bir bağ. Sorun listesi döndürüyor —
+`throw` etmiyor ki bir sayı hazırlanırken bütün hatalar tek seferde görülsün.
+
+---
+
+## Bloklar
+
+19 blok tipinin her biri [`src/lib/blocks/`](src/lib/blocks/) altında bir Svelte
+bileşeni; hepsini [`Block.svelte`](src/lib/blocks/Block.svelte) dağıtıyor. Zincirin
+sonundaki `bilinmeyenTip(block: never)` kapsam denetimi: `types.ts`'e eklenip
+buraya yazılmayan bir tip `pnpm check`'i kırıyor. (Prototip aynı durumda konsola
+uyarı basıp bloğu sessizce atlıyordu.)
+
+`.blk`, `--i` ve ankraj kimliği bloğun **kendi kök öğesine** yayılıyor; sarmalayıcı
+bir `<div>` yok, çünkü CSS `.page__inner > .blk + .blk` gibi doğrudan-çocuk
+seçicileri kullanıyor ([`attrs.ts`](src/lib/blocks/attrs.ts)).
+
+Satır içi biçimleme (`*italik*`, `**kalın**`, `` `kod` ``, `[bağ](url)`) HTML
+dizgisi değil **jeton listesi** üretiyor ([`inline.ts`](src/lib/blocks/inline.ts))
+— aynı fonksiyon Faz 3'te okur yorumlarını da biçimlendirecek ve o gün `{@html}`
+bir güvenlik açığı olurdu. Prototiple aynı çıktıyı verdiği, sayının 87 metni
+üzerinde ölçülerek doğrulanıyor.
+
+Hepsini bir arada görmek için:
+
+```sh
+pnpm dev            # → http://localhost:5173/dev/bloklar
+```
+
+Katalog örnekleri **sayının kendi içeriğinden** alıyor (uydurma "lorem" yok) ve
+tipe değil *çeşide* göre gruplanıyor: `h1 · big`, `list · dict`, `kicker · invert`
+gibi 29 kart. Kartlar küçültülmüş birer tuval, çünkü blok ölçülerinin hepsi `cqi`.
