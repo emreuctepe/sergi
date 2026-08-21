@@ -1,7 +1,34 @@
+/* ============================================================================
+   CLOUDFLARE — Workers (Pages DEĞİL)
+   ----------------------------------------------------------------------------
+   Önce `pages_build_output_dir` yazıyordu, yani Pages projesi. Cloudflare yeni
+   panelde depoyu bağlarken projeyi WORKERS olarak açtı ve dağıtım komutu
+   `wrangler deploy` oldu — Pages'inki `wrangler pages deploy`. İkisi aynı
+   yapılandırmayı okumuyor: `wrangler deploy` bir giriş noktası (`main`) arıyor,
+   Pages yapılandırmasında öyle bir anahtar yok. İlk dağıtım tam da bu yüzden
+   "Missing entry-point to Worker script" diyerek düştü.
+
+   Workers'a geçildi, çünkü Cloudflare yeni projeleri oraya yönlendiriyor ve
+   adapter-cloudflare ikisini de destekliyor. Fark yalnızca bu dosyada.
+
+   ÜÇ ANAHTAR BİRLİKTE ÇALIŞIR (adapter-cloudflare/utils.js bunu doğruluyor):
+     main              → SvelteKit sunucusunun derlendiği yer
+     assets.directory  → statiklerin sunulacağı klasör
+     assets.binding    → Worker'ın statiklere eriştiği bağlama adı
+   Biri eksikse derleme, dağıtım değil, BUILD hatası veriyor — yani sorun
+   Cloudflare'e çıkmadan önce yerelde görünür.
+
+   `main` bilerek `assets.directory`'nin İÇİNDE: adaptör oraya bir
+   `.assetsignore` yazıp `_worker.js`'i statik olarak sunulmaktan çıkarıyor.
+   ========================================================================= */
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
 	"name": "sergi",
 	"compatibility_date": "2026-08-20",
 	"compatibility_flags": ["nodejs_als"],
-	"pages_build_output_dir": ".svelte-kit/cloudflare"
+	"main": ".svelte-kit/cloudflare/_worker.js",
+	"assets": {
+		"binding": "ASSETS",
+		"directory": ".svelte-kit/cloudflare"
+	}
 }

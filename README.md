@@ -33,7 +33,7 @@ pnpm dev            # → http://localhost:5173
 | Komut | Ne yapar |
 |---|---|
 | `pnpm dev` | Geliştirme sunucusu |
-| `pnpm build` | Üretim derlemesi (Cloudflare Pages) |
+| `pnpm build` | Üretim derlemesi (Cloudflare Workers) |
 | `pnpm preview` | Derlemeyi yerelde wrangler ile sun (:4173) |
 | `pnpm check` | TypeScript + Svelte tip denetimi |
 | `pnpm lint` | Prettier + ESLint |
@@ -55,7 +55,7 @@ python3 tools/devserver.py 4174 prototype    # → http://localhost:4174
 
 | Hedef | Ne yayınlanır | Nasıl tetiklenir |
 |---|---|---|
-| **Cloudflare** | **Gerçek 1.0 build'i** (`src/`) | Cloudflare panelinden depo bağlantısı — `main`'e her push |
+| **Cloudflare Workers** | **Gerçek 1.0 build'i** (`src/`) | Cloudflare panelinden depo bağlantısı — `main`'e her push |
 | **GitHub Pages** | Prototip arşivi (`prototype/`) | [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) — yalnız `prototype/` değişince |
 
 Gerçek build **GitHub Pages'te yayınlanamaz**: `adapter-cloudflare` çıktısı bir
@@ -64,18 +64,32 @@ Faz 2'nin Supabase girişi, yorum uçları ve Resend postaları da sunucu ister.
 
 ### Cloudflare bağlantısı — panel ayarları
 
-Workers & Pages → Create → Pages → Connect to Git → `emreuctepe/sergi`:
+**Workers**, Pages değil. Cloudflare yeni panelde depo bağlarken projeyi Workers
+olarak açıyor ve dağıtımı `wrangler deploy` ile yapıyor; Pages'inki
+`wrangler pages deploy`. İkisi aynı yapılandırmayı okumadığı için karıştırmak
+"Missing entry-point to Worker script" hatası veriyor
+(bkz. [wrangler.jsonc](wrangler.jsonc) başındaki not).
+
+Workers & Pages → Create → **Workers** → Connect to Git → `emreuctepe/sergi`:
 
 | Alan | Değer |
 |---|---|
 | Production branch | `main` |
-| Framework preset | SvelteKit *(ya da None — aşağıdaki iki alan zaten doğru)* |
 | Build command | `pnpm build` |
-| Build output directory | `.svelte-kit/cloudflare` |
+| Deploy command | `npx wrangler deploy` *(varsayılan)* |
 
-Node ve pnpm sürümleri depoda sabit: [`.node-version`](.node-version) 22.23.2,
-`package.json` içindeki `packageManager` alanı pnpm 11.22.0. Panelde ayrıca
-sürüm değişkeni girmeye gerek yok — build makinesi bunları okur.
+Çıktı klasörü panelde SORULMAZ — `wrangler.jsonc`'deki `main` ve
+`assets.directory` zaten söylüyor. Node ve pnpm sürümleri de depoda sabit:
+[`.node-version`](.node-version) 22.23.2, `package.json` içindeki
+`packageManager` alanı pnpm 11.22.0.
+
+⚠️ `wrangler.jsonc` değişirse **`pnpm gen` çalıştırıp
+`worker-configuration.d.ts`'i commit'lemek gerekiyor** — ve `gen` derleme çıktısı
+SİLİNMİŞKEN çalıştırılmalı (`rm -rf .svelte-kit/cloudflare`). Sebebi:
+`wrangler types`, `main`'in gösterdiği dosya diskte varsa çıktıya
+`typeof import("./.svelte-kit/cloudflare/_worker")` satırını ekliyor; o satır
+commit'lenirse `checkJs` üretilmiş Worker'ı da tip denetimine sokuyor ve
+`pnpm check` yüzlerce hatayla patlıyor. `src/lib/deploy.test.ts` bunu bekliyor.
 
 Ortam değişkeni (`.env`) gerekmiyor; Faz 2'de Supabase ve Resend anahtarları
 panelin **Settings → Environment variables** bölümüne girecek, depoya değil.
@@ -164,7 +178,7 @@ seçicileri kullanıyor ([`attrs.ts`](src/lib/blocks/attrs.ts)).
 Satır içi biçimleme (`*italik*`, `**kalın**`, `` `kod` ``, `[bağ](url)`) HTML
 dizgisi değil **jeton listesi** üretiyor ([`inline.ts`](src/lib/blocks/inline.ts))
 — aynı fonksiyon Faz 3'te okur yorumlarını da biçimlendirecek ve o gün `{@html}`
-bir güvenlik açığı olurdu. Prototiple aynı çıktıyı verdiği, sayının 87 metni
+bir güvenlik açığı olurdu. Prototiple aynı çıktıyı verdiği, sayının 84 metni
 üzerinde ölçülerek doğrulanıyor.
 
 Hepsini bir arada görmek için:

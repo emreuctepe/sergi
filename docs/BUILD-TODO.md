@@ -14,8 +14,8 @@ kararları için [YORUM-SISTEMI.md](YORUM-SISTEMI.md).
 | **Aktif adım** | Faz 1 — tuval, bloklar, içerik (**1a–1e bitti**, sırada 1f) |
 | **Son tamamlanan** | **1e — sahneler**: `paper`, `portrait`, `sumi` prototiple birebir çiziliyor |
 | **Sonraki dosya** | 1f — `estimateMinutes()`, mod seçici, konum koruma, tanıtım kartları |
-| **Çalışır durum** | `pnpm dev` → http://localhost:5173/sayi/2026-09 · `lint` · `check` (451 dosya) · `test:unit` (234 test) · `test:e2e` (14 test) hepsi yeşil |
-| **Canlı** | Gerçek build → **Cloudflare** (panelden depo bağlantısı bekliyor; kurulunca URL buraya). Prototip arşivi → https://emreuctepe.github.io/sergi/ |
+| **Çalışır durum** | `pnpm dev` → http://localhost:5173/sayi/2026-09 · `lint` · `check` (452 dosya) · `test:unit` (237 test) · `test:e2e` (14 test) · `wrangler deploy --dry-run` hepsi yeşil |
+| **Canlı** | Gerçek build → **Cloudflare Workers** (ilk dağıtım Pages/Workers karışıklığından düştü, yapılandırma düzeltildi; URL kurulunca buraya). Prototip arşivi → https://emreuctepe.github.io/sergi/ |
 
 **Ortam notu:** Node 22 LTS gerekiyor (Vite 8 Node 20+ istiyor). Konteynerde
 `/usr/local` altına kuruldu, `pnpm` corepack ile geldi. Node 18 ile çalışmaz.
@@ -38,7 +38,7 @@ Bunlar tartışıldı ve kapandı; yeniden açmak için yeni bir sebep gerekir.
 | Blok kimliği | **Veri, türetme değil.** Biçim prototipteki gibi `sayfaId:index` — eski ankrajlar geçerli kalsın diye |
 | Uydurma bulmaca istatistikleri | **Taşınmıyor.** Tohum yorumlarla aynı gerekçe: sahte sayıyı gerçek gibi göstermiyoruz |
 | Varlık yolları | `img:assets/…` prototiptekiyle aynı → `static/assets/`. `assets/` atılsaydı `/2026-09` sayı rotasıyla çakışırdı |
-| Yığın | SvelteKit + Svelte 5 + TS + Supabase + Resend + Cloudflare Pages |
+| Yığın | SvelteKit + Svelte 5 + TS + Supabase + Resend + **Cloudflare Workers** (Pages değil — bkz. 1.34) |
 | Depo | **Monorepo değil**, tek uygulama. Klasör sınırları gelecekteki paketleri taklit eder |
 | Marka adı | `src/lib/brand.ts` tek kaynak; koda gömülmez |
 | `prototype/` | **Dokunulmaz.** Lint, Prettier ve build kapsamı dışında |
@@ -289,3 +289,5 @@ Kod değil, karar. İkisi de çözülmeden 1.0 çıkamaz.
 | 1.31 | Sahne id'leri `$props.id()` ile örnek başına benzersiz | Prototip degradeye sabit `pg` id'si veriyordu. Bir belgede id'ler tekil olmak zorunda: aynı sahne iki kez çizilseydi ikinci `url(#pg)` birincinin degradesini gösterirdi. Prototipte fark edilmedi çünkü her sahne sayıda bir kez geçiyor — yani hata değil, patlamamış bir mayındı. Uçtan uca test artık hem benzersizliği hem her başvurunun karşılığını ölçüyor |
 | 1.32 | Sahne geometrisi bileşenden ayrı (`sumi.ts`) | `sumi` 14 sıçramayı, 5 imgeyi ve mühür kesiklerini tohumdan üretiyor. Elle taşınan böyle bir üreteç "çalışıyor" görünür — yanlış tohumda da makul bir kompozisyon çıkar, sadece prototipteki çıkmaz. Sayılar SVG'den ayrılınca prototipin kendi çıktısıyla karşılaştırılabildi. `canvas/geometry.ts` ile aynı gerekçe (1.21) |
 | 1.33 | `rng` `Math.random()` değil, tohumlu | Dergi sayfası bir kompozisyon; her ziyarette yeniden zar atılan bir şey değil. Ayrıca sunucuda çizilenle tarayıcıda hidratlanan tutmazdı — Svelte `hydration_mismatch` deyip ağacı temizler, okur boş sayfa görürdü (1.18'de tam olarak bu yaşandı) |
+| 1.34 | Cloudflare hedefi Pages değil WORKERS | İlk dağıtım `Missing entry-point to Worker script` diyerek düştü: panel projeyi Workers olarak açmış ve `wrangler deploy` koşuyordu, ama `wrangler.jsonc`'de Pages'in anahtarı (`pages_build_output_dir`) vardı. İkisi aynı dosyayı okumuyor — Workers `main` + `assets.directory` + `assets.binding` istiyor. Workers'a geçildi çünkü Cloudflare yeni projeleri oraya yönlendiriyor ve adaptör ikisini de destekliyor; fark yalnızca `wrangler.jsonc`'de. Eksik anahtar artık DERLEME hatası (adapter-cloudflare/utils.js doğruluyor), yani sorun Cloudflare'e çıkmadan yerelde görünüyor. `pnpm preview` de `wrangler pages dev`'den `wrangler dev`'e geçti; uçtan uca 14 test gerçek Worker'a karşı yeşil |
+| 1.35 | `wrangler types --check` `build`in İÇİNDEN çıkarıldı | Bu kontrol dağıtımı ikinci kez düşürecekti ve sebebi ince: `wrangler types`, `main`'in gösterdiği dosya diskte VARSA çıktıya bir satır daha ekliyor (`mainModule: typeof import("./.svelte-kit/cloudflare/_worker")`). Cloudflare temiz bir ağaçta derliyor — orada o dosya henüz yok, yani commit'lenmiş tipler ne olursa olsun kontrol düşerdi. Üstüne, o satır commit'lenirse `checkJs` üretilmiş Worker'ı tip denetimine sokup `pnpm check`'i 747 hatayla patlatıyor (yaşandı). Cloudflare'in kendi SvelteKit şablonu da `build`e böyle bir kontrol koymuyor. `build` artık yalnız `vite build`; sözleşme `src/lib/deploy.test.ts`'e taşındı ve üç iddiası da bilerek bozulup kırmızı yandığı görüldü |
