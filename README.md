@@ -55,7 +55,7 @@ python3 tools/devserver.py 4174 prototype    # → http://localhost:4174
 
 | Hedef | Ne yayınlanır | Nasıl tetiklenir |
 |---|---|---|
-| **Cloudflare Workers** | **Gerçek 1.0 build'i** (`src/`) | Cloudflare panelinden depo bağlantısı — `main`'e her push |
+| **Cloudflare Workers** | **Gerçek 1.0 build'i** (`src/`) → [sergi.muhammedemreuctepe.workers.dev](https://sergi.muhammedemreuctepe.workers.dev/sayi/2026-09) | Cloudflare panelinden depo bağlantısı — `main`'e her push |
 | **GitHub Pages** | Prototip arşivi (`prototype/`) | [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) — yalnız `prototype/` değişince |
 
 Gerçek build **GitHub Pages'te yayınlanamaz**: `adapter-cloudflare` çıktısı bir

@@ -15,7 +15,7 @@ kararları için [YORUM-SISTEMI.md](YORUM-SISTEMI.md).
 | **Son tamamlanan** | **1e — sahneler**: `paper`, `portrait`, `sumi` prototiple birebir çiziliyor |
 | **Sonraki dosya** | 1f — `estimateMinutes()`, mod seçici, konum koruma, tanıtım kartları |
 | **Çalışır durum** | `pnpm dev` → http://localhost:5173/sayi/2026-09 · `lint` · `check` (452 dosya) · `test:unit` (237 test) · `test:e2e` (14 test) · `wrangler deploy --dry-run` hepsi yeşil |
-| **Canlı** | Gerçek build → **Cloudflare Workers** (ilk dağıtım Pages/Workers karışıklığından düştü, yapılandırma düzeltildi; URL kurulunca buraya). Prototip arşivi → https://emreuctepe.github.io/sergi/ |
+| **Canlı** | **https://sergi.muhammedemreuctepe.workers.dev/sayi/2026-09** (Cloudflare Workers, `main`'e her push). Prototip arşivi → https://emreuctepe.github.io/sergi/ |
 
 **Ortam notu:** Node 22 LTS gerekiyor (Vite 8 Node 20+ istiyor). Konteynerde
 `/usr/local` altına kuruldu, `pnpm` corepack ile geldi. Node 18 ile çalışmaz.
