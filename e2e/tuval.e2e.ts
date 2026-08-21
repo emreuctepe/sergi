@@ -20,8 +20,12 @@ import { expect, test, type Page } from '@playwright/test';
 
 const SAYI = '/sayi/2026-09';
 
-/** `full` modun vaadi (bkz. validate.test.ts: min 18 / mid 24 / full 28). */
-const SAYFA_SAYISI = 28;
+/** `full` modun vaadi (bkz. validate.test.ts: min 17 / mid 22 / full 25). */
+const SAYFA_SAYISI = 25;
+
+/** Folio biçimi: `01 / 25`. Sayı tek yerde dursun diye dizgi burada kuruluyor —
+    öncesinde her iddiada elle yazılıydı ve bir sayfa eklenince yedi yer kayıyordu. */
+const folioText = (n: number) => `${String(n).padStart(2, '0')} / ${SAYFA_SAYISI}`;
 
 /** Okuma ilerlemesi (%). */
 const percent = (page: Page) =>
@@ -62,10 +66,10 @@ test('yatay taşma yok', async ({ page }) => {
 
 test('klavye sayfa çeviriyor, folio ve ilerleme onunla geliyor', async ({ page }) => {
 	const folio = page.locator('#folio-page');
-	await expect(folio).toHaveText('01 / 28');
+	await expect(folio).toHaveText(folioText(1));
 
 	await page.keyboard.press('ArrowDown');
-	await expect(folio).toHaveText('02 / 28');
+	await expect(folio).toHaveText(folioText(2));
 	await expect(page.locator('#folio')).toHaveAttribute('data-hidden', 'false');
 
 	/* Folio hedefi anında gösteriyor (gezinme niyeti belli), ilerleme çubuğu ise
@@ -74,16 +78,16 @@ test('klavye sayfa çeviriyor, folio ve ilerleme onunla geliyor', async ({ page 
 	await expect.poll(() => percent(page), { timeout: 3000 }).toBeGreaterThan(0);
 
 	await page.keyboard.press('ArrowUp');
-	await expect(folio).toHaveText('01 / 28');
+	await expect(folio).toHaveText(folioText(1));
 });
 
 test('End sayının sonuna, Home başına götürüyor', async ({ page }) => {
 	await page.keyboard.press('End');
-	await expect(page.locator('#folio-page')).toHaveText('28 / 28');
+	await expect(page.locator('#folio-page')).toHaveText(folioText(SAYFA_SAYISI));
 	await expect.poll(() => percent(page), { timeout: 5000 }).toBeGreaterThan(95);
 
 	await page.keyboard.press('Home');
-	await expect(page.locator('#folio-page')).toHaveText('01 / 28');
+	await expect(page.locator('#folio-page')).toHaveText(folioText(1));
 	await expect.poll(() => percent(page), { timeout: 5000 }).toBe(0);
 });
 
@@ -129,12 +133,12 @@ test('sayı baştan sona okununca hiçbir sayfa gizli kalmıyor', async ({ page 
 	   basışta bitmiyor, önce kendi içlerinde ilerliyorlar — ki doğrusu bu, aksi
 	   hâlde bir tuş yazının yarısını atlardı. */
 	const folio = page.locator('#folio-page');
-	for (let i = 0; i < 60 && (await folio.textContent())?.trim() !== '28 / 28'; i++) {
+	for (let i = 0; i < 60 && (await folio.textContent())?.trim() !== folioText(SAYFA_SAYISI); i++) {
 		await page.keyboard.press('ArrowDown');
 		await page.waitForTimeout(120);
 	}
 
-	await expect(folio).toHaveText('28 / 28');
+	await expect(folio).toHaveText(folioText(SAYFA_SAYISI));
 	await expect(page.locator('.page[data-inview="false"]')).toHaveCount(0);
 });
 

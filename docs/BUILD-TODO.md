@@ -13,7 +13,7 @@ kararları için [YORUM-SISTEMI.md](YORUM-SISTEMI.md).
 |---|---|
 | **Aktif adım** | Faz 1 — tuval, bloklar, içerik (**1a–1d bitti**, sırada 1e) |
 | **Son tamamlanan** | **1d — tuval**: `/sayi/2026-09` açılıyor, sayı baştan sona okunuyor |
-| **Sonraki dosya** | `src/lib/art/` — 22 SVG sahne + `photo()` (`scene:`/`photo:` sayfaları şu an kâğıt zeminde açılıyor) |
+| **Sonraki dosya** | `src/lib/art/` — 3 SVG sahne: `paper`, `sumi`, `portrait` (bu üçü şu an kâğıt zeminde açılıyor) |
 | **Çalışır durum** | `pnpm dev` → http://localhost:5173/sayi/2026-09 · `lint` · `check` · `test:unit` (229 test) · `test:e2e` (12 test) hepsi yeşil |
 | **Canlı** | Gerçek build → **Cloudflare** (panelden depo bağlantısı bekliyor; kurulunca URL buraya). Prototip arşivi → https://emreuctepe.github.io/sergi/ |
 
@@ -85,15 +85,27 @@ Backend yok; sayı baştan sona okunuyor. **1.0'ın en büyük tek teslimatı.**
 - [x] **1d** `canvas/` — letterbox, dock ölçüsü, snap, IntersectionObserver, klavye
 - [x] **1d** `/sayi/[slug]` rotası — sayı baştan sona okunuyor
 - [x] **1d** Uçtan uca testler (Playwright): gezinme, sahne tetikleme, taşma denetimi
-- [ ] **1e** `art/` — 22 SVG sahne + `photo()`
-      (`rule`, `leafMark`, Shorts rozeti ve manga karesinin işaretlemesi 1c'de geldi)
+- [x] **1e** "Gece Hattı"nın çekilmemiş 3 karesi sayıdan düşürüldü
+      (`gh-2/3/4`) — sayı 29→**26 sayfa**, 90→**87 blok**, derinlik
+      18/24/28 → **17/22/25**. Gerekçe ve liste: `tools/tasi-icerik.mjs`
+      → `DUSEN_SAYFALAR`
+- [ ] **1e** `art/` — **3 SVG sahne** (`paper`, `sumi`, `portrait`)
+      (`rule`, `leafMark`, Shorts rozeti ve manga karesinin işaretlemesi 1c'de geldi.
+      Plan "22 sahne" diyordu; sayılan sahne `art.js`'in TOPLAMIYDI, kalan 19'u
+      yalnız 2026-10 çağırıyor. `photo()` hiç yazılmıyor — tek kullanıcısı
+      düşürülen üç sayfaydı)
 - [ ] **1f** Derinlik: `estimateMinutes()`, mod seçici, konum koruma
       (`flow()`/`pageVisible()` 1b'de yazıldı — doğrulayıcının ihtiyacıydı)
 - [ ] **1f** Tanıtım (intro) 5 kartı
 - [ ] `tokens.css`'ten kullanılmayan sayı temalarını (2026-08/10/11) ayıkla
 
-**Doğrulama:** 29 sayfa telefonda ve masaüstünde akıcı; min 18 / mid 24 / full 28
+**Doğrulama:** 26 sayfa telefonda ve masaüstünde akıcı; min 17 / mid 22 / full 25
 sayfa; mod değişince okunan yer kaybolmuyor; `prefers-reduced-motion` sadeleşiyor.
+
+⚠️ Aşağıdaki "1a–1d'de doğrulandı" paragrafları O GÜNÜN sayılarını taşıyor
+(29 sayfa / 90 blok / 18-24-28). Rakamlar 1e'de değişti; paragraflar tarih
+kaydı olduğu için geriye dönük düzeltilmedi. Güncel sayı yukarıdaki satırda,
+kanıtı `validate.test.ts` ile `parity.test.ts`'te.
 
 **1a'da doğrulandı:** `src/lib/content/parity.test.ts` taşınan sayıyı prototiple
 her çalıştırmada karşılaştırıyor (11 test). Sayımlar tuttu: 9 bölüm, 29 sayfa,
@@ -260,3 +272,5 @@ Kod değil, karar. İkisi de çözülmeden 1.0 çıkamaz.
 | 1.25 | Uçtan uca testler ÜRETİM derlemesine bakıyor | Tuvalin üç can damarı (rAF, IntersectionObserver, yumuşak kaydırma) yalnızca BOYAYAN bir tarayıcıda çalışıyor — gömülü önizleme paneli boyamıyor ve orada tuval "bozuk" görünüyordu. Playwright hem gerçek tarayıcı hem gerçek derleme: dev sunucusunda çalışıp derlemede kırılanı yayın günü öğrenmek istemiyoruz |
 | 1.26 | Taşma denetimi "0 taşma" değil, BİLİNEN LİSTE sabitliyor | Üç sayfa taşıyor ve prototip birebir aynı üçünde taşıyor — yani devralınan borç. "0 bekle" demek testi kalıcı kırmızıya, "hiç bakma" demek borcu görünmezliğe mahkûm ederdi. Liste büyürse de küçülürse de kırmızı yanıyor |
 | 1.27 | Canlı yayın GitHub Pages'e değil Cloudflare'e bağlandı | Pages'e statik basmak bugün mümkündü (sunucu uç noktası yok, `/sayi/[slug]` zaten `entries()` üretiyor) ama `adapter-static` + `base: '/sergi'` + `.nojekyll` iskelesi Faz 2'de silinecekti: Supabase girişi, yorum uçları ve Resend postaları sunucu ister, Pages yalnız statik dosya sunar. Cloudflare zaten kilitlenmiş yığın kararı ve kodda tek satır değişiklik istemedi. Pages prototip arşivi olarak kaldı — parite testleri ona bakıyor |
+| 1.28 | "Gece Hattı"nın üç karesi sayıdan DÜŞÜRÜLDÜ | Beş sayfalık foto-öykünün üç sayfasında arka plan `photo:<seed>`ti: çekilmiş bir kare değil, `art.js`'in seed'den ürettiği rastgele daire ve dikdörtgenler. Altyazı belgesel dilinde konuşuyor ("00:19 — Turnikeler. Tek ses, kartların çıkardığı ses."), altındaki görüntü uydurma. Uydurma bulmaca istatistikleriyle aynı karar. Düşürme `tasi-icerik.mjs`'te açık bir listede — elle silinse taşıma script'inin ilk koşusunda geri gelirdi. Test iki yönlü: liste boşalırsa da, prototip değişip sayfalar oradan kalkarsa da kırmızı yanıyor (boşaltılarak denendi, iki test düştü) |
+| 1.29 | 1e 22 sahne değil 3 sahne | Plandaki 22, `art.js`'in TOPLAM sahne sayısıydı. Kızıl Mevsim'in gerçekte çağırdığı `bg: scene:` değerleri sayıldı: `paper` ×2, `sumi`, `portrait`. Kalan 19'u (`neon-city`, `terminal`, `circuit`, `emaki`…) yalnız 2026-10 kullanıyor — `term`/`rtlhint` bileşenlerini taşımama kararıyla aynı. 1.0'da hiçbir sayfanın çağırmayacağı 19 bileşen, test edilemeyen ve gözle doğrulanamayan ölü kod olurdu |

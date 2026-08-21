@@ -42,11 +42,15 @@ describe('2026-09 doğrulaması', () => {
 	});
 
 	it('üç okuma modu da söz verdiği sayfa sayısını üretiyor', () => {
-		/* min 18 / mid 24 / full 28 — mod seçim kartlarındaki vaadin sayısal
-		   karşılığı. Bir sayfanın `depth`i değişirse burada görünür. */
-		expect(flow(content, 'min')).toHaveLength(18);
-		expect(flow(content, 'mid')).toHaveLength(24);
-		expect(flow(content, 'full')).toHaveLength(28);
+		/* min 17 / mid 22 / full 25 — mod seçim kartlarındaki vaadin sayısal
+		   karşılığı. Bir sayfanın `depth`i değişirse burada görünür.
+
+		   Sayılar 18/24/28'di: "Gece Hattı"nın çekilmemiş üç karesi düşünce
+		   üçü de indi (gh-2 `all`, gh-3 `mid`+`full`, gh-4 yalnız `full`).
+		   Gerekçe: tools/tasi-icerik.mjs → DUSEN_SAYFALAR. */
+		expect(flow(content, 'min')).toHaveLength(17);
+		expect(flow(content, 'mid')).toHaveLength(22);
+		expect(flow(content, 'full')).toHaveLength(25);
 	});
 });
 

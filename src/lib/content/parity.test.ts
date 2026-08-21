@@ -20,7 +20,12 @@
    ========================================================================= */
 
 import { describe, expect, it } from 'vitest';
-import { loadIssue, migratePuzzle, migrateSection } from '../../../tools/tasi-icerik.mjs';
+import {
+	dusenSayfalar,
+	loadIssue,
+	migratePuzzle,
+	migrateSection
+} from '../../../tools/tasi-icerik.mjs';
 import { BLOCK_TYPES } from './types';
 import { content } from '../../content/2026-09/index';
 
@@ -52,13 +57,32 @@ describe('2026-09 ↔ prototip paritesi', () => {
 		expect(proto.puzzles.every((p: { stats?: unknown }) => p.stats)).toBe(true);
 		expect(content.puzzles.some((p) => 'stats' in p)).toBe(false);
 	});
+
+	it('çekilmemiş foto-öykü kareleri taşınmadı', () => {
+		/* "Gece Hattı"nın gh-2/3/4 sayfaları prototipte VAR ve arka planları
+		   `photo:<seed>` — çekilmiş bir kare değil, seed'den üretilmiş rastgele
+		   şekiller. Gerekçe: tools/tasi-icerik.mjs → DUSEN_SAYFALAR.
+
+		   İki yönlü test: liste boşaltılırsa da, prototip değişip sayfalar
+		   oradan kalkarsa da kırmızı yanar. İkincisi önemli, çünkü o gün bu
+		   düşürme sessizce anlamsızlaşır ve listenin silinmesi gerekir. */
+		const protoIds = proto.sections.flatMap((s: { pages: { id: string }[] }) =>
+			s.pages.map((p) => p.id)
+		);
+		for (const id of dusenSayfalar) {
+			expect(protoIds, `${id} prototipte yok — düşürme listesi güncellenmeli`).toContain(id);
+		}
+
+		const ids = new Set(pages.map((p) => p.id));
+		for (const id of dusenSayfalar) expect(ids).not.toContain(id);
+	});
 });
 
 describe('2026-09 içerik bütünlüğü', () => {
-	it('9 bölüm · 29 sayfa · 90 blok', () => {
+	it('9 bölüm · 26 sayfa · 87 blok', () => {
 		expect(content.sections).toHaveLength(9);
-		expect(pages).toHaveLength(29);
-		expect(blocks).toHaveLength(90);
+		expect(pages).toHaveLength(26);
+		expect(blocks).toHaveLength(87);
 	});
 
 	it('19 blok tipinin hepsi kullanılıyor ve hepsi kayıtlı', () => {

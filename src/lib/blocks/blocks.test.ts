@@ -211,15 +211,15 @@ describe('söyleşi', () => {
 /* ==========================================================================
    SAYININ TAMAMI
    --------------------------------------------------------------------------
-   Asıl test bu: 90 bloğun 90'ı da çiziliyor mu, ankrajları eksiksiz mi?
+   Asıl test bu: 87 bloğun 87'si de çiziliyor mu, ankrajları eksiksiz mi?
    ======================================================================= */
 
 describe('2026-09 sayısının tamamı', () => {
 	const blocks = content.sections.flatMap((s) => s.pages.flatMap((p) => p.blocks));
 	const drawn = blocks.map((block, i) => draw(block, i));
 
-	it('90 blok', () => {
-		expect(blocks).toHaveLength(90);
+	it('87 blok', () => {
+		expect(blocks).toHaveLength(87);
 	});
 
 	it('hiçbiri boş çizilmiyor', () => {

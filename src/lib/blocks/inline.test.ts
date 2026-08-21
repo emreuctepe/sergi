@@ -96,10 +96,13 @@ const texts = [
 
 describe('taşınan sayının metinleri', () => {
 	/* Sayı kilitli ("1.0'da tek sayı, bugünkü hâliyle"), o yüzden sayı da kilitli:
-	   87'nin 3'e düşmesi testin kapsamının çöktüğü anlamına gelir ve o an
-	   kırmızı yanmalı. İçerik editöryel olarak açılırsa bu satır güncellenir. */
-	it('87 benzersiz metin tarıyor', () => {
-		expect(texts.length).toBe(87);
+	   84'ün 3'e düşmesi testin kapsamının çöktüğü anlamına gelir ve o an
+	   kırmızı yanmalı. İçerik editöryel olarak açılırsa bu satır güncellenir.
+
+	   87'ydi: "Gece Hattı"nın düşen üç sayfası birer altyazı taşıyordu
+	   (bkz. tools/tasi-icerik.mjs → DUSEN_SAYFALAR). */
+	it('84 benzersiz metin tarıyor', () => {
+		expect(texts.length).toBe(84);
 	});
 
 	it('en az bir tanesinde gerçekten biçim işareti var', () => {

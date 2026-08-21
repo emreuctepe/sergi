@@ -12,7 +12,7 @@
    olduğu sürece "taşıma sırasında bir şey değişti mi?" sorusunun cevabı
    `git diff` kadar yakın.
 
-   TAŞIMA SIRASINDA DEĞİŞEN ÜÇ ŞEY (gerisi birebir)
+   TAŞIMA SIRASINDA DEĞİŞEN DÖRT ŞEY (gerisi birebir)
    1. Her blok AÇIK bir `id` alır: `sayfaId:index`. Prototipte bu kimlik çizim
       anında türetiliyordu — blok yer değiştirince ona bağlı yorumlar sessizce
       komşu paragrafa kayardı. Artık kimlik veridir ve elle korunur.
@@ -22,6 +22,7 @@
       istatistik Faz 4'te sunucudan gelecek (bkz. src/lib/content/types.ts).
    3. Sayfaların varsayılanları açık yazılır: `fit` ve `scene` her sayfada
       bulunur, `bleed` yalnızca `full` iken.
+   4. `DUSEN_SAYFALAR`'daki sayfalar DÜŞÜRÜLÜR. Gerekçe listenin başında.
 
    ⚠️ ÇIKTI KLASÖRÜNÜN SAHİBİ BU SCRIPT. `src/content/<slug>/` her çalıştırmada
    SİLİNİP yeniden yazılır — oraya elle bir dosya koymak onu kaybetmektir (bir kez
@@ -135,6 +136,22 @@ function migratePage(page) {
 	});
 }
 
+/**
+ * Sayıya GİRMEYEN sayfalar. Prototipten sapmanın tek yeri burası: liste açık,
+ * gerekçeli ve testli olduğu sürece sapmak serbest — sessizce sapmak değil
+ * (CSS tarafındaki `FORKED` listesiyle aynı sözleşme).
+ *
+ * `gh-2`/`gh-3`/`gh-4` — "Gece Hattı" 5 sayfalık bir FOTO-ÖYKÜ ama üç karesi
+ * hiç çekilmemiş: arka planları `photo:102/103/104`, yani `art.js`'in seed'den
+ * ürettiği rastgele daire ve dikdörtgenler. Altyazılar belgesel dilinde
+ * ("00:19 — Turnikeler. Tek ses, kartların çıkardığı ses."). Olmayan bir kareyi
+ * varmış gibi sunmak, uydurma bulmaca istatistikleriyle aynı şey. Bölüm
+ * gerçek fotoğrafı olan iki sayfayla (gh-1, gh-5) ayakta duruyor.
+ *
+ * Gerçek kareler çekilirse: `bg`'yi `img:`e çevir, sayfayı buradan sil.
+ */
+const DUSEN_SAYFALAR = new Set(['gh-2', 'gh-3', 'gh-4']);
+
 /** @param {Raw} section */
 export function migrateSection(section) {
 	const { slug, type, title, kicker, author, minutes, tags, direction, pages } = section;
@@ -147,9 +164,12 @@ export function migrateSection(section) {
 		minutes,
 		tags,
 		direction,
-		pages: /** @type {Raw[]} */ (pages).map(migratePage)
+		pages: /** @type {Raw[]} */ (pages).filter((p) => !DUSEN_SAYFALAR.has(p.id)).map(migratePage)
 	});
 }
+
+/** Testler "düşürme gerçekten oldu mu?" diye sorabilsin diye dışarı açık. */
+export const dusenSayfalar = DUSEN_SAYFALAR;
 
 /**
  * `stats` düşer; gerisi olduğu gibi kalır.

@@ -1,7 +1,7 @@
 /* ==========================================================================
    03 · GECE HATTI
    --------------------------------------------------------------------------
-   6 sayfa: gh-acilis, gh-1, gh-2, gh-3, gh-4, gh-5
+   3 sayfa: gh-acilis, gh-1, gh-5
 
    Blok kimlikleri (`sayfaId:index`) yorum ankrajıdır — bir bloğu silmek
    ya da taşımak ona bağlı yorumları etkiler. Sıra değiştirirken
@@ -52,57 +52,6 @@ export const geceHatti: Section = {
 					id: 'gh-1:0',
 					invert: true,
 					text: '00:12 — Peronda son anons. Kimse acele etmiyor.'
-				}
-			]
-		},
-		{
-			id: 'gh-2',
-			depth: ['all'],
-			kind: 'photo',
-			fit: 'contain',
-			bleed: 'full',
-			bg: 'photo:102',
-			scene: 'fade-up',
-			blocks: [
-				{
-					t: 'caption',
-					id: 'gh-2:0',
-					invert: true,
-					text: '00:19 — Turnikeler. Tek ses, kartların çıkardığı ses.'
-				}
-			]
-		},
-		{
-			id: 'gh-3',
-			depth: ['mid', 'full'],
-			kind: 'photo',
-			fit: 'contain',
-			bleed: 'full',
-			bg: 'photo:103',
-			scene: 'fade-up',
-			blocks: [
-				{
-					t: 'caption',
-					id: 'gh-3:0',
-					invert: true,
-					text: '00:26 — Merdivenin ortasında duran adam. Telefonuna değil, yukarı bakıyor.'
-				}
-			]
-		},
-		{
-			id: 'gh-4',
-			depth: ['full'],
-			kind: 'photo',
-			fit: 'contain',
-			bleed: 'full',
-			bg: 'photo:104',
-			scene: 'fade-up',
-			blocks: [
-				{
-					t: 'caption',
-					id: 'gh-4:0',
-					invert: true,
-					text: '00:31 — Çıkışta açık kalan tek dükkân. Işığı sokağa taşıyor.'
 				}
 			]
 		},
