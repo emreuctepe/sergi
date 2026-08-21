@@ -11,10 +11,10 @@ kararları için [YORUM-SISTEMI.md](YORUM-SISTEMI.md).
 
 | | |
 |---|---|
-| **Aktif adım** | Faz 1 — tuval, bloklar, içerik (**1a bitti**, sırada 1b) |
-| **Son tamamlanan** | **1a — içerik taşındı**: 9 bölüm / 29 sayfa / 90 blok / 19 tip, hepsi tipli |
-| **Sonraki dosya** | `src/lib/content/validate.ts` — çalışma anı doğrulaması + `blockids.lock.json` |
-| **Çalışır durum** | `pnpm dev` → http://localhost:5173 · `pnpm run lint` · `pnpm run check` · `pnpm test:unit` (23 test) hepsi yeşil |
+| **Aktif adım** | Faz 1 — tuval, bloklar, içerik (**1a+1b bitti**, sırada 1c) |
+| **Son tamamlanan** | **1b — doğrulama**: `validate.ts`, kimlik kilidi, varlıklar `static/`e |
+| **Sonraki dosya** | `src/lib/blocks/` — 19 blok bileşeni (`render.js`'in Svelte karşılığı) |
+| **Çalışır durum** | `pnpm dev` → http://localhost:5173 · `pnpm run lint` · `pnpm run check` · `pnpm test:unit` (57 test) hepsi yeşil |
 
 **Ortam notu:** Node 22 LTS gerekiyor (Vite 8 Node 20+ istiyor). Konteynerde
 `/usr/local` altına kuruldu, `pnpm` corepack ile geldi. Node 18 ile çalışmaz.
@@ -72,14 +72,16 @@ Backend yok; sayı baştan sona okunuyor. **1.0'ın en büyük tek teslimatı.**
 - [x] **1a** `src/lib/content/types.ts` — `Issue → Section → Page[] → Block[]`
 - [x] **1a** Taşıma script'i: `prototype/js/issues/2026-09.js` → `src/content/2026-09/`
       **açık blok kimlikleriyle** (90 blok / 29 sayfa / 19 tip)
-- [ ] **1b** `validate.ts`: kayıtlı blok tipi, geçerli `depth`/`fit`,
-      var olan `img:` yolu (dosya denetimi 1e'deki varlık taşımasından sonra açılır)
-- [ ] **1b** `blockids.lock.json` — kimlik silinirse CI kırmızı yanar
+- [x] **1b** `validate.ts`: kayıtlı blok tipi, geçerli `depth`/`fit`,
+      boş metin, bulmaca referansları, var olan `img:` yolu
+- [x] **1b** `blockids.lock.json` — kimlik silinirse CI kırmızı yanar
+- [x] **1b** Varlıklar `static/assets/`e: 17 webp (3,6 MB) — *1e'den öne alındı,
+      `img:` yolu denetimi ancak dosyalar oradayken gerçek oluyor*
 - [ ] **1c** 19 blok bileşeni (`term` ve `rtlhint` taşınmıyor — yalnız 2026-10'da)
 - [ ] **1d** `canvas/` — letterbox, dock ölçüsü, snap, IntersectionObserver, klavye
 - [ ] **1e** `art/` — 22 SVG sahne + `photo()` + `mangaPanel()`
-- [ ] **1e** Varlıklar `static/`e: 17 webp (3,7 MB)
-- [ ] **1f** Derinlik: `flow()`/`pageVisible()`/`estimateMinutes()`, mod seçici, konum koruma
+- [ ] **1f** Derinlik: `estimateMinutes()`, mod seçici, konum koruma
+      (`flow()`/`pageVisible()` 1b'de yazıldı — doğrulayıcının ihtiyacıydı)
 - [ ] **1f** Tanıtım (intro) 5 kartı
 - [ ] `/dev/bloklar` katalog rotası
 - [ ] `tokens.css`'ten kullanılmayan sayı temalarını (2026-08/10/11) ayıkla
@@ -87,10 +89,17 @@ Backend yok; sayı baştan sona okunuyor. **1.0'ın en büyük tek teslimatı.**
 **Doğrulama:** 29 sayfa telefonda ve masaüstünde akıcı; min 18 / mid 24 / full 28
 sayfa; mod değişince okunan yer kaybolmuyor; `prefers-reduced-motion` sadeleşiyor.
 
-**1a'da doğrulandı:** `src/content/2026-09/parity.test.ts` taşınan sayıyı
-prototiple her çalıştırmada karşılaştırıyor (11 test). Sayımlar tuttu: 9 bölüm,
-29 sayfa, 90 blok, 19 tip, 90 benzersiz blok kimliği. `pnpm run check` 390 dosya
-0 hata. Test bilerek bozulan bir cümlede kırmızı yandığı görüldü — yani ısırıyor.
+**1a'da doğrulandı:** `src/lib/content/parity.test.ts` taşınan sayıyı prototiple
+her çalıştırmada karşılaştırıyor (11 test). Sayımlar tuttu: 9 bölüm, 29 sayfa,
+90 blok, 19 tip, 90 benzersiz blok kimliği. Test bilerek bozulan bir cümlede
+kırmızı yandı — yani ısırıyor.
+
+**1b'de doğrulandı:** `validateIssue(2026-09)` sıfır sorun döndürüyor ve
+doğrulayıcının kendisi 11 bozuk örnekle sınandı (her kural için bir tane —
+"her zaman boş liste döndüren" bir doğrulayıcı bu testlerden geçemez).
+Derinlik sayıları vaadi tutuyor: **min 18 / mid 24 / full 28**. 17 görselin
+hepsi `static/assets/` altında. Kilit ve varlık testleri de bilerek bozulup
+kırmızı yandığı görülerek doğrulandı. Toplam 57 test, `check` 398 dosya 0 hata.
 
 ---
 
@@ -196,3 +205,8 @@ Kod değil, karar. İkisi de çözülmeden 1.0 çıkamaz.
 | 1.3 | Blok kimliği türetilmekten çıkıp veri oldu | Prototipte kimlik çizim anında `page.id + ":" + i`'den geliyordu: bir blok yer değiştirince ona bağlı yorumlar sessizce komşu paragrafa kayıyordu. Artık dosyada yazılı; taşımak bilinçli bir karar |
 | 1.4 | Bulmacaların `stats` alanı düşürüldü | `plays: 1284`, `firstTryRate: 0.34`… hepsi uydurmaydı. İçerik dosyasında durmaları onları gerçek istatistik gibi sunmak olurdu. Gerçek sayılar Faz 4'te `puzzle_stats`'tan |
 | 1.5 | İçerik parite testi (11 test) | CSS'te işe yarayan sözleşmenin aynısı: taşınan sayı her çalıştırmada script çıktısıyla karşılaştırılıyor. Bilerek bozulan bir cümleyle kırmızı yandığı doğrulandı. 1.0 "tek sayı, bugünkü hâliyle" kararına dayanıyor — içerik editöryel olarak açılırsa test silinir |
+| 1.6 | 🐞 Parite testi üretilen klasörün içine konmuştu | Taşıma script'i `src/content/<slug>/`'i her çalıştırmada siliyor; ikinci çalıştırma testi de sildi. Test `src/lib/content/`'e taşındı, script'in başına uyarı yazıldı: o klasörün sahibi script |
+| 1.7 | `validate.ts` throw etmiyor, liste döndürüyor | Bir sayı hazırlanırken on hatası olabilir; ilkinde patlayan doğrulayıcı on kez çalıştırılan doğrulayıcıdır. Dosya sistemine de bakmıyor — saf kalsın, tarayıcıda da çalışsın |
+| 1.8 | Doğrulayıcı 11 bozuk örnekle sınandı | Sadece "gerçek içerik temiz geçiyor" testi yazmak yeterli değil: her zaman boş liste döndüren bir fonksiyon da geçer. Her kuralın bilerek bozulmuş bir örneği var |
+| 1.9 | `blockids.lock.json` elle bakımlı bırakıldı | Üreteç script'i yazılabilirdi ama kilit tam da "otomatik tazelenmesin" diye var: bir kimliği silmek kilitten de silmeyi gerektiriyor, o da diff'te görünen bilinçli bir satır. CSS'teki `FORKED` listesiyle aynı mantık |
+| 1.10 | Varlıklar 1e'den öne alındı | `img:` yolunun geçerliliğini denetleyen bir test, dosyalar `static/` altında değilken ya yalan söyler ya kapalı durur. 17 webp (3,6 MB) `static/assets/`e kopyalandı; prototipteki kopya dokunulmaz kaldığı için ikizleme kaçınılmaz |

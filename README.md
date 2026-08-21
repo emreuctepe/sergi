@@ -103,4 +103,13 @@ aynı sözleşme.
 Her blok **açık bir kimlik** taşıyor (`km-1:3` = `sayfaId:index`). Bu kimlik
 yorum ankrajının dayanağı: bir bloğu taşımak ona bağlı yorumları da taşır, o
 yüzden kimlikler içerik düzenlenirken elle korunur
-([YORUM-SISTEMI §2.1](docs/YORUM-SISTEMI.md)).
+([YORUM-SISTEMI §2.1](docs/YORUM-SISTEMI.md)). Kimlikler
+[`blockids.lock.json`](src/lib/content/blockids.lock.json)'da kilitli — biri
+kaybolursa test kırmızı yanar. Kilit elle bakımlıdır: silmek bilinçli bir satır
+olmalı, otomatik tazelenen bir kilit hiçbir şey korumaz.
+
+Tipin yakalayamadığı tutarsızlıkları
+[`validate.ts`](src/lib/content/validate.ts) denetliyor: yinelenen kimlik,
+sayfasıyla uyuşmayan blok kimliği, `text: ''`, tanımsız bulmaca referansı,
+olmayan görsel dosyası. Sorun listesi döndürüyor — `throw` etmiyor ki bir sayı
+hazırlanırken bütün hatalar tek seferde görülsün.
