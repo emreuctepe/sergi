@@ -237,6 +237,39 @@ koy. Üçüncüsü unutulursa `pnpm check` kırılır.
 - **`<defs>` kimlikleri `$props.id()` ile benzersiz.** Aynı sahne bir belgede iki
   kez çizilirse sabit bir id ikinci örneği birincinin degradesine bağlardı.
 
+## Görseller
+
+Sayının ağırlığının **%97'si** fotoğraf: kod tarafında kazanılacak 100 KB bile
+yok. Kaynak `.webp` dosyaları `static/assets/<sayı>/` altında durur ve doğruluk
+kaynağıdır; yanlarına [`tools/gorsel-turevleri.mjs`](tools/gorsel-turevleri.mjs)
+birkaç boyda AVIF yazar:
+
+```sh
+node tools/gorsel-turevleri.mjs
+```
+
+Ölçülen sonuç — sayıyı baştan sona okumak:
+
+| Cihaz | Önce | Sonra |
+|---|---|---|
+| 1× masaüstü / geniş ekran | 3.634 KB | **672 KB** |
+| 2× telefon | 3.634 KB | **1.225 KB** |
+| 3× telefon, 2× tablet | 3.634 KB | **2.182 KB** |
+| AVIF desteklemeyen tarayıcı | 3.634 KB | 3.634 KB (kaynak webp) |
+
+Aynı boyda yeniden kodlamak işe YARAMIYOR — denendi, dosyalar büyüdü. Kaynaklar
+zaten verimli sıkıştırılmış; ağırlık ince dokudan geliyor. Kazanç iki yerden:
+ölçek (tuval masaüstünde 560 CSS px'te sabitleniyor) ve format.
+
+Hangi dosyanın hangi boyları olduğu
+[`gorsel-turevleri.json`](src/lib/content/gorsel-turevleri.json)'da yazılı ve
+bileşen bunu **tahmin etmiyor, okuyor**: eksik bir AVIF `<source>` ile eşleşip
+404 alır ve `<img>`e geri DÜŞMEZ — okur kırık görsel görür. 47 türevin her biri
+ayrı testle diskte aranıyor.
+
+Yeni görsel eklerken: dosyayı `static/assets/` altına koy, script'i çalıştır,
+manifesti commit'le. Unutulursa `pnpm test` kırmızı yanar.
+
 ### Uçtan uca testler
 
 ```sh

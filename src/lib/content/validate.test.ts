@@ -24,6 +24,7 @@ import { formatProblems, validateIssue } from './validate';
 import type { Depth, IssueContent } from './types';
 import { content } from '../../content/2026-09/index';
 import lock from './blockids.lock.json';
+import turevler from './gorsel-turevleri.json';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '../../..');
@@ -113,6 +114,42 @@ describe('görsel yolları', () => {
 
 	it.each([...referenced].sort())('static/%s var', (rel) => {
 		expect(existsSync(resolve(root, 'static', rel)), `${rel} bulunamadı`).toBe(true);
+	});
+
+	/* ----------------------------------------------------------------------
+	   AVIF TÜREVLERİ
+	   ----------------------------------------------------------------------
+	   Bu, `img:` dosyası denetiminin kardeşi ve ondan DAHA sert kırılıyor:
+	   eksik bir `.webp` boş bir kutu bırakır, eksik bir `.avif` ise KIRIK bir
+	   görsel. Çünkü `<source type="image/avif">` tarayıcıyla eşleşiyor —
+	   tarayıcı o dosyayı ister, 404 alır ve `<img>`e GERİ DÜŞMEZ. Yani
+	   manifest ile disk ayrışırsa okur bomboş bir kare görür.
+
+	   Manifesti `tools/gorsel-turevleri.mjs` yazıyor; bu test onu diskle
+	   karşılaştırıyor. Türev üretmeden görsel eklenirse burada yanar.
+	   -------------------------------------------------------------------- */
+	const turevListesi = Object.entries(turevler as Record<string, number[]>).flatMap(
+		([kaynak, boylar]) => {
+			const base = kaynak.slice(0, kaynak.lastIndexOf('.'));
+			return boylar.map((w) => `${base}-${w}.avif`);
+		}
+	);
+
+	it('manifest 47 türev sayıyor', () => {
+		expect(turevListesi).toHaveLength(47);
+	});
+
+	it.each(turevListesi.sort())('static/%s var', (rel) => {
+		expect(existsSync(resolve(root, 'static', rel)), `${rel} üretilmemiş`).toBe(true);
+	});
+
+	it('türevi olmayan tek görsel 256px logo', () => {
+		/* Manifest dışında kalan her dosya `<picture>`da sade `<img>` olarak
+		   çiziliyor — bu bir kayıp değil, karar: 256px'lik bir filigrana üç boy
+		   üretmek kazançtan çok gürültü. Liste büyürse gerekçesi de büyümeli. */
+		const manifestte = new Set(Object.keys(turevler as Record<string, number[]>));
+		const disarda = [...referenced].filter((r) => !manifestte.has(r));
+		expect(disarda).toEqual(['assets/2026-09/kapali-kapilar/logo.webp']);
 	});
 });
 

@@ -55,7 +55,13 @@
 	aria-roledescription="sayfa"
 	aria-label="{section.title} — sayfa {index + 1} / {total}"
 >
-	{#if page.bg}<PageBackground bg={page.bg} />{/if}
+	<!--
+		İlk sayfa `eager`: kapak görseli sayının LCP öğesi ve 425 KB. Tembel
+		işaretlenmiş bir LCP, tarayıcıya "acelesi yok" demektir — oysa okurun
+		ilk gördüğü şey o. Geri kalan 14 görsel tembel kalıyor; ölçüldü, ilk
+		görünümde yalnız iki görsel iniyor.
+	-->
+	{#if page.bg}<PageBackground bg={page.bg} eager={index === 0} />{/if}
 
 	<div class="page__inner">
 		{#each page.blocks as block, i (block.id)}
