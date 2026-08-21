@@ -11,10 +11,10 @@ kararları için [YORUM-SISTEMI.md](YORUM-SISTEMI.md).
 
 | | |
 |---|---|
-| **Aktif adım** | Faz 1 — tuval, bloklar, içerik (**1a–1d bitti**, sırada 1e) |
-| **Son tamamlanan** | **1d — tuval**: `/sayi/2026-09` açılıyor, sayı baştan sona okunuyor |
-| **Sonraki dosya** | `src/lib/art/` — 3 SVG sahne: `paper`, `sumi`, `portrait` (bu üçü şu an kâğıt zeminde açılıyor) |
-| **Çalışır durum** | `pnpm dev` → http://localhost:5173/sayi/2026-09 · `lint` · `check` · `test:unit` (229 test) · `test:e2e` (12 test) hepsi yeşil |
+| **Aktif adım** | Faz 1 — tuval, bloklar, içerik (**1a–1e bitti**, sırada 1f) |
+| **Son tamamlanan** | **1e — sahneler**: `paper`, `portrait`, `sumi` prototiple birebir çiziliyor |
+| **Sonraki dosya** | 1f — `estimateMinutes()`, mod seçici, konum koruma, tanıtım kartları |
+| **Çalışır durum** | `pnpm dev` → http://localhost:5173/sayi/2026-09 · `lint` · `check` (451 dosya) · `test:unit` (234 test) · `test:e2e` (14 test) hepsi yeşil |
 | **Canlı** | Gerçek build → **Cloudflare** (panelden depo bağlantısı bekliyor; kurulunca URL buraya). Prototip arşivi → https://emreuctepe.github.io/sergi/ |
 
 **Ortam notu:** Node 22 LTS gerekiyor (Vite 8 Node 20+ istiyor). Konteynerde
@@ -89,10 +89,10 @@ Backend yok; sayı baştan sona okunuyor. **1.0'ın en büyük tek teslimatı.**
       (`gh-2/3/4`) — sayı 29→**26 sayfa**, 90→**87 blok**, derinlik
       18/24/28 → **17/22/25**. Gerekçe ve liste: `tools/tasi-icerik.mjs`
       → `DUSEN_SAYFALAR`
-- [ ] **1e** `art/` — **3 SVG sahne** (`paper`, `sumi`, `portrait`)
+- [x] **1e** `art/` — **3 SVG sahne** (`paper`, `sumi`, `portrait`) + sahne kaydı
       (`rule`, `leafMark`, Shorts rozeti ve manga karesinin işaretlemesi 1c'de geldi.
       Plan "22 sahne" diyordu; sayılan sahne `art.js`'in TOPLAMIYDI, kalan 19'u
-      yalnız 2026-10 çağırıyor. `photo()` hiç yazılmıyor — tek kullanıcısı
+      yalnız 2026-10 çağırıyor. `photo()` hiç yazılmadı — tek kullanıcısı
       düşürülen üç sayfaydı)
 - [ ] **1f** Derinlik: `estimateMinutes()`, mod seçici, konum koruma
       (`flow()`/`pageVisible()` 1b'de yazıldı — doğrulayıcının ihtiyacıydı)
@@ -133,6 +133,17 @@ iki kırılımda, ve **hiçbir sayfa gizli kalmadan** açılıyor. 12 uçtan uca
 Gömülü önizleme panelinde doğrulanamadı — o panel sayfayı boyamıyor, dolayısıyla
 `requestAnimationFrame` ve `IntersectionObserver` orada hiç çalışmıyor; tuvalin
 doğrulaması gerçek bir tarayıcı gerektiriyor.
+
+**1e'de doğrulandı:** Üç sahne prototiple YAN YANA çizilip karşılaştırıldı
+(kendi üretim derlemesinden sökülen SVG, prototipin `MAG.art.scene()` çıktısının
+yanına konup aynı sayfada aynı CSS değişkenleriyle boyandı): `paper`, `portrait`
+ve `sumi` aydınlık ve koyu temada birebir aynı, ensō tema dönünce mürekkepten
+kâğıda geçiyor. Sayısal parite ayrıca `art.test.ts`'te: `rng` prototiple aynı
+50 sayıyı veriyor, 14 sıçrama · imge sütunu · 5 mühür kesiği aynı koordinatlarda.
+Bite testi — sıçramada iki `rand()` çağrısının sırası değiştirildi, parite
+kırmızı yandı. Uçtan uca iki test eklendi: sahneler sayfaya gerçekten basılıyor
+(0×0 değil) ve `url(#…)` başvurularının hepsi bir tanım buluyor. 234 birim +
+14 uçtan uca test.
 
 
 ---
@@ -274,3 +285,7 @@ Kod değil, karar. İkisi de çözülmeden 1.0 çıkamaz.
 | 1.27 | Canlı yayın GitHub Pages'e değil Cloudflare'e bağlandı | Pages'e statik basmak bugün mümkündü (sunucu uç noktası yok, `/sayi/[slug]` zaten `entries()` üretiyor) ama `adapter-static` + `base: '/sergi'` + `.nojekyll` iskelesi Faz 2'de silinecekti: Supabase girişi, yorum uçları ve Resend postaları sunucu ister, Pages yalnız statik dosya sunar. Cloudflare zaten kilitlenmiş yığın kararı ve kodda tek satır değişiklik istemedi. Pages prototip arşivi olarak kaldı — parite testleri ona bakıyor |
 | 1.28 | "Gece Hattı"nın üç karesi sayıdan DÜŞÜRÜLDÜ | Beş sayfalık foto-öykünün üç sayfasında arka plan `photo:<seed>`ti: çekilmiş bir kare değil, `art.js`'in seed'den ürettiği rastgele daire ve dikdörtgenler. Altyazı belgesel dilinde konuşuyor ("00:19 — Turnikeler. Tek ses, kartların çıkardığı ses."), altındaki görüntü uydurma. Uydurma bulmaca istatistikleriyle aynı karar. Düşürme `tasi-icerik.mjs`'te açık bir listede — elle silinse taşıma script'inin ilk koşusunda geri gelirdi. Test iki yönlü: liste boşalırsa da, prototip değişip sayfalar oradan kalkarsa da kırmızı yanıyor (boşaltılarak denendi, iki test düştü) |
 | 1.29 | 1e 22 sahne değil 3 sahne | Plandaki 22, `art.js`'in TOPLAM sahne sayısıydı. Kızıl Mevsim'in gerçekte çağırdığı `bg: scene:` değerleri sayıldı: `paper` ×2, `sumi`, `portrait`. Kalan 19'u (`neon-city`, `terminal`, `circuit`, `emaki`…) yalnız 2026-10 kullanıyor — `term`/`rtlhint` bileşenlerini taşımama kararıyla aynı. 1.0'da hiçbir sayfanın çağırmayacağı 19 bileşen, test edilemeyen ve gözle doğrulanamayan ölü kod olurdu |
+| 1.30 | Sahne adı `string` değil `SceneName` | Prototipte `A.scene()` bilinmeyen adı sessizce `paper`e düşürüyordu: `scene:tori` yazım hatasının cezası boş bir kâğıt sayfaydı ve kimse fark etmezdi. Artık ad üç yerden birden kapanıyor — `Background` tipi derlemede, `validate.ts` içerikte, `Scene.svelte`'in `never` dalı dağıtıcıda. `bilinmeyenTip(block: never)` kararının (1.13) sahne karşılığı |
+| 1.31 | Sahne id'leri `$props.id()` ile örnek başına benzersiz | Prototip degradeye sabit `pg` id'si veriyordu. Bir belgede id'ler tekil olmak zorunda: aynı sahne iki kez çizilseydi ikinci `url(#pg)` birincinin degradesini gösterirdi. Prototipte fark edilmedi çünkü her sahne sayıda bir kez geçiyor — yani hata değil, patlamamış bir mayındı. Uçtan uca test artık hem benzersizliği hem her başvurunun karşılığını ölçüyor |
+| 1.32 | Sahne geometrisi bileşenden ayrı (`sumi.ts`) | `sumi` 14 sıçramayı, 5 imgeyi ve mühür kesiklerini tohumdan üretiyor. Elle taşınan böyle bir üreteç "çalışıyor" görünür — yanlış tohumda da makul bir kompozisyon çıkar, sadece prototipteki çıkmaz. Sayılar SVG'den ayrılınca prototipin kendi çıktısıyla karşılaştırılabildi. `canvas/geometry.ts` ile aynı gerekçe (1.21) |
+| 1.33 | `rng` `Math.random()` değil, tohumlu | Dergi sayfası bir kompozisyon; her ziyarette yeniden zar atılan bir şey değil. Ayrıca sunucuda çizilenle tarayıcıda hidratlanan tutmazdı — Svelte `hydration_mismatch` deyip ağacı temizler, okur boş sayfa görürdü (1.18'de tam olarak bu yaşandı) |

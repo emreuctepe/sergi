@@ -106,6 +106,52 @@ test('gezinme düğmeleri uçlarda kapanıyor', async ({ page }) => {
 });
 
 /* ==========================================================================
+   ÇİZİLMİŞ SAHNELER (1e)
+   --------------------------------------------------------------------------
+   Sahne geometrisinin prototiple paritesi `src/lib/art/art.test.ts`'te
+   tarayıcısız ölçülüyor. Burada sorulan başka bir soru: SVG gerçekten SAYFAYA
+   BASILIYOR mu, ve boyanınca bir alan kaplıyor mu? `url(#…)` başvurusu tutmayan
+   bir degrade ya da 0×0 çizilen bir `<svg>` birim testinden geçer, ekranda
+   hiçbir şey göstermez.
+   ======================================================================= */
+
+/** `bg: "scene:…"` diyen dört sayfa — ed-1, bl-1 (paper), sy-acilis, son-kunye. */
+const SAHNELI_SAYFA = 4;
+
+test('çizilmiş sahneler sayfaya basılıyor', async ({ page }) => {
+	const scenes = page.locator('.page__bg > svg.art');
+	await expect(scenes).toHaveCount(SAHNELI_SAYFA);
+
+	/* İlk sahne (ed-1) açılıştan hemen sonra akışın başında — ölçülebilir bir
+	   alan kaplamalı. `toBeVisible` yetmez: 0 yükseklikli bir svg de "görünür". */
+	const box = await scenes.first().boundingBox();
+	expect(box?.width ?? 0).toBeGreaterThan(100);
+	expect(box?.height ?? 0).toBeGreaterThan(100);
+});
+
+test('sahnelerin id başvuruları tutuyor', async ({ page }) => {
+	/* Sumi ve portre degradelerini `url(#…)` ile çağırıyor. Aynı sahne bir
+	   belgede iki kez çizilirse sabit bir id ikinci örneği birincininkine
+	   bağlardı; bileşenler bu yüzden `$props.id()` kullanıyor. Test kimliklerin
+	   BENZERSİZ olduğunu ve her başvurunun bir tanımı bulduğunu ölçüyor. */
+	const { ids, refs } = await page.evaluate(() => {
+		const roots = [...document.querySelectorAll('.page__bg > svg.art')];
+		return {
+			ids: roots.flatMap((s) => [...s.querySelectorAll('[id]')].map((n) => n.id)),
+			refs: roots.flatMap((s) =>
+				[...s.querySelectorAll('[fill^="url(#"]')].map((n) =>
+					(n.getAttribute('fill') ?? '').slice(5, -1)
+				)
+			)
+		};
+	});
+
+	expect(new Set(ids).size, `yinelenen sahne id'si: ${ids.join(', ')}`).toBe(ids.length);
+	expect(refs.length).toBeGreaterThan(0);
+	for (const ref of refs) expect(ids, `url(#${ref}) karşılıksız`).toContain(ref);
+});
+
+/* ==========================================================================
    SAHNE TETİKLEME
    ======================================================================= */
 

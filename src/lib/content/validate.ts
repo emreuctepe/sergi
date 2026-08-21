@@ -8,6 +8,7 @@
      · bir blok kimliğinin sayfasıyla uyuşmaması (`km-1:3` bloğu `km-2`'de)
      · `text: ''` — tip geçer, sayfada boşluk kalır
      · `bg: 'img:…'` diyen bir sayfanın gösterdiği dosyanın olmaması
+     · `bg: 'scene:…'` diyen bir sayfanın istediği sahnenin kayıtlı olmaması
      · `puzzlePool`'da olmayan bir bulmacanın adı
      · bir derinliğin hiç sayfa üretmemesi
 
@@ -19,6 +20,7 @@
    gerçekten var olup olmadığını `validate.test.ts` ayrıca denetler.
    ========================================================================= */
 
+import { SCENE_NAMES, isSceneName } from '$lib/art/scenes';
 import { flow } from './flow';
 import { BLOCK_TYPES, DEPTHS } from './types';
 import type { Block, IssueContent, Page, Section } from './types';
@@ -54,7 +56,7 @@ const SECTION_TYPES = [
 
 /** Kimlikler seçici ve URL parçası olarak kullanılıyor — güvenli alfabe. */
 const ID = /^[a-z0-9-]+$/;
-const BG = /^(scene|photo|img):.+$/;
+const BG = /^(scene|img):(.+)$/;
 
 /* ==========================================================================
    BLOK
@@ -147,7 +149,17 @@ function validatePage(page: Page, where: string): Problem[] {
 	if (!TRANSITIONS.includes(page.scene)) add(`geçersiz geçiş: "${page.scene}".`);
 	if (page.bleed && !BLEEDS.includes(page.bleed)) add(`geçersiz bleed: "${page.bleed}".`);
 	if (page.kind && !PAGE_KINDS.includes(page.kind)) add(`geçersiz sayfa türü: "${page.kind}".`);
-	if (page.bg && !BG.test(page.bg)) add(`arka plan "scene:", "photo:" ya da "img:" ile başlamalı.`);
+	if (page.bg) {
+		const bg = BG.exec(page.bg);
+		if (!bg) {
+			add(`arka plan "scene:" ya da "img:" ile başlamalı.`);
+		} else if (bg[1] === 'scene' && !isSceneName(bg[2])) {
+			/* `img:` yolunun var olup olmadığını denetlemekle aynı iş: orada dosya
+			   yok, burada bileşen yok. Prototip bilinmeyen sahneyi sessizce `paper`e
+			   düşürüyordu — bir yazım hatasının cezası boş bir kâğıt sayfaydı. */
+			add(`kayıtsız sahne: "${bg[2]}". Kayıtlılar: ${SCENE_NAMES.join(', ')}.`);
+		}
+	}
 
 	if (!page.depth.length) add('hiçbir okuma modunda görünmüyor.');
 	for (const d of page.depth) {

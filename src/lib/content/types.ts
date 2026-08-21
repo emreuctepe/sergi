@@ -18,6 +18,8 @@
    (`sayfaId:index`) ki prototipte yazılmış ankrajlar geçerliliğini korusun.
    ========================================================================= */
 
+import type { SceneName } from '$lib/art/scenes';
+
 /* ==========================================================================
    TEMEL BİRİMLER
    ======================================================================= */
@@ -36,16 +38,23 @@ export type Depth = (typeof DEPTHS)[number];
 export type PageDepth = readonly (Depth | 'all')[];
 
 /**
- * Sayfa arka planı — üç kaynak:
- *   `scene:torii`                     → art.ts'teki satır içi SVG sahne
- *   `photo:101`                       → art.ts'in ürettiği sahte "fotoğraf"
+ * Sayfa arka planı — iki kaynak:
+ *   `scene:sumi`                      → `src/lib/art/` altındaki SVG sahne
  *   `img:assets/2026-09/tren.webp`    → `static/` altındaki gerçek dosya
+ *
+ * Sahne adı `string` DEĞİL `SceneName`: prototipte `A.scene()` bilinmeyen adı
+ * sessizce `paper`e düşürüyordu, yani `scene:tori` yazım hatası boş bir kâğıt
+ * sayfa üretir ve kimse fark etmezdi. Artık yazım hatası derleme hatası.
+ *
+ * Üçüncü bir kaynak vardı — `photo:101`, `art.js`'in tohumdan ürettiği soyut
+ * şekiller. 1e'de kaldırıldı: tek kullanıcısı "Gece Hattı"nın çekilmemiş üç
+ * karesiydi ve o sayfalar sayıdan düştü (tools/tasi-icerik.mjs → DUSEN_SAYFALAR).
  *
  * `img:` yolu prototiptekiyle birebir aynı bırakıldı: dosyalar `static/assets/`
  * altına konur, URL `/assets/2026-09/tren.webp` olur. `assets/` önekini atıp
  * sayı klasörünü köke çıkarmak `/2026-09` rotasıyla kavram olarak çakışırdı.
  */
-export type Background = `scene:${string}` | `photo:${string}` | `img:${string}`;
+export type Background = `scene:${SceneName}` | `img:${string}`;
 
 /** Sayfa içeriği tuvale sığar mı, yoksa kendi içinde kayar mı? */
 export type Fit = 'contain' | 'scroll';

@@ -255,7 +255,18 @@ describe('doğrulayıcı bozuk içeriği yakalıyor', () => {
 			bozukta((c) => {
 				(c.sections[0].pages[0] as { bg: string }).bg = 'assets/x.webp';
 			})
-		).toContain('"scene:", "photo:" ya da "img:"');
+		).toContain('"scene:" ya da "img:"');
+	});
+
+	/* `img:` yolu denetiminin sahne karşılığı: orada dosya yok, burada bileşen.
+	   Prototip bilinmeyen sahneyi sessizce `paper`e düşürdüğü için `scene:tori`
+	   gibi bir yazım hatası boş bir kâğıt sayfa üretip görünmez kalıyordu. */
+	it('kayıtsız sahne adı', () => {
+		expect(
+			bozukta((c) => {
+				(c.sections[0].pages[0] as { bg: string }).bg = 'scene:tori';
+			})
+		).toContain('kayıtsız sahne: "tori"');
 	});
 
 	/* Blok bileşenleri bağları `target="_blank"` ile basıyor (bkz.

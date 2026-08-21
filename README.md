@@ -199,6 +199,30 @@ iş ölçmek ve yazmak.
   effect'i kendi kendini tetikleyip `effect_update_depth_exceeded` ile bütün
   effect'leri düşürüyor: sayfa çizilir, kaydırma ve folio ölü doğar.
 
+## Sahneler
+
+Bazı sayfaların arka planı fotoğraf değil, çizim: `bg: 'scene:sumi'`.
+[`src/lib/art/`](src/lib/art/) — 1.0'da **üç** sahne var (`paper`, `portrait`,
+`sumi`). Prototipteki 22'nin kalan 19'unu yalnız 2026-10 çağırıyor, o sayı
+gelene kadar taşınmıyorlar.
+
+Sahne adı `string` değil [`SceneName`](src/lib/art/scenes.ts): prototipte
+bilinmeyen bir ad sessizce `paper`e düşüyordu, yani `scene:tori` yazım hatası
+boş bir kâğıt sayfa üretip görünmez kalıyordu. Ad artık üç yerden kapanıyor —
+tip derlemede, `validate.ts` içerikte, `Scene.svelte`'in `never` dalı dağıtıcıda.
+
+Sahne eklemek: bileşeni yaz → adını `SCENE_NAMES`'e ekle → `Scene.svelte`'e dal
+koy. Üçüncüsü unutulursa `pnpm check` kırılır.
+
+İki ayrıntı:
+
+- **`sumi`nin sayıları tohumdan geliyor** ([`sumi.ts`](src/lib/art/sumi.ts)) ve
+  `rand()` çağrı sırası sözleşmenin parçası — bir satırı yukarı almak
+  kompozisyonu sessizce başkalaştırır. `Math.random()` olamaz: sunucuda çizilenle
+  tarayıcıda hidratlanan tutmazsa Svelte ağacı temizler, okur boş sayfa görür.
+- **`<defs>` kimlikleri `$props.id()` ile benzersiz.** Aynı sahne bir belgede iki
+  kez çizilirse sabit bir id ikinci örneği birincinin degradesine bağlardı.
+
 ### Uçtan uca testler
 
 ```sh
