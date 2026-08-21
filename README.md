@@ -49,6 +49,39 @@ python3 tools/devserver.py 4174 prototype    # → http://localhost:4174
 
 ---
 
+## Yayın
+
+İki ayrı hedef var; hangi URL'in neyi gösterdiğini karıştırmamak gerekiyor.
+
+| Hedef | Ne yayınlanır | Nasıl tetiklenir |
+|---|---|---|
+| **Cloudflare** | **Gerçek 1.0 build'i** (`src/`) | Cloudflare panelinden depo bağlantısı — `main`'e her push |
+| **GitHub Pages** | Prototip arşivi (`prototype/`) | [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) — yalnız `prototype/` değişince |
+
+Gerçek build **GitHub Pages'te yayınlanamaz**: `adapter-cloudflare` çıktısı bir
+Worker (`.svelte-kit/cloudflare/_worker.js`) ve Pages yalnız statik dosya sunar.
+Faz 2'nin Supabase girişi, yorum uçları ve Resend postaları da sunucu ister.
+
+### Cloudflare bağlantısı — panel ayarları
+
+Workers & Pages → Create → Pages → Connect to Git → `emreuctepe/sergi`:
+
+| Alan | Değer |
+|---|---|
+| Production branch | `main` |
+| Framework preset | SvelteKit *(ya da None — aşağıdaki iki alan zaten doğru)* |
+| Build command | `pnpm build` |
+| Build output directory | `.svelte-kit/cloudflare` |
+
+Node ve pnpm sürümleri depoda sabit: [`.node-version`](.node-version) 22.23.2,
+`package.json` içindeki `packageManager` alanı pnpm 11.22.0. Panelde ayrıca
+sürüm değişkeni girmeye gerek yok — build makinesi bunları okur.
+
+Ortam değişkeni (`.env`) gerekmiyor; Faz 2'de Supabase ve Resend anahtarları
+panelin **Settings → Environment variables** bölümüne girecek, depoya değil.
+
+---
+
 ## Belgeler
 
 | Dosya | İçerik |

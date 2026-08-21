@@ -1,5 +1,14 @@
 name: Deploy prototype to Pages
 
+# İKİ AYRI YAYIN HEDEFİ VAR — karıştırma:
+#
+#   GitHub Pages  → PROTOTİP arşivi   (bu dosya)      emreuctepe.github.io/sergi/
+#   Cloudflare    → GERÇEK 1.0 build'i (repo bağlantısı, panelden kurulur)
+#
+# Gerçek build burada YAYINLANAMAZ: adapter-cloudflare çıktısı bir Worker
+# (`.svelte-kit/cloudflare/_worker.js`) ve Pages yalnız statik dosya sunar.
+# Faz 2'nin giriş/yorum uçları da sunucu ister. Ayrıntı: README "Yayın" bölümü.
+#
 # Prototip `prototype/` klasöründe duruyor; GitHub Pages "branch" modu yalnızca
 # kök ya da /docs'tan yayınlayabildiği için siteyi buradan (Actions ile) basıyoruz.
 # Böylece repo düzeni bozulmadan prototype/ canlıya çıkar.
@@ -7,6 +16,11 @@ name: Deploy prototype to Pages
 on:
   push:
     branches: [main]
+    # Prototip donduruldu; her commit'te yeniden basmak boşuna koşu ve
+    # "Pages deployed" bildirimi demek olurdu. Yalnız kendisi değişince çalışır.
+    paths:
+      - 'prototype/**'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch: # Actions sekmesinden elle de çalıştırılabilir
 
 permissions:
