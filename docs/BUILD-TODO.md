@@ -15,6 +15,7 @@ kararları için [YORUM-SISTEMI.md](YORUM-SISTEMI.md).
 | **Son tamamlanan** | **1d — tuval**: `/sayi/2026-09` açılıyor, sayı baştan sona okunuyor |
 | **Sonraki dosya** | `src/lib/art/` — 22 SVG sahne + `photo()` (`scene:`/`photo:` sayfaları şu an kâğıt zeminde açılıyor) |
 | **Çalışır durum** | `pnpm dev` → http://localhost:5173/sayi/2026-09 · `lint` · `check` · `test:unit` (229 test) · `test:e2e` (12 test) hepsi yeşil |
+| **Canlı** | Gerçek build → **Cloudflare** (panelden depo bağlantısı bekliyor; kurulunca URL buraya). Prototip arşivi → https://emreuctepe.github.io/sergi/ |
 
 **Ortam notu:** Node 22 LTS gerekiyor (Vite 8 Node 20+ istiyor). Konteynerde
 `/usr/local` altına kuruldu, `pnpm` corepack ile geldi. Node 18 ile çalışmaz.
@@ -258,3 +259,4 @@ Kod değil, karar. İkisi de çözülmeden 1.0 çıkamaz.
 | 1.24 | 🐞 Hızlı basılan tuşların üçte ikisi yutuluyordu | `scrollTo({behavior:'smooth'})` hemen bitmiyor; ikinci basış yol yarıdayken geldiğinde `current` hâlâ eski sayfaydı ve basış aynı sayfayı yeniden hedefliyordu. Uçtan uca testte 27 basış 10 sayfa ilerletti. Gezinme artık hedefi anında yazıyor; kaydırma konumunun sözü animasyon oturunca geçerli |
 | 1.25 | Uçtan uca testler ÜRETİM derlemesine bakıyor | Tuvalin üç can damarı (rAF, IntersectionObserver, yumuşak kaydırma) yalnızca BOYAYAN bir tarayıcıda çalışıyor — gömülü önizleme paneli boyamıyor ve orada tuval "bozuk" görünüyordu. Playwright hem gerçek tarayıcı hem gerçek derleme: dev sunucusunda çalışıp derlemede kırılanı yayın günü öğrenmek istemiyoruz |
 | 1.26 | Taşma denetimi "0 taşma" değil, BİLİNEN LİSTE sabitliyor | Üç sayfa taşıyor ve prototip birebir aynı üçünde taşıyor — yani devralınan borç. "0 bekle" demek testi kalıcı kırmızıya, "hiç bakma" demek borcu görünmezliğe mahkûm ederdi. Liste büyürse de küçülürse de kırmızı yanıyor |
+| 1.27 | Canlı yayın GitHub Pages'e değil Cloudflare'e bağlandı | Pages'e statik basmak bugün mümkündü (sunucu uç noktası yok, `/sayi/[slug]` zaten `entries()` üretiyor) ama `adapter-static` + `base: '/sergi'` + `.nojekyll` iskelesi Faz 2'de silinecekti: Supabase girişi, yorum uçları ve Resend postaları sunucu ister, Pages yalnız statik dosya sunar. Cloudflare zaten kilitlenmiş yığın kararı ve kodda tek satır değişiklik istemedi. Pages prototip arşivi olarak kaldı — parite testleri ona bakıyor |
