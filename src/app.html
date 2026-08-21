@@ -4,7 +4,15 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 		<meta name="text-scale" content="scale" />
-		<link rel="icon" href="%sveltekit.assets%/favicon.svg" />
+		<!--
+			Favicon burada DEĞİL, `+layout.svelte`'te: dosya `src/lib/assets/`
+			altında duruyor ve oradan `import` edilince derleyici onu hash'liyor,
+			yani bir yıllık `immutable` önbelleğe giriyor. Burada `%sveltekit.assets%`
+			ile yazılsaydı dosyanın `static/`te olması gerekirdi — nitekim öyle
+			yazılmıştı, dosya orada değildi ve favicon canlıda 404 veriyordu.
+			Kimse fark etmemişti; sayı rotası önceden çizilmeye başlayınca
+			prerender kırık bağı yüzümüze söyledi.
+		-->
 		<!--
 			Tema, ilk boyadan ÖNCE uygulanmalı. Svelte'in devralmasını beklersek
 			koyu temayı seçmiş okur her açılışta bir kare beyaz görür (FOUC).

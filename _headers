@@ -1,0 +1,32 @@
+# ============================================================================
+# ÖNBELLEK BAŞLIKLARI
+# ----------------------------------------------------------------------------
+# Bu dosya PROJE KÖKÜNDE durur, `static/` altında değil — adapter-cloudflare
+# oradakini görürse uyarı basıp yok sayıyor.
+#
+# Adaptör kendi `_headers`ını üretip bunun üstüne ekliyor; o yalnız
+# `/_app/immutable/*`ı kapsıyor (derleyicinin hash'lediği JS/CSS). Geri kalan
+# her şey — 3,6 MB'lık görseller dahil — Cloudflare'in varsayılanına kalıyordu:
+#
+#     cache-control: public, max-age=0, must-revalidate
+#
+# Yani okur sayıyı ikinci kez açtığında 17 görselin her biri için bir koşullu
+# istek gidiyordu. İçerik değişmediği için hepsi 304 dönüyor ama gidiş-dönüş
+# duruyor; mobil bağlantıda tam da bu görünür.
+# ============================================================================
+
+# Sayı varlıkları. Yol sayı klasörünü taşıyor (`assets/2026-09/…`), yani
+# yayınlanmış bir sayının görseli bir daha değişmez — değişmesi gerekiyorsa
+# dosya adı değişmeli.
+#
+# ⚠️ Şimdilik BİR HAFTA, bir yıl değil: 2026-09 hâlâ yapım aşamasında ve
+# görseller yeniden kodlanıyor. Bir yıllık `immutable` verilseydi hem tarayıcı
+# hem Cloudflare kenarı eski dosyayı aylarca tutardı. Yayın günü bu satır
+# `max-age=31536000, immutable` olacak (bkz. docs/BUILD-TODO.md Faz 6).
+/assets/*
+  Cache-Control: public, max-age=604800
+
+# Font dosya adı sabit ve içeriği yayın öncesi bir kez değişecek (lisans borcu,
+# bkz. README). Ondan sonra gerçekten değişmez.
+/fonts/*
+  Cache-Control: public, max-age=604800

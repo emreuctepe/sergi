@@ -206,11 +206,17 @@ kırmızı yandı. Uçtan uca iki test eklendi: sahneler sayfaya gerçekten bas�
 
 ## 🚧 Yayın blocker'ları
 
-Kod değil, karar. İkisi de çözülmeden 1.0 çıkamaz.
+Kod değil, karar. Hiçbiri çözülmeden 1.0 çıkamaz.
 
 1. **Marka adı + alan adı.** `src/lib/brand.ts` şu an yer tutucu (`ornek.com`).
    `brand.test.ts` bunu bilerek test ediyor — gerçek alan adı girilince o test silinir.
-2. **Font lisansı.** `static/fonts/animeace2_reg.ttf` lisanssız. OFL/ticari kullanıma
+2. **Favicon hâlâ SvelteKit şablonunun SVELTE LOGOSU.** `src/lib/assets/favicon.svg`
+   turuncu Svelte işareti (`<title>svelte-logo</title>`). Derginin kendi imzası
+   var — `src/lib/art/leaf.ts`'teki yaprak. Değişmeden yayına çıkarsa sekmede
+   başka bir markanın logosu durur.
+3. **`_headers`'taki önbellek süresi bir haftadan bir yıla çıkarılacak**
+   (`max-age=31536000, immutable`) — sayı dondurulduktan sonra.
+4. **Font lisansı.** `static/fonts/animeace2_reg.ttf` lisanssız. OFL/ticari kullanıma
    açık bir alternatifle değişecek, subset + woff2'ye inecek. Aday font
    `tokens.css`'teki Türkçe kapsam denetiminden aynen geçmeli (ç Ç ğ Ğ ı İ ö Ö ş Ş ü Ü;
    Anime Ace'te uzun tire — – yoktu).
@@ -291,3 +297,5 @@ Kod değil, karar. İkisi de çözülmeden 1.0 çıkamaz.
 | 1.33 | `rng` `Math.random()` değil, tohumlu | Dergi sayfası bir kompozisyon; her ziyarette yeniden zar atılan bir şey değil. Ayrıca sunucuda çizilenle tarayıcıda hidratlanan tutmazdı — Svelte `hydration_mismatch` deyip ağacı temizler, okur boş sayfa görürdü (1.18'de tam olarak bu yaşandı) |
 | 1.34 | Cloudflare hedefi Pages değil WORKERS | İlk dağıtım `Missing entry-point to Worker script` diyerek düştü: panel projeyi Workers olarak açmış ve `wrangler deploy` koşuyordu, ama `wrangler.jsonc`'de Pages'in anahtarı (`pages_build_output_dir`) vardı. İkisi aynı dosyayı okumuyor — Workers `main` + `assets.directory` + `assets.binding` istiyor. Workers'a geçildi çünkü Cloudflare yeni projeleri oraya yönlendiriyor ve adaptör ikisini de destekliyor; fark yalnızca `wrangler.jsonc`'de. Eksik anahtar artık DERLEME hatası (adapter-cloudflare/utils.js doğruluyor), yani sorun Cloudflare'e çıkmadan yerelde görünüyor. `pnpm preview` de `wrangler pages dev`'den `wrangler dev`'e geçti; uçtan uca 14 test gerçek Worker'a karşı yeşil |
 | 1.35 | `wrangler types --check` `build`in İÇİNDEN çıkarıldı | Bu kontrol dağıtımı ikinci kez düşürecekti ve sebebi ince: `wrangler types`, `main`'in gösterdiği dosya diskte VARSA çıktıya bir satır daha ekliyor (`mainModule: typeof import("./.svelte-kit/cloudflare/_worker")`). Cloudflare temiz bir ağaçta derliyor — orada o dosya henüz yok, yani commit'lenmiş tipler ne olursa olsun kontrol düşerdi. Üstüne, o satır commit'lenirse `checkJs` üretilmiş Worker'ı tip denetimine sokup `pnpm check`'i 747 hatayla patlatıyor (yaşandı). Cloudflare'in kendi SvelteKit şablonu da `build`e böyle bir kontrol koymuyor. `build` artık yalnız `vite build`; sözleşme `src/lib/deploy.test.ts`'e taşındı ve üç iddiası da bilerek bozulup kırmızı yandığı görüldü |
+| 1.36 | Sayı rotası önceden çiziliyor (`prerender = true`) | Sayfa her istekte sunucuda üretiliyordu (canlıda TTFB 563 ms, `x-sveltekit-page: true`) ama içerik uygulama paketinin içinde — sunucu hiç değişmeyen bir girdiden hep aynı HTML'i kuruyordu. `entries()` zaten bu iş için yazılmıştı, bayrak açılmamıştı. Bedava bir yan etkisi oldu: prerender kırık bağları geziyor ve `/favicon.svg`'nin canlıda 404 verdiğini ortaya çıkardı — `app.html` onu `static/`te arıyordu, dosya `src/lib/assets/` altındaydı. Faz 3'te yorumlar istemcide yüklendiği için bu satır bozulmuyor |
+| 1.37 | Görsel ve font önbelleği `_headers` ile açıldı | Adaptörün ürettiği `_headers` yalnız `/_app/immutable/*`ı kapsıyor; 3,6 MB'lık görseller Cloudflare varsayılanına (`max-age=0, must-revalidate`) kalıyordu, yani her ziyarette 17 koşullu istek. Süre bilerek BİR HAFTA: sayı hâlâ yapımda ve görseller yeniden kodlanıyor, bir yıllık `immutable` verilseydi hem tarayıcı hem kenar eski dosyayı tutardı |

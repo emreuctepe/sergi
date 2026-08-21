@@ -23,6 +23,20 @@ const SAYILAR: Record<string, IssueContent> = {
 /** Önceden çizilecek rotalar — sayı sayısı elle sayılmaz, buradan gelir. */
 export const entries: EntryGenerator = () => Object.keys(SAYILAR).map((slug) => ({ slug }));
 
+/**
+ * Sayfa DERLEME anında çiziliyor, her istekte değil.
+ *
+ * İçerik zaten uygulama paketinin içinde (yukarıdaki nota bak): sunucunun her
+ * istekte yaptığı iş, hiç değişmeyen bir girdiden hep aynı HTML'i üretmekti.
+ * Ölçüldü — canlıda TTFB 563 ms, yanıtta `x-sveltekit-page: true`. Önceden
+ * çizilince sayfa Cloudflare'in kenarından statik dosya olarak çıkıyor.
+ *
+ * Faz 3'te yorumlar gelince bu bozulmuyor: yorumlar okurun tarayıcısında
+ * yükleniyor, kabuk statik kalıyor. Kabuğun sunucuda üretilmesini gerektiren
+ * ilk şey (okura göre değişen bir HTML) çıktığı gün bu satır kalkar.
+ */
+export const prerender = true;
+
 export const load: PageLoad = ({ params }) => {
 	const content = SAYILAR[params.slug];
 	if (!content) error(404, `"${params.slug}" diye bir sayı yok.`);
