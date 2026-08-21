@@ -146,6 +146,20 @@ kırmızı yandı. Uçtan uca iki test eklendi: sahneler sayfaya gerçekten bas�
 14 uçtan uca test.
 
 
+**Hız — canlıda doğrulandı (1e sonrası):**
+
+| | önce | sonra |
+|---|---|---|
+| Sayfanın sunucu süresi | 563 ms (SSR) | **0 ms** — `robots.txt` ile aynı, statik |
+| 1× masaüstü, tam okuma | 3.634 KB | **672 KB** |
+| 2× telefon | 3.634 KB | **1.225 KB** |
+| 3× telefon / 2× tablet | 3.634 KB | **2.182 KB** |
+| Görsel önbelleği | her ziyarette 17 koşullu istek | 1 hafta |
+
+`x-sveltekit-page` başlığı yanıttan kalktı — kanıt bu. Kalan ~500 ms ölçümün
+yapıldığı konteynerin ağ mesafesi (tek başına TCP el sıkışması 300 ms), sunucu
+işi değil. AVIF desteklemeyen tarayıcı kaynak webp'e düşüyor, hiçbir kayıp yok.
+
 ---
 
 ### ⏳ Faz 2 — Supabase ve kimlik
