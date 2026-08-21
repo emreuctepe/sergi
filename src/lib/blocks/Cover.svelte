@@ -4,12 +4,13 @@
 -->
 <script lang="ts">
 	import LeafMark from '$lib/art/LeafMark.svelte';
-	import { getIssueContext } from '$lib/content/context';
+	import { issueContext } from '$lib/content/context';
 	import type { BlockAttrs } from './attrs';
 
 	let { ...attrs }: BlockAttrs = $props();
 
-	const issue = getIssueContext();
+	const readIssue = issueContext();
+	const issue = $derived(readIssue());
 	const no = $derived(String(issue.number).padStart(2, '0'));
 </script>
 

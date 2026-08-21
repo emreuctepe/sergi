@@ -20,7 +20,7 @@
 	import { setIssueContext } from '$lib/content/context';
 	import { BLOCK_TYPES, type Block as BlockType, type Page } from '$lib/content/types';
 
-	setIssueContext(content.issue);
+	setIssueContext(() => content.issue);
 
 	const ISSUE = content.issue.slug;
 

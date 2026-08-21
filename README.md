@@ -143,3 +143,42 @@ pnpm dev            # → http://localhost:5173/dev/bloklar
 Katalog örnekleri **sayının kendi içeriğinden** alıyor (uydurma "lorem" yok) ve
 tipe değil *çeşide* göre gruplanıyor: `h1 · big`, `list · dict`, `kicker · invert`
 gibi 29 kart. Kartlar küçültülmüş birer tuval, çünkü blok ölçülerinin hepsi `cqi`.
+
+---
+
+## Tuval
+
+Sayının okunduğu yer: `/sayi/2026-09`. [`src/lib/canvas/`](src/lib/canvas/) —
+3:4 kabuk, dikey snap, letterbox bantları, klavye ve sahne tetikleme.
+
+Aritmetik DOM'dan ayrı duruyor ([`geometry.ts`](src/lib/canvas/geometry.ts)):
+letterbox eşiği, okunan sayfanın seçimi, ilerleme yüzdesi, ileri/geri adımı —
+hepsi girdi sayı çıktı sayı, hepsi tarayıcısız test edilebilir. Bileşene kalan
+iş ölçmek ve yazmak.
+
+İki kural kolay unutuluyor:
+
+- **Sayfalar `data-inview="true"` doğar.** Giriş animasyonları `opacity: 0` ile
+  başlıyor; "false" ile doğan bir sayfayı açacak JavaScript çalışmazsa dergi
+  bomboş açılır. Tuval yalnızca ekranın altında kalanları gizleyip gözlemciye
+  verir — yani animasyon bir eklenti, bir şart değil.
+- **Sayfa ölçüleri (`metrics`) reaktif değildir.** `$state` yapıldığında ölçüm
+  effect'i kendi kendini tetikleyip `effect_update_depth_exceeded` ile bütün
+  effect'leri düşürüyor: sayfa çizilir, kaydırma ve folio ölü doğar.
+
+### Uçtan uca testler
+
+```sh
+pnpm exec playwright test        # tarayıcı kuruluysa
+pnpm test:e2e                    # tarayıcıyı da kurar
+```
+
+[`e2e/tuval.e2e.ts`](e2e/tuval.e2e.ts) üretim derlemesini gerçek bir tarayıcıda
+gezer. Tuvalin üç can damarı — `requestAnimationFrame`, `IntersectionObserver`,
+yumuşak kaydırma — yalnızca BOYAYAN bir tarayıcıda çalışıyor; gömülü önizleme
+panelleri boyamadığı için orada tuval "bozuk" görünür. Doğrulama buradan geçer.
+
+⚠️ Testlerden biri "taşma yok" demiyor, **bilinen taşma listesini** sabitliyor:
+üç sayfa (`km-acilis`, `km-imza`, `son-kunye`) tuvale sığmıyor ve altları
+kırpılıyor. Prototip de birebir aynı üç sayfada taşıyor — devralınmış bir
+içerik borcu, yayın öncesi kapanacak (bkz. BUILD-TODO "karar bekleyen sorular").

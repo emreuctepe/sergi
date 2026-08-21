@@ -11,10 +11,10 @@ kararları için [YORUM-SISTEMI.md](YORUM-SISTEMI.md).
 
 | | |
 |---|---|
-| **Aktif adım** | Faz 1 — tuval, bloklar, içerik (**1a+1b+1c bitti**, sırada 1d) |
-| **Son tamamlanan** | **1c — bloklar**: 19 bileşen, `/dev/bloklar` kataloğu, satır içi biçimleme |
-| **Sonraki dosya** | `src/lib/canvas/` — letterbox, dock ölçüsü, snap, IntersectionObserver, klavye |
-| **Çalışır durum** | `pnpm dev` → http://localhost:5173/dev/bloklar · `pnpm run lint` · `pnpm run check` · `pnpm test:unit` (206 test) hepsi yeşil |
+| **Aktif adım** | Faz 1 — tuval, bloklar, içerik (**1a–1d bitti**, sırada 1e) |
+| **Son tamamlanan** | **1d — tuval**: `/sayi/2026-09` açılıyor, sayı baştan sona okunuyor |
+| **Sonraki dosya** | `src/lib/art/` — 22 SVG sahne + `photo()` (`scene:`/`photo:` sayfaları şu an kâğıt zeminde açılıyor) |
+| **Çalışır durum** | `pnpm dev` → http://localhost:5173/sayi/2026-09 · `lint` · `check` · `test:unit` (229 test) · `test:e2e` (12 test) hepsi yeşil |
 
 **Ortam notu:** Node 22 LTS gerekiyor (Vite 8 Node 20+ istiyor). Konteynerde
 `/usr/local` altına kuruldu, `pnpm` corepack ile geldi. Node 18 ile çalışmaz.
@@ -81,7 +81,9 @@ Backend yok; sayı baştan sona okunuyor. **1.0'ın en büyük tek teslimatı.**
 - [x] **1c** `inline.ts` — `*italik*`, `**kalın**`, `` `kod` ``, `[bağ](url)`;
       dizgi değil JETON döndürüyor, yani `{@html}` yok
 - [x] **1c** `/dev/bloklar` katalog rotası — 29 çeşit, küçültülmüş tuvallerde
-- [ ] **1d** `canvas/` — letterbox, dock ölçüsü, snap, IntersectionObserver, klavye
+- [x] **1d** `canvas/` — letterbox, dock ölçüsü, snap, IntersectionObserver, klavye
+- [x] **1d** `/sayi/[slug]` rotası — sayı baştan sona okunuyor
+- [x] **1d** Uçtan uca testler (Playwright): gezinme, sahne tetikleme, taşma denetimi
 - [ ] **1e** `art/` — 22 SVG sahne + `photo()`
       (`rule`, `leafMark`, Shorts rozeti ve manga karesinin işaretlemesi 1c'de geldi)
 - [ ] **1f** Derinlik: `estimateMinutes()`, mod seçici, konum koruma
@@ -112,6 +114,13 @@ ters çevrilmiş 6 blok kataloğun içinde görünüyor. Testler 57 → **206**:
 prototiple satır içi biçimleme paritesi (87 metin + 20 kenar durumu) ve 19
 tipin sözleşmesi. İki bite testi yapıldı: dağıtıcıdan bir dal silinince hem
 `check` hem test kırmızı yanıyor, alt birim kimliği bir kayınca üç test düşüyor.
+**1d'de doğrulandı:** Sayı gerçek bir tarayıcıda baştan sona okundu (Playwright,
+üretim derlemesi): 28 sayfa, klavyeyle gezinme, folio, ilerleme çubuğu, letterbox
+iki kırılımda, ve **hiçbir sayfa gizli kalmadan** açılıyor. 12 uçtan uca test.
+Gömülü önizleme panelinde doğrulanamadı — o panel sayfayı boyamıyor, dolayısıyla
+`requestAnimationFrame` ve `IntersectionObserver` orada hiç çalışmıyor; tuvalin
+doğrulaması gerçek bir tarayıcı gerektiriyor.
+
 
 ---
 
@@ -189,14 +198,23 @@ Kod değil, karar. İkisi de çözülmeden 1.0 çıkamaz.
 1. **Eş okuma varsayılan mı, kapalı mı?** (YORUM-SISTEMI §7.1) Öneri: kapalı.
 2. **Prototip URL'i yayından sonra kalsın mı?** Öneri: kalsın, `noindex` + üstte bant.
 3. **Yorum düzenleme yok, silme var** — 1.0 sadeliği için kabul mü?
-4. **`fit:contain` taşma denetimi** derleyici yokken nasıl? Öneri: Playwright'ta iki
-   ekran ölçüsünde 29 sayfayı gez, `scrollHeight > clientHeight` olan `contain`
-   sayfa varsa kırmızı. *(1c'de ölçüm elle yapıldı — katalogdaki 29 kartın hiçbiri
-   taşmıyor. Ama katalog sayfa başına TEK blok gösteriyor; asıl soru sayfanın
-   tamamı çizilince ne olduğu ve o 1d'nin işi.)*
+4. ~~**`fit:contain` taşma denetimi** derleyici yokken nasıl?~~ **Kapandı (1d).**
+   Playwright iki ekran ölçüsünde bütün sayfaları ölçüyor (`e2e/tuval.e2e.ts`).
+   Cevap acı: **üç sayfa taşıyor** — `km-acilis`, `km-imza`, `son-kunye`. Sayfa
+   `overflow: hidden` olduğu için metnin altı KIRPILIYOR ve hiçbir belirti yok.
+   Gerileme değil, devralınan bir borç: prototip 1280×1000'de birebir aynı üç
+   sayfada taşıyor (817/811/1343 → 747). Test şimdilik bu listeyi sabitliyor;
+   düzeltmesi editöryel (aşağıda 6. madde).
 5. **`min` modun vaadi zayıf:** `sozluk`, `gece-hatti` ve manga hiç kısalmıyor;
    gerçek ayrışma yalnız `kizil-mevsim` + `soylesi`'de. Editöryel iş: ya min sürümleri
    yazılacak ya vaat dürüstleştirilecek.
+6. **Taşan üç sayfa nasıl düzelecek?** (4. maddenin devamı) Üç seçenek:
+   `fit: 'scroll'`e almak (en ucuz, ama `son-kunye` 1343px — o sayfa tuvalde
+   bir sayfa olmayı hak etmiyor), metni kısaltmak, ya da sayfayı ikiye bölmek.
+   Karar içeriğe dokunmayı gerektiriyor: `src/content/` klasörünün sahibi
+   `tools/tasi-icerik.mjs`, yani düzeltme ya prototipte yapılıp yeniden
+   taşınacak ya da script'in ömrü bitirilecek. **Yayın öncesi kapanmalı** —
+   şu an okur, üç sayfanın altını hiç göremiyor.
 
 ---
 
@@ -234,3 +252,9 @@ Kod değil, karar. İkisi de çözülmeden 1.0 çıkamaz.
 | 1.18 | 🐞 `%sveltekit.body%` doğrudan `<body>` içindeydi | Katalog sayfası iframe'de çalışıyor, sekmenin kendisinde BOMBOŞ geliyordu. Sebep: `<body>`ye dışarıdan sokulan bir düğüm hidrasyon sırasını kaydırıyor, Svelte "hydration_mismatch" deyip ağacı temizliyor. Bu, eklentisi olan gerçek okurların da başına gelirdi. `<div style="display: contents">` ile sarıldı |
 | 1.19 | 🐞 Katalog kartı `--canvas-h`yi `auto` bırakmıştı | Manga "plan" sayfası kartta taşıyordu. `blocks.css` sayfanın boyunu `calc(var(--canvas-h) - …)` ile hesaplıyor; `auto` orada geçersiz bir calc üretiyor. Tuvalin sözleşmesi bir UZUNLUK vermek — `aspect-ratio` ile idare etmek onu bozdu. Bloklarda hata yoktu, ölçen kaptaydı |
 | 1.20 | Katalog "tip"e değil "ÇEŞİT"e göre kuruldu | İlk hâli her tipin sayıdaki ilk örneğini gösteriyordu ve sayıdaki ilk `h1` düz, ilk `list` madde listesiydi: `h1--big` ve sözlük katalogda hiç görünmüyordu. Yani kapsadığını sandığı yüzeyin yarısını kaçırıyordu. Artık ayırt edici bayrakların her bileşimi ayrı bir kart — 19 tip, 29 çeşit |
+| 1.21 | Tuval aritmetiği DOM'dan ayrıldı (`geometry.ts`) | Prototipte letterbox eşiği, sayfa seçimi ve adım hesabı olay dinleyicilerinin gövdesindeydi: "eşik doğru mu?" sorusunu sormanın tek yolu pencereyi sürüklemekti. Girdi sayı, çıktı sayı olunca her eşiğin iki yanı da yazılabildi (23 test) |
+| 1.22 | 🐞 `metrics` `$state`ti ve tuvali FELÇ ediyordu | Ölçüm effect'i aynı diziye hem yazıp hem okuyordu → sonsuz döngü → Svelte `effect_update_depth_exceeded` atıp effect'leri bırakıyor. Sayfa çiziliyor ama kaydırma, folio ve ilerleme ölü doğuyor; konsolda tek satır, ekranda hiçbir belirti. Dizi zaten yalnız olay işleyicilerinde okunuyor — reaktif olmaması döngüyü baştan imkânsız kılıyor |
+| 1.23 | `data-inview` "true" doğuyor, "false" değil | Giriş animasyonları `opacity: 0` ile başlıyor. "false" ile doğan bir sayfa, kendisini açacak JS herhangi bir sebeple çalışmazsa (betik yok, IntersectionObserver yok, sekme hiç boyanmamış) SONSUZA KADAR görünmez kalır. Prototip tam da öyleydi: `if (!('IntersectionObserver' in window)) return;` — eski tarayıcıda dergi bomboş. Sıra tersine çevrildi: sayfalar görünür doğuyor, tuval yalnız ekranın altındakileri gizleyip gözlemciye veriyor |
+| 1.24 | 🐞 Hızlı basılan tuşların üçte ikisi yutuluyordu | `scrollTo({behavior:'smooth'})` hemen bitmiyor; ikinci basış yol yarıdayken geldiğinde `current` hâlâ eski sayfaydı ve basış aynı sayfayı yeniden hedefliyordu. Uçtan uca testte 27 basış 10 sayfa ilerletti. Gezinme artık hedefi anında yazıyor; kaydırma konumunun sözü animasyon oturunca geçerli |
+| 1.25 | Uçtan uca testler ÜRETİM derlemesine bakıyor | Tuvalin üç can damarı (rAF, IntersectionObserver, yumuşak kaydırma) yalnızca BOYAYAN bir tarayıcıda çalışıyor — gömülü önizleme paneli boyamıyor ve orada tuval "bozuk" görünüyordu. Playwright hem gerçek tarayıcı hem gerçek derleme: dev sunucusunda çalışıp derlemede kırılanı yayın günü öğrenmek istemiyoruz |
+| 1.26 | Taşma denetimi "0 taşma" değil, BİLİNEN LİSTE sabitliyor | Üç sayfa taşıyor ve prototip birebir aynı üçünde taşıyor — yani devralınan borç. "0 bekle" demek testi kalıcı kırmızıya, "hiç bakma" demek borcu görünmezliğe mahkûm ederdi. Liste büyürse de küçülürse de kırmızı yanıyor |

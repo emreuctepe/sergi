@@ -96,6 +96,11 @@
 			İlerleme: <code>docs/BUILD-TODO.md</code>
 		</p>
 		<p>
+			Sayı baştan sona okunuyor: <a href={resolve('/sayi/[slug]', { slug: '2026-09' })}
+				>Kızıl Mevsim</a
+			> — 28 sayfa, 3:4 tuvalde.
+		</p>
+		<p>
 			19 blok tipi hazır: <a href={resolve('/dev/bloklar')}>blok kataloğu</a> — sayının kendi içeriğinden
 			29 çeşit, küçültülmüş tuvallerde.
 		</p>
