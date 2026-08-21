@@ -11,10 +11,10 @@ kararları için [YORUM-SISTEMI.md](YORUM-SISTEMI.md).
 
 | | |
 |---|---|
-| **Aktif adım** | Faz 1 — tuval, bloklar, içerik |
-| **Son tamamlanan** | **Faz 0 — iskelet** (SvelteKit + CSS taşıması + marka kaynağı) |
-| **Sonraki dosya** | `src/lib/content/types.ts` — içerik tipleri |
-| **Çalışır durum** | `pnpm dev` → http://localhost:5173 · `pnpm run lint` · `pnpm run check` · `pnpm test:unit` hepsi yeşil |
+| **Aktif adım** | Faz 1 — tuval, bloklar, içerik (**1a bitti**, sırada 1b) |
+| **Son tamamlanan** | **1a — içerik taşındı**: 9 bölüm / 29 sayfa / 90 blok / 19 tip, hepsi tipli |
+| **Sonraki dosya** | `src/lib/content/validate.ts` — çalışma anı doğrulaması + `blockids.lock.json` |
+| **Çalışır durum** | `pnpm dev` → http://localhost:5173 · `pnpm run lint` · `pnpm run check` · `pnpm test:unit` (23 test) hepsi yeşil |
 
 **Ortam notu:** Node 22 LTS gerekiyor (Vite 8 Node 20+ istiyor). Konteynerde
 `/usr/local` altına kuruldu, `pnpm` corepack ile geldi. Node 18 ile çalışmaz.
@@ -34,6 +34,9 @@ Bunlar tartışıldı ve kapandı; yeniden açmak için yeni bir sebep gerekir.
 | Alıntı kartı PNG | **Kapsam dışı** |
 | Editör analitik paneli | **Kapsam içi**, ama gerçek olay verisiyle |
 | İçerik biçimi | **Tipli TS dosyaları.** Markdown derleyicisi 2. sayıya ertelendi |
+| Blok kimliği | **Veri, türetme değil.** Biçim prototipteki gibi `sayfaId:index` — eski ankrajlar geçerli kalsın diye |
+| Uydurma bulmaca istatistikleri | **Taşınmıyor.** Tohum yorumlarla aynı gerekçe: sahte sayıyı gerçek gibi göstermiyoruz |
+| Varlık yolları | `img:assets/…` prototiptekiyle aynı → `static/assets/`. `assets/` atılsaydı `/2026-09` sayı rotasıyla çakışırdı |
 | Yığın | SvelteKit + Svelte 5 + TS + Supabase + Resend + Cloudflare Pages |
 | Depo | **Monorepo değil**, tek uygulama. Klasör sınırları gelecekteki paketleri taklit eder |
 | Marka adı | `src/lib/brand.ts` tek kaynak; koda gömülmez |
@@ -66,11 +69,11 @@ Bunlar tartışıldı ve kapandı; yeniden açmak için yeni bir sebep gerekir.
 
 Backend yok; sayı baştan sona okunuyor. **1.0'ın en büyük tek teslimatı.**
 
-- [ ] **1a** `src/lib/content/types.ts` — `Issue → Section → Page[] → Block[]`
-- [ ] **1a** Taşıma script'i: `prototype/js/issues/2026-09.js` → `src/content/2026-09/`
+- [x] **1a** `src/lib/content/types.ts` — `Issue → Section → Page[] → Block[]`
+- [x] **1a** Taşıma script'i: `prototype/js/issues/2026-09.js` → `src/content/2026-09/`
       **açık blok kimlikleriyle** (90 blok / 29 sayfa / 19 tip)
-- [ ] **1b** `validate.ts` + `content.test.ts`: benzersiz kimlik, kayıtlı blok tipi,
-      geçerli `depth`/`fit`, var olan `img:` yolu
+- [ ] **1b** `validate.ts`: kayıtlı blok tipi, geçerli `depth`/`fit`,
+      var olan `img:` yolu (dosya denetimi 1e'deki varlık taşımasından sonra açılır)
 - [ ] **1b** `blockids.lock.json` — kimlik silinirse CI kırmızı yanar
 - [ ] **1c** 19 blok bileşeni (`term` ve `rtlhint` taşınmıyor — yalnız 2026-10'da)
 - [ ] **1d** `canvas/` — letterbox, dock ölçüsü, snap, IntersectionObserver, klavye
@@ -83,6 +86,11 @@ Backend yok; sayı baştan sona okunuyor. **1.0'ın en büyük tek teslimatı.**
 
 **Doğrulama:** 29 sayfa telefonda ve masaüstünde akıcı; min 18 / mid 24 / full 28
 sayfa; mod değişince okunan yer kaybolmuyor; `prefers-reduced-motion` sadeleşiyor.
+
+**1a'da doğrulandı:** `src/content/2026-09/parity.test.ts` taşınan sayıyı
+prototiple her çalıştırmada karşılaştırıyor (11 test). Sayımlar tuttu: 9 bölüm,
+29 sayfa, 90 blok, 19 tip, 90 benzersiz blok kimliği. `pnpm run check` 390 dosya
+0 hata. Test bilerek bozulan bir cümlede kırmızı yandığı görüldü — yani ısırıyor.
 
 ---
 
@@ -183,3 +191,8 @@ Kod değil, karar. İkisi de çözülmeden 1.0 çıkamaz.
 | 0.8 | `@layer` ile kaskad sırası beyan edildi | Prototipte sıra `index.html`'deki `<link>` sırasına bağlıydı — bir satır kayarsa tema bozulurdu. Artık sıra kaskadın kendisinde |
 | 0.9 | 🐞 Sonda tuvalinde `--pad-page` dolgusu container'ın kendisine verilmişti | Bir öğe kendi container'ı olamaz → `cqi` viewport'a düşüyor, dolgu 28px yerine 102px oldu. Dolgu içteki katmana alındı (gerçek yapı da `.canvas > .page__inner`) |
 | 0.10 | 🐞 Faz 0 sayfası zemine doğrudan yazıyordu | `base.css` gövdeye koyu `--backdrop` ve `overflow:hidden` veriyor (kaydırma tuvalin içinde olmalı). Aydınlık temada `--ink` okunmuyordu ve sayfanın altı erişilemezdi. Sayfa kendi kâğıt yüzeyini kurup kendi içinde kaydırıyor |
+| 1.1 | `types.ts` — 19 blok `t` üzerinden ayrımlı birlik | Blok bileşenlerini yazarken `switch (b.t)` tam kapsam denetimine giriyor: yeni tip ekleyip bir yerde unutmak derleme hatası. `term`/`rtlhint` bilerek dışarıda (yalnız 2026-10) |
+| 1.2 | Taşıma elle değil script'le (`tools/tasi-icerik.mjs`) | 90 blok elle kopyalanırsa kayan tek bir tırnak içeriği sessizce bozar ve diff'te kaybolur. Script prototipi sahte bir `window` altında çalıştırıp çıktıyı Prettier'dan geçiriyor — sonuç yeniden üretilebilir |
+| 1.3 | Blok kimliği türetilmekten çıkıp veri oldu | Prototipte kimlik çizim anında `page.id + ":" + i`'den geliyordu: bir blok yer değiştirince ona bağlı yorumlar sessizce komşu paragrafa kayıyordu. Artık dosyada yazılı; taşımak bilinçli bir karar |
+| 1.4 | Bulmacaların `stats` alanı düşürüldü | `plays: 1284`, `firstTryRate: 0.34`… hepsi uydurmaydı. İçerik dosyasında durmaları onları gerçek istatistik gibi sunmak olurdu. Gerçek sayılar Faz 4'te `puzzle_stats`'tan |
+| 1.5 | İçerik parite testi (11 test) | CSS'te işe yarayan sözleşmenin aynısı: taşınan sayı her çalıştırmada script çıktısıyla karşılaştırılıyor. Bilerek bozulan bir cümleyle kırmızı yandığı doğrulandı. 1.0 "tek sayı, bugünkü hâliyle" kararına dayanıyor — içerik editöryel olarak açılırsa test silinir |

@@ -77,3 +77,30 @@ dosya `FORKED` listesine nedeniyle yazılır. Prettier bu klasöre girmez.
 İki ölçek var: tuval içi her şey `cqi` (3:4 tuvalin genişliğine göre), tuval
 dışı arayüz `px`/`clamp`. Ayrıntı [`tokens.css`](src/lib/styles/tokens.css)
 başındaki notta.
+
+---
+
+## İçerik
+
+Bir sayının şekli tek yerde: [`src/lib/content/types.ts`](src/lib/content/types.ts)
+— `Issue → Section → Page[] → Block[]`, 19 blok tipi `t` alanı üzerinden ayrımlı
+bir birlik. Markdown derleyicisi yok; 1.0 tek sayı yayınlıyor ve o sayı tipli TS
+dosyalarında yaşıyor.
+
+Sayının kendisi [`src/content/2026-09/`](src/content/2026-09/) altında: künye +
+tanıtım + bulmacalar `issue.ts`'te, dokuz bölüm `sections/NN-*.ts`'te, sıra
+`index.ts`'te. **O klasörün sahibi `tools/tasi-icerik.mjs`** — prototipten
+üretiyor ve her çalıştığında klasörü sıfırdan yazıyor, elle dosya konmaz:
+
+```sh
+node tools/tasi-icerik.mjs 2026-09
+```
+
+Taşımanın prototipten sapmadığı bir testle korunuyor
+([`parity.test.ts`](src/lib/content/parity.test.ts)) — CSS'teki parite testiyle
+aynı sözleşme.
+
+Her blok **açık bir kimlik** taşıyor (`km-1:3` = `sayfaId:index`). Bu kimlik
+yorum ankrajının dayanağı: bir bloğu taşımak ona bağlı yorumları da taşır, o
+yüzden kimlikler içerik düzenlenirken elle korunur
+([YORUM-SISTEMI §2.1](docs/YORUM-SISTEMI.md)).
