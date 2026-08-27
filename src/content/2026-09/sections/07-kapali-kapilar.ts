@@ -86,7 +86,7 @@ export const kapaliKapilar: Section = {
 							text: [
 								{
 									text: 'sadece gerçekten gelmek isteyenler gelebilir…',
-									at: { top: '-13%', left: '10%', width: '104%' }
+									at: { top: '0%', left: '70%', width: '104%' }
 								},
 								{ text: 'ya kimse gelmezse?', at: { bottom: '8%', left: '16%', width: '56%' } }
 							]

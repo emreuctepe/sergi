@@ -198,7 +198,19 @@ export const soylesi: Section = {
 					id: 'sy-6:1',
 					who: 'a',
 					name: 'KargaManga',
-					text: 'Kendi tarzımı oluşturmaya başladığım süreçte çizimlerini çok beğendiğim, incelediğim ve örnek almaya çalıştığım birçok mangaka oldu. Bunlardan bazıları Masashi Kishimoto, Junji Ito, Takeshi Obata ve Murata Yusuke diyebilirim. Bu mangakaların eserleri hem okumaya hem de örnek almaya değer.'
+					/* Dört mangaka adı Vikipedi'ye bağlandı: okur için bu isimler
+					   bir sonraki adımın kendisi, aramaya göndermenin anlamı yok.
+
+					   ⚠️ Üçü Türkçe Vikipedi, Murata İNGİLİZCE — Türkçesi yok
+					   (`Yusuke Murata`, `Yūsuke Murata`, `Murata Yusuke` üç yazım
+					   da boş; API ile bakıldı). Türkçesi açılırsa bu bağ da
+					   tr'ye döner.
+
+					   Bağ metinleri röportajın kendi sözleri: metin "Murata
+					   Yusuke" diyor (Japonca sıra), Vikipedi maddesi "Yusuke
+					   Murata". Adres maddeye gider, GÖRÜNEN ad konuşanın
+					   yazdığı gibi kalır — alıntıyı düzeltmek bize düşmez. */
+					text: 'Kendi tarzımı oluşturmaya başladığım süreçte çizimlerini çok beğendiğim, incelediğim ve örnek almaya çalıştığım birçok mangaka oldu. Bunlardan bazıları [Masashi Kishimoto](https://tr.wikipedia.org/wiki/Masashi_Kishimoto), [Junji Ito](https://tr.wikipedia.org/wiki/Junji_Ito), [Takeshi Obata](https://tr.wikipedia.org/wiki/Takeshi_Obata) ve [Murata Yusuke](https://en.wikipedia.org/wiki/Yusuke_Murata) diyebilirim. Bu mangakaların eserleri hem okumaya hem de örnek almaya değer.'
 				},
 				{
 					t: 'figure',
