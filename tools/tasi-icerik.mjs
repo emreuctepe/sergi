@@ -24,11 +24,17 @@
       bulunur, `bleed` yalnızca `full` iken.
    4. `DUSEN_SAYFALAR`'daki sayfalar DÜŞÜRÜLÜR. Gerekçe listenin başında.
 
-   ⚠️ ÇIKTI KLASÖRÜNÜN SAHİBİ BU SCRIPT. `src/content/<slug>/` her çalıştırmada
-   SİLİNİP yeniden yazılır — oraya elle bir dosya koymak onu kaybetmektir (bir kez
-   denendi: parite testi oraya konmuştu, ikinci çalıştırma sildi. Test artık
-   src/lib/content/parity.test.ts'te). İçeriğin kendisi elle düzenlenebilir, ama
-   o gün bu script'in ömrü biter; düzenlemeler `git status` temizken yapılır.
+   ⛔ BU SCRIPT'İN ÖMRÜ BİTTİ — ARTIK ÇALIŞTIRMA.
+   Başındaki uyarı "içeriğin kendisi elle düzenlenebilir, ama o gün bu script'in
+   ömrü biter" diyordu. O gün geldi: "Fener Ustası" uydurma söyleşisinin yerine
+   KargaManga ile yapılmış gerçek röportaj yazıldı ve `src/content/2026-09/`
+   elle bakımlı hâle geçti (bkz. docs/BUILD-TODO.md karar 1.42). Bugün
+   çalıştırılırsa klasörü SİLİP prototipten yeniden yazar, yani o röportajı
+   ve `figure` bloklarını götürür.
+
+   Dosya tarih kaydı olarak duruyor: taşımanın ne yaptığı ve neyi bilerek
+   düşürdüğü (`DUSEN_SAYFALAR`) burada yazılı. Prototiple parite testi de
+   silindi; kalan bütünlük testi src/lib/content/integrity.test.ts'te.
 
    ÇIKTI TEK YÖNLÜ: prototipe geri yazılmaz.
    ========================================================================= */

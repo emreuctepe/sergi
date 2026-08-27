@@ -43,15 +43,17 @@ describe('2026-09 doğrulaması', () => {
 	});
 
 	it('üç okuma modu da söz verdiği sayfa sayısını üretiyor', () => {
-		/* min 17 / mid 22 / full 25 — mod seçim kartlarındaki vaadin sayısal
+		/* min 19 / mid 26 / full 30 — mod seçim kartlarındaki vaadin sayısal
 		   karşılığı. Bir sayfanın `depth`i değişirse burada görünür.
 
 		   Sayılar 18/24/28'di: "Gece Hattı"nın çekilmemiş üç karesi düşünce
-		   üçü de indi (gh-2 `all`, gh-3 `mid`+`full`, gh-4 yalnız `full`).
-		   Gerekçe: tools/tasi-icerik.mjs → DUSEN_SAYFALAR. */
-		expect(flow(content, 'min')).toHaveLength(17);
-		expect(flow(content, 'mid')).toHaveLength(22);
-		expect(flow(content, 'full')).toHaveLength(25);
+		   17/22/25'e indi (gh-2 `all`, gh-3 `mid`+`full`, gh-4 yalnız `full`;
+		   gerekçe: tools/tasi-icerik.mjs → DUSEN_SAYFALAR). Sonra söyleşi
+		   4 sayfadan 9'a çıktı — her soru-cevap kendi snap'ine ayrıldı — ve
+		   bölümün ayak izi 2/3/4'ten 4/7/9'a genişledi (karar 1.42). */
+		expect(flow(content, 'min')).toHaveLength(19);
+		expect(flow(content, 'mid')).toHaveLength(26);
+		expect(flow(content, 'full')).toHaveLength(30);
 	});
 });
 
@@ -97,19 +99,28 @@ describe('blok kimliği kilidi', () => {
    ======================================================================= */
 
 describe('görsel yolları', () => {
-	/** İçerikte adı geçen bütün dosya yolları — sayfa arka planı, manga karesi, logo. */
+	/**
+	 * İçerikte adı geçen bütün dosya yolları — sayfa arka planı, `figure` bloğu,
+	 * manga karesi, logo.
+	 *
+	 * ⚠️ Yeni bir blok tipi görsel taşımaya başlarsa BURAYA da yazılmalı: bu küme
+	 * eksikse aşağıdaki iki denetim (dosya var mı, türevi üretilmiş mi) o görseli
+	 * hiç görmez ve sessizce geçer.
+	 */
 	const referenced = new Set<string>();
 	for (const page of pages) {
 		if (page.bg?.startsWith('img:')) referenced.add(page.bg.slice(4));
 		for (const block of page.blocks) {
+			if (block.t === 'figure') referenced.add(block.img);
 			if (block.t !== 'manga') continue;
 			if (block.mark?.img) referenced.add(block.mark.img);
 			for (const panel of block.panels) if (panel.img) referenced.add(panel.img);
 		}
 	}
 
-	it('içerik 17 görsel dosyasına atıfta bulunuyor', () => {
-		expect(referenced.size).toBe(17);
+	it('içerik 26 görsel dosyasına atıfta bulunuyor', () => {
+		/* 17'ydi: söyleşi 8 çizim + 1 açılış banner'ı getirdi (karar 1.42). */
+		expect(referenced.size).toBe(26);
 	});
 
 	it.each([...referenced].sort())('static/%s var', (rel) => {
@@ -135,8 +146,10 @@ describe('görsel yolları', () => {
 		}
 	);
 
-	it('manifest 47 türev sayıyor', () => {
-		expect(turevListesi).toHaveLength(47);
+	it('manifest 59 türev sayıyor', () => {
+		/* 47'ydi: söyleşinin 8 çizimi birer boy (kaynakları 400px, upscale yok),
+		   banner'ı dört boy getirdi. */
+		expect(turevListesi).toHaveLength(59);
 	});
 
 	it.each(turevListesi.sort())('static/%s var', (rel) => {
@@ -327,6 +340,22 @@ describe('doğrulayıcı bozuk içeriği yakalıyor', () => {
 				} as never);
 			})
 		).toContain('"https://" ile başlamalı');
+	});
+
+	/* `figure` bloğunun alt metni manga karesindekiyle aynı borç — orada zorunlu
+	   olup burada isteğe bağlı olsaydı, söyleşinin sekiz çizimi ekran okuyucuya
+	   sekiz sessizlik olarak giderdi. */
+	it('alt metni olmayan figure bloğu', () => {
+		expect(
+			bozukta((c) => {
+				c.sections[0].pages[0].blocks.push({
+					t: 'figure',
+					id: 'ed-1:2',
+					img: 'assets/x.webp',
+					alt: '  '
+				} as never);
+			})
+		).toContain('alt metni yok');
 	});
 
 	it('alt metni olmayan manga karesi', () => {

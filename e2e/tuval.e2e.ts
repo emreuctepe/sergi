@@ -20,10 +20,10 @@ import { expect, test, type Page } from '@playwright/test';
 
 const SAYI = '/sayi/2026-09';
 
-/** `full` modun vaadi (bkz. validate.test.ts: min 17 / mid 22 / full 25). */
-const SAYFA_SAYISI = 25;
+/** `full` modun vaadi (bkz. validate.test.ts: min 19 / mid 26 / full 30). */
+const SAYFA_SAYISI = 30;
 
-/** Folio biçimi: `01 / 25`. Sayı tek yerde dursun diye dizgi burada kuruluyor —
+/** Folio biçimi: `01 / 30`. Sayı tek yerde dursun diye dizgi burada kuruluyor —
     öncesinde her iddiada elle yazılıydı ve bir sayfa eklenince yedi yer kayıyordu. */
 const folioText = (n: number) => `${String(n).padStart(2, '0')} / ${SAYFA_SAYISI}`;
 

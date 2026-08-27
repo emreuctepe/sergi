@@ -6,8 +6,8 @@
    sayfada eksik bir paragraf ve hiçbir yerde bir hata. Buradaki iki soru bunun
    üstüne kurulu:
 
-     1. 19 tipin hepsinin bir bileşeni var mı? (`Block.svelte` dağıtıcısı)
-     2. Taşınan sayının 90 bloğunun 90'ı da çiziliyor ve ANKRAJINI taşıyor mu?
+     1. 20 tipin hepsinin bir bileşeni var mı? (`Block.svelte` dağıtıcısı)
+     2. Sayının 99 bloğunun 99'u da çiziliyor ve ANKRAJINI taşıyor mu?
 
    Bileşenler `svelte/server` ile sunucuda çiziliyor — tarayıcı kurmadan gerçek
    çıktıya bakmanın yolu bu. Aranan şey görünüm değil SÖZLEŞME: sınıf, ankraj
@@ -47,6 +47,7 @@ const SAMPLES = {
 	quote: { t: 'quote', id: 'x:0', text: 'Alıntı.', by: 'Biri' },
 	note: { t: 'note', id: 'x:0', text: 'Editör notu.' },
 	caption: { t: 'caption', id: 'x:0', text: 'Görsel altı.' },
+	figure: { t: 'figure', id: 'x:0', img: 'assets/x/01.webp', alt: 'çizim', caption: 'Altyazı.' },
 	rule: { t: 'rule', id: 'x:0' },
 	byline: { t: 'byline', id: 'x:0', author: 'Yazar', role: 'Rol', minutes: 4 },
 	stat: { t: 'stat', id: 'x:0', items: [{ v: '12', k: 'gün' }] },
@@ -211,15 +212,15 @@ describe('söyleşi', () => {
 /* ==========================================================================
    SAYININ TAMAMI
    --------------------------------------------------------------------------
-   Asıl test bu: 87 bloğun 87'si de çiziliyor mu, ankrajları eksiksiz mi?
+   Asıl test bu: 99 bloğun 99'u da çiziliyor mu, ankrajları eksiksiz mi?
    ======================================================================= */
 
 describe('2026-09 sayısının tamamı', () => {
 	const blocks = content.sections.flatMap((s) => s.pages.flatMap((p) => p.blocks));
 	const drawn = blocks.map((block, i) => draw(block, i));
 
-	it('87 blok', () => {
-		expect(blocks).toHaveLength(87);
+	it('99 blok', () => {
+		expect(blocks).toHaveLength(99);
 	});
 
 	it('hiçbiri boş çizilmiyor', () => {
@@ -237,6 +238,6 @@ describe('2026-09 sayısının tamamı', () => {
 	it('sayının bütün tipleri kullanımda (örnekler uydurma değil)', () => {
 		const used = new Set(blocks.map((b) => b.t));
 		expect([...used].sort()).toEqual([...used].sort().filter((t) => BLOCK_TYPES.includes(t)));
-		expect(used.size).toBe(19);
+		expect(used.size).toBe(20);
 	});
 });

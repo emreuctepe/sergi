@@ -7,7 +7,7 @@
      · iki sayfanın aynı kimliği taşıması
      · bir blok kimliğinin sayfasıyla uyuşmaması (`km-1:3` bloğu `km-2`'de)
      · `text: ''` — tip geçer, sayfada boşluk kalır
-     · `bg: 'img:…'` diyen bir sayfanın gösterdiği dosyanın olmaması
+     · `bg: 'img:…'` ya da bir `figure` bloğunun gösterdiği dosyanın olmaması
      · `bg: 'scene:…'` diyen bir sayfanın istediği sahnenin kayıtlı olmaması
      · `puzzlePool`'da olmayan bir bulmacanın adı
      · bir derinliğin hiç sayfa üretmemesi
@@ -118,6 +118,18 @@ function validateBlock(block: Block, page: Page, index: number, where: string): 
 			if (empty) add(`${i}. satırı boş.`);
 			problems.push(...linkProblems(typeof it === 'string' ? it : it.def, where));
 		});
+	}
+
+	if (block.t === 'figure') {
+		if (!block.img.trim()) add('görsel yolu boş.');
+		/* Manga karesindeki denetimin kardeşi: alt metni erişilebilirlik
+		   borcudur, sonra kapatılmaz. */
+		if (!block.alt.trim()) add('alt metni yok.');
+		if (block.caption !== undefined) {
+			if (!block.caption.trim()) add('`caption` boş.');
+			/* Altyazı `<Inline>`'dan geçiyor, yani içindeki bağ da `_blank` açılıyor. */
+			problems.push(...linkProblems(block.caption, where));
+		}
 	}
 
 	if (block.t === 'manga') {

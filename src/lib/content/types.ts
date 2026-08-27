@@ -77,7 +77,7 @@ export type SectionType =
 /* ==========================================================================
    BLOKLAR
    --------------------------------------------------------------------------
-   19 tip. Ayrım `t` alanından: `switch (block.t)` yazan her yer TypeScript
+   20 tip. Ayrım `t` alanından: `switch (block.t)` yazan her yer TypeScript
    tarafından tam kapsam denetimine girer — yeni tip ekleyip bir yerde
    unutmak derleme hatası olur.
 
@@ -154,6 +154,25 @@ export interface NoteBlock extends BlockBase {
 export interface CaptionBlock extends BlockBase {
 	t: 'caption';
 	text: string;
+}
+
+/**
+ * Metnin altına oturan tek görsel. Yol kökü `Background`'daki `img:` ile aynı
+ * (`assets/2026-09/…`), yani aynı dosyalar, aynı AVIF türevleri.
+ *
+ * Neden `bg: 'img:…'` yetmedi: o görseli SAYFANIN TAMAMINA seriyor ve metin
+ * üstünde yüzüyor. Söyleşinin istediği şey bunun tersi — soru-cevap okunur,
+ * altında görsel durur. Kaydırılan bir sayfada arka plan bunu yapamaz.
+ *
+ * `alt` isteğe bağlı değil: `manga` karesinde de zorunlu ve orada da
+ * doğrulayıcı ısırıyor (validate.ts). Erişilebilirlik borcu sonra kapanmıyor.
+ */
+export interface FigureBlock extends BlockBase {
+	t: 'figure';
+	img: string;
+	alt: string;
+	/** Görsel altı yazısı — verilmezse hiç basılmaz. */
+	caption?: string;
 }
 
 /** Süs çizgisi. İçerik taşımaz ama kendi kimliği vardır (yorumlanabilir). */
@@ -280,6 +299,7 @@ export type Block =
 	| QuoteBlock
 	| NoteBlock
 	| CaptionBlock
+	| FigureBlock
 	| RuleBlock
 	| BylineBlock
 	| StatBlock
@@ -302,6 +322,7 @@ export const BLOCK_TYPES = [
 	'quote',
 	'note',
 	'caption',
+	'figure',
 	'rule',
 	'byline',
 	'stat',

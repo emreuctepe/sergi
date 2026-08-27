@@ -2,7 +2,7 @@
 	/* ==========================================================================
 	   /dev/bloklar — BLOK KATALOĞU
 	   --------------------------------------------------------------------------
-	   19 blok tipinin hepsi, SAYININ GERÇEK İÇERİĞİNDEN alınmış örneklerle.
+	   20 blok tipinin hepsi, SAYININ GERÇEK İÇERİĞİNDEN alınmış örneklerle.
 	   Uydurma örnek metin kullanmıyoruz: `caption` bloğunun gerçek uzunluğu,
 	   `pull`ın gerçek satır sayısı ancak gerçek cümleyle görünür.
 

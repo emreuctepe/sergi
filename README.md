@@ -130,22 +130,21 @@ başındaki notta.
 ## İçerik
 
 Bir sayının şekli tek yerde: [`src/lib/content/types.ts`](src/lib/content/types.ts)
-— `Issue → Section → Page[] → Block[]`, 19 blok tipi `t` alanı üzerinden ayrımlı
+— `Issue → Section → Page[] → Block[]`, 20 blok tipi `t` alanı üzerinden ayrımlı
 bir birlik. Markdown derleyicisi yok; 1.0 tek sayı yayınlıyor ve o sayı tipli TS
 dosyalarında yaşıyor.
 
 Sayının kendisi [`src/content/2026-09/`](src/content/2026-09/) altında: künye +
 tanıtım + bulmacalar `issue.ts`'te, dokuz bölüm `sections/NN-*.ts`'te, sıra
-`index.ts`'te. **O klasörün sahibi `tools/tasi-icerik.mjs`** — prototipten
-üretiyor ve her çalıştığında klasörü sıfırdan yazıyor, elle dosya konmaz:
+`index.ts`'te. Klasör başlangıçta `tools/tasi-icerik.mjs` ile prototipten
+üretildi; **artık elle bakımlı** — söyleşi bölümü editöryel olarak yeniden
+yazıldığı gün script'in ömrü bitti (bkz. BUILD-TODO karar 1.42). Script'i
+tekrar çalıştırmak klasörü sıfırdan yazar ve o düzenlemeleri siler.
 
-```sh
-node tools/tasi-icerik.mjs 2026-09
-```
-
-Taşımanın prototipten sapmadığı bir testle korunuyor
-([`parity.test.ts`](src/lib/content/parity.test.ts)) — CSS'teki parite testiyle
-aynı sözleşme.
+Sayının kendi içinde tutarlılığı
+[`integrity.test.ts`](src/lib/content/integrity.test.ts)'te sabitleniyor:
+bölüm/sayfa/blok sayıları, kimlik biçimi, benzersizlik. (Prototiple BAYT BAYT
+parite yalnız CSS tarafında sürüyor.)
 
 Her blok **açık bir kimlik** taşıyor (`km-1:3` = `sayfaId:index`). Bu kimlik
 yorum ankrajının dayanağı: bir bloğu taşımak ona bağlı yorumları da taşır, o
@@ -165,7 +164,7 @@ olmayan görsel dosyası, sayı içine giden bir bağ. Sorun listesi döndürüy
 
 ## Bloklar
 
-19 blok tipinin her biri [`src/lib/blocks/`](src/lib/blocks/) altında bir Svelte
+20 blok tipinin her biri [`src/lib/blocks/`](src/lib/blocks/) altında bir Svelte
 bileşeni; hepsini [`Block.svelte`](src/lib/blocks/Block.svelte) dağıtıyor. Zincirin
 sonundaki `bilinmeyenTip(block: never)` kapsam denetimi: `types.ts`'e eklenip
 buraya yazılmayan bir tip `pnpm check`'i kırıyor. (Prototip aynı durumda konsola
@@ -264,7 +263,7 @@ zaten verimli sıkıştırılmış; ağırlık ince dokudan geliyor. Kazanç iki
 Hangi dosyanın hangi boyları olduğu
 [`gorsel-turevleri.json`](src/lib/content/gorsel-turevleri.json)'da yazılı ve
 bileşen bunu **tahmin etmiyor, okuyor**: eksik bir AVIF `<source>` ile eşleşip
-404 alır ve `<img>`e geri DÜŞMEZ — okur kırık görsel görür. 47 türevin her biri
+404 alır ve `<img>`e geri DÜŞMEZ — okur kırık görsel görür. 59 türevin her biri
 ayrı testle diskte aranıyor.
 
 Yeni görsel eklerken: dosyayı `static/assets/` altına koy, script'i çalıştır,

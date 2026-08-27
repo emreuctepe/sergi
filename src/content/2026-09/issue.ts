@@ -4,8 +4,9 @@
    Sayının künyesi, ilk ziyaretteki tanıtım kartları ve bulmaca havuzu.
    Bölümler ayrı dosyalarda: sections/NN-<slug>.ts
 
-   Üretildi: tools/tasi-icerik.mjs — elle düzenlenebilir, script yeniden
-   çalıştırılırsa üzerine yazar.
+   Başlangıçta tools/tasi-icerik.mjs üretti; klasör ARTIK ELLE BAKIMLI.
+   O script'i tekrar çalıştırmak bu klasörü silip prototipten yeniden yazar,
+   yani söyleşi bölümünü götürür (bkz. docs/BUILD-TODO.md karar 1.42).
    ======================================================================= */
 
 import type { IntroCard, Issue, Puzzle } from '$lib/content/types';

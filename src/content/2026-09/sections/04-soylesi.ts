@@ -1,7 +1,15 @@
 /* ==========================================================================
-   04 · FENER USTASI
+   04 · KARGAMANGA
    --------------------------------------------------------------------------
-   4 sayfa: sy-acilis, sy-1, sy-2, sy-3
+   9 sayfa: sy-acilis + sy-1…sy-8. Her soru-cevap KENDİ sayfasında, cevabın
+   altında o cevaba eşlik eden çizim.
+
+   Kaynak: KargaManga ile yapılan röportajın dizgi dosyası (iki sütunlu tek
+   sayfa). Oradan yalnız METİN ve GÖRSEL EŞLEŞMESİ alındı; sütun düzeni tuvale
+   girmiyor — tuval dikey ve snap'li, iki sütun orada okunmaz.
+
+   Bu bölüm sayının prototipten AYRILAN ilk yeri: yerine geçtiği "Fener Ustası"
+   uydurma bir söyleşiydi (bkz. docs/BUILD-TODO.md karar 1.42).
 
    Blok kimlikleri (`sayfaId:index`) yorum ankrajıdır — bir bloğu silmek
    ya da taşımak ona bağlı yorumları etkiler. Sıra değiştirirken
@@ -13,11 +21,11 @@ import type { Section } from '$lib/content/types';
 export const soylesi: Section = {
 	slug: 'soylesi',
 	type: 'interview',
-	title: 'Fener Ustası',
-	kicker: 'Söyleşi',
+	title: 'KargaManga',
+	kicker: 'Röportaj',
 	author: 'Emre',
-	minutes: 6,
-	tags: ['zanaat', 'portre'],
+	minutes: 5,
+	tags: ['manga', 'portre'],
 	pages: [
 		{
 			id: 'sy-acilis',
@@ -28,18 +36,25 @@ export const soylesi: Section = {
 			bg: 'scene:portrait',
 			scene: 'mask-wipe',
 			blocks: [
-				{ t: 'kicker', id: 'sy-acilis:0', text: 'Söyleşi', invert: true },
-				{
-					t: 'h1',
-					id: 'sy-acilis:1',
-					text: '“Kâğıt ışığı yumuşatır, cam sertleştirir”',
-					invert: true
-				},
+				{ t: 'kicker', id: 'sy-acilis:0', text: 'Röportaj', invert: true },
+				{ t: 'h1', id: 'sy-acilis:1', text: 'KargaManga Kimdir?', invert: true },
 				{
 					t: 'lead',
 					id: 'sy-acilis:2',
 					invert: true,
-					text: 'Kırk bir yıldır kâğıt fener yapan bir ustayla, atölyesinde.'
+					text: 'Küçük yaşlardan itibaren manga-anime kültürüne ilgi duyan ve zamanla kendisi de bu alanda eserler üretmeye çalışan bir çizer.'
+				},
+				/* Banner ARKA PLAN olarak denendi ve olmadı: 1707×282'lik bir şerit
+				   3:4 sayfaya `cover` ile oturunca ortasından dar bir dilim altı kat
+				   büyütülüyor — okunmayan, bulanık bir "AM" parçası kalıyor. Kendi
+				   oranında bir blok olarak duruyor; sayfanın arka planı yine
+				   `scene:portrait`. */
+				{
+					t: 'figure',
+					id: 'sy-acilis:3',
+					invert: true,
+					img: 'assets/2026-09/soylesi/banner.webp',
+					alt: 'KargaManga kanal afişi: fırça darbeleriyle yazılmış “KARGAMANGA” ve altında カルガマンガ.'
 				}
 			]
 		},
@@ -49,21 +64,24 @@ export const soylesi: Section = {
 			fit: 'scroll',
 			scene: 'fade-up',
 			blocks: [
-				{ t: 'dialog', id: 'sy-1:0', who: 'q', text: 'Kaç fener yaptınız?' },
+				{
+					t: 'dialog',
+					id: 'sy-1:0',
+					who: 'q',
+					text: 'Düzenli olarak içerik üretmenizdeki motivasyon nedir? Sürekliliği nasıl sağlıyorsunuz?'
+				},
 				{
 					t: 'dialog',
 					id: 'sy-1:1',
 					who: 'a',
-					name: 'Usta',
-					text: 'Bilmiyorum. Saymayı otuz yıl önce bıraktım. Ama her yıl aynı sayıda yapıyorum, yani sayabilirsin.'
+					name: 'KargaManga',
+					text: 'Çizim yapmak ve hikâyeler oluşturmak, hâlihazırda en keyif aldığım aktiviteler. Özellikle ortaya çıkardığım ürünün son hâlini görmenin verdiği tatmin duygusu, bir sonraki oluşturacağım içerik için beni heyecanlandırıyor. En büyük motivasyonumun ise içeriklerime ilgi duyan ve desteğini esirgemeyen insanların yorumlarını okumak olduğunu söyleyebilirim.'
 				},
-				{ t: 'dialog', id: 'sy-1:2', who: 'q', text: 'Neden aynı sayıda?' },
 				{
-					t: 'dialog',
-					id: 'sy-1:3',
-					who: 'a',
-					name: 'Usta',
-					text: 'Çünkü elim o kadarına yetiyor. Daha fazlasını yapsam, fazlası kötü olur. Kötü fener yapmak, fener yapmamaktan daha kötüdür.'
+					t: 'figure',
+					id: 'sy-1:2',
+					img: 'assets/2026-09/soylesi/01-motivasyon.webp',
+					alt: 'Taçlı bir kral, gülen bir çocuğun başını okşuyor.'
 				}
 			]
 		},
@@ -73,57 +91,182 @@ export const soylesi: Section = {
 			fit: 'scroll',
 			scene: 'fade-up',
 			blocks: [
-				{ t: 'pull', id: 'sy-2:0', text: '“Kötü fener yapmak, fener yapmamaktan daha kötüdür.”' },
+				{ t: 'dialog', id: 'sy-2:0', who: 'q', text: 'Nihai hedefiniz nedir?' },
 				{
 					t: 'dialog',
 					id: 'sy-2:1',
-					who: 'q',
-					text: 'Makineyle üretilenler için ne düşünüyorsunuz?'
+					who: 'a',
+					name: 'KargaManga',
+					text: 'Sanırım tek bir nihai hedefim yok. Genel olarak, hatırlanacak ve okuyucuyu etkisi altına alacak hikâyeler oluşturmak diyebilirim.'
 				},
 				{
-					t: 'dialog',
+					t: 'figure',
 					id: 'sy-2:2',
-					who: 'a',
-					name: 'Usta',
-					text: 'Güzeller. Cidden. Ucuzlar ve dayanıyorlar. Sorun onlarda değil, bizde: artık farkı görmüyoruz. Fark görülmeyince, fark yok demektir.'
-				},
-				{ t: 'dialog', id: 'sy-2:3', who: 'q', text: 'Fark ne peki?' },
-				{
-					t: 'dialog',
-					id: 'sy-2:4',
-					who: 'a',
-					name: 'Usta',
-					text: 'Kâğıt ışığı yumuşatır, cam sertleştirir. Bir odaya kâğıt fener koyduğunda insanlar daha alçak sesle konuşur. Bunu ölçemezsin ama olur.'
+					img: 'assets/2026-09/soylesi/02-hedef.webp',
+					alt: 'Kollarını havaya kaldırmış, gözleri kapalı sevinen bir çocuk.'
 				}
 			]
 		},
 		{
 			id: 'sy-3',
-			depth: ['full'],
+			depth: ['all'],
 			fit: 'scroll',
 			scene: 'fade-up',
 			blocks: [
-				{ t: 'dialog', id: 'sy-3:0', who: 'q', text: 'Devam edecek biri var mı?' },
+				{
+					t: 'dialog',
+					id: 'sy-3:0',
+					who: 'q',
+					text: 'Mangalara olan ilgin nasıl başladı ve nereye doğru gidiyor sence?'
+				},
 				{
 					t: 'dialog',
 					id: 'sy-3:1',
 					who: 'a',
-					name: 'Usta',
-					text: 'Yeğenim üç yıl geldi, sonra gitti. Kızmadım. Bu iş sabır değil, tekrar istiyor. Sabır romantiktir; tekrar sıkıcıdır. İnsanlar sıkıcı olanı sevmiyor.'
+					name: 'KargaManga',
+					text: 'Mangaya olan ilgim, Naruto serisiyle başladı. Onun sayesinde bu kültürle tanıştım ve sonrasında başka serilerle de deneyimimi sürdürdüm. İnsanların zihinlerindeki hikâyeleri çizerek bunları bu kadar güzel bir şekilde karşı tarafa aktarabildiğini görünce, “Ben de bunu yapmak istiyorum.” diyerek kendimi bu yönde geliştirdim. Tüketici olarak başladığım bu sektörde, üretici olmaya çalışarak devam ediyorum.'
 				},
-				{ t: 'dialog', id: 'sy-3:2', who: 'q', text: 'Siz nasıl dayandınız?' },
+				{
+					t: 'figure',
+					id: 'sy-3:2',
+					img: 'assets/2026-09/soylesi/03-baslangic.webp',
+					alt: 'Kareli defter kâğıdına çizilmiş iki profil, aralarında çiçek taçyapraklarının ortasında duran bir figür.'
+				}
+			]
+		},
+		{
+			id: 'sy-4',
+			depth: ['all'],
+			fit: 'scroll',
+			scene: 'fade-up',
+			blocks: [
 				{
 					t: 'dialog',
-					id: 'sy-3:3',
-					who: 'a',
-					name: 'Usta',
-					text: 'Ben de sevmedim. Sadece bırakmadım. İkisi farklı şeyler.'
+					id: 'sy-4:0',
+					who: 'q',
+					text: 'İçerikleriniz kitle kaygısı olmaksızın olumlu duygu ve düşünceler üzerine kurulu. Daha büyük kitlelere ulaşmak uğruna kitle memnun eden içeriklere yönelmektense kendi tarzınızda ilerlemek konusunda ne düşünüyorsunuz?'
 				},
-				{ t: 'rule', id: 'sy-3:4' },
+				{
+					t: 'dialog',
+					id: 'sy-4:1',
+					who: 'a',
+					name: 'KargaManga',
+					text: 'Sosyal medyada mizahi içeriklerin daha popüler olduğu bir gerçek. Genelde komik bir içerik gördüğünüzde bunu arkadaşlarınızla paylaşırsınız, bu da o videonun algoritmasını önemli derecede etkiler. Benim oluşturduğum içerikler ise biraz bunun dışında kalıyor. Başlangıçta bu yüzden, “Acaba mizahi içerikler mi üretmeliyim?” diye kendime sormadım değil. Çünkü geçmişte de absürt komedi tarzında içerikler yazıyordum ve bu daha büyük bir kitleye hitap etmemi sağlayabilirdi. Ama sonrasında şunu fark ettim: Mizahi içerikler oluşturmaktansa, şu an yaptığım gibi insan psikolojisi üzerine, izleyen kişinin empati kurabileceği veya üzerine düşünebileceği içerikler yapmak çok daha hoşuma gidiyor. Bu tarz içerikler oluşturmanın bana da iyi geldiğini fark ettim. Mizahi içerikler oluşturmak için her zaman uygun modda olmayabilirim ama şu an yaptığım içerik türü, kötü bir moddaysam bile o moddan çıkmamı sağlayabilecek türde. Tabii yine de bazı içeriklerime biraz mizah eklemenin, tamamen düşündürücü olmasından daha iyi olabileceğini de düşünüyorum. Aksi hâlde okuyucuda fazla karamsar bir etki bırakabilirim.'
+				},
+				{
+					t: 'figure',
+					id: 'sy-4:2',
+					img: 'assets/2026-09/soylesi/04-tarz.webp',
+					alt: 'Gün batımında çimenlikte karşılıklı oturan iki siluet, arkalarında ışıkları yanan şehir.'
+				}
+			]
+		},
+		{
+			id: 'sy-5',
+			depth: ['mid', 'full'],
+			fit: 'scroll',
+			scene: 'fade-up',
+			blocks: [
+				{
+					t: 'dialog',
+					id: 'sy-5:0',
+					who: 'q',
+					text: 'Çizimlerinin yanında yazdığın olay örgüleri de gerçekten çok başarılı. Hikâye kurgulama konusunda özel olarak çalışıyor musun?'
+				},
+				{
+					t: 'dialog',
+					id: 'sy-5:1',
+					who: 'a',
+					name: 'KargaManga',
+					text: 'Günümün bir kısmında bunun üzerine düşünüyorum ama en hoşuma giden konular genelde üzerine düşündüğümde değil, günün bir vakti ansızın aklıma gelenler oluyor. Geldiği zaman kenara not alıyorum ve videoya dönüştürmek istediğimde de diyalog ekleyerek son hâlini veriyorum.'
+				},
+				{
+					t: 'figure',
+					id: 'sy-5:2',
+					img: 'assets/2026-09/soylesi/05-kurgu.webp',
+					alt: 'Koyu bir zeminde, ana hatları soluklaşmış beyaz gömlekli bir figür.'
+				}
+			]
+		},
+		{
+			id: 'sy-6',
+			depth: ['full'],
+			fit: 'scroll',
+			scene: 'fade-up',
+			blocks: [
+				{
+					t: 'dialog',
+					id: 'sy-6:0',
+					who: 'q',
+					text: 'Çizimlerinde örnek aldığın mangakalar kimler?'
+				},
+				{
+					t: 'dialog',
+					id: 'sy-6:1',
+					who: 'a',
+					name: 'KargaManga',
+					text: 'Kendi tarzımı oluşturmaya başladığım süreçte çizimlerini çok beğendiğim, incelediğim ve örnek almaya çalıştığım birçok mangaka oldu. Bunlardan bazıları Masashi Kishimoto, Junji Ito, Takeshi Obata ve Murata Yusuke diyebilirim. Bu mangakaların eserleri hem okumaya hem de örnek almaya değer.'
+				},
+				{
+					t: 'figure',
+					id: 'sy-6:2',
+					img: 'assets/2026-09/soylesi/06-mangakalar.webp',
+					alt: 'Dolunayın önünde, bulutların üstünde duran pelerinli karanlık bir figür.'
+				}
+			]
+		},
+		{
+			id: 'sy-7',
+			depth: ['full'],
+			fit: 'scroll',
+			scene: 'fade-up',
+			blocks: [
+				{ t: 'dialog', id: 'sy-7:0', who: 'q', text: 'Hiç âşık oldun mu?' },
+				{
+					t: 'dialog',
+					id: 'sy-7:1',
+					who: 'a',
+					name: 'KargaManga',
+					text: 'Bu konuları konuşmak beni utandırdığı için pas geçeceğim, kusura bakma asdfjkasjda)'
+				},
+				{
+					t: 'figure',
+					id: 'sy-7:2',
+					img: 'assets/2026-09/soylesi/07-ask.webp',
+					alt: 'Yan yana duran bir kız ve bir erkek; kızın arkasında gökkuşağı renginde bir halka.'
+				}
+			]
+		},
+		{
+			id: 'sy-8',
+			depth: ['mid', 'full'],
+			fit: 'scroll',
+			scene: 'fade-up',
+			blocks: [
+				{
+					t: 'dialog',
+					id: 'sy-8:0',
+					who: 'q',
+					text: 'Hayatının her beş senesini bir kelimeyle anlatır mısın?'
+				},
+				{
+					t: 'dialog',
+					id: 'sy-8:1',
+					who: 'a',
+					name: 'KargaManga',
+					text: '0-5, bulanık. 5-10, bilinç. 10-15, farkındalık. 15-20, karmaşa. 20-25, durgunluk.'
+				},
+				{
+					t: 'figure',
+					id: 'sy-8:2',
+					img: 'assets/2026-09/soylesi/08-bes-sene.webp',
+					alt: 'Bir elinde tuttuğu polaroid fotoğrafları gözünün önüne kaldırmış figür.'
+				},
+				{ t: 'rule', id: 'sy-8:3' },
 				{
 					t: 'note',
-					id: 'sy-3:5',
-					text: 'Söyleşi eylülün ilk haftasında, atölyesinde yapıldı. Kısaltıldı.'
+					id: 'sy-8:4',
+					text: 'Söyleşi yazışmayla yapıldı. Çizimler KargaManga’ya aittir.'
 				}
 			]
 		}

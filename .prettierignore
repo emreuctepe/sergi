@@ -11,6 +11,11 @@ bun.lockb
 # Üretilen dosya (wrangler types) — 573 KB, elle düzenlenmez
 worker-configuration.d.ts
 
+# Makineye özel araç ayarı: git'in genel yok sayma listesinde, yani depoya hiç
+# girmiyor ve onu yazan da insan değil. Prettier'ın kapsamında kalırsa `lint`
+# yalnızca o dosya yazıldığı için kırmızı yanıyordu.
+.claude/settings.local.json
+
 # Prototipten taşınan küresel CSS. Prettier'a bırakılmıyor ki
 # `diff prototype/css/x.css src/lib/styles/x.css` anlamlı kalsın: taşıma
 # sırasında istemeden değişen tek bir kural bile anında görünsün. Dosyalar

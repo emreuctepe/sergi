@@ -81,6 +81,9 @@ function inlineTexts(block: Block): string[] {
 		case 'caption':
 		case 'dialog':
 			return [block.text];
+		case 'figure':
+			/* Görselin kendisi değil, varsa altyazısı — `caption` bloğuyla aynı tür. */
+			return block.caption ? [block.caption] : [];
 		case 'list':
 			return block.style === 'dict' ? block.items.map((it) => it.def) : block.items.map((it) => it);
 		default:
@@ -95,14 +98,15 @@ const texts = [
 ].sort();
 
 describe('taşınan sayının metinleri', () => {
-	/* Sayı kilitli ("1.0'da tek sayı, bugünkü hâliyle"), o yüzden sayı da kilitli:
-	   84'ün 3'e düşmesi testin kapsamının çöktüğü anlamına gelir ve o an
-	   kırmızı yanmalı. İçerik editöryel olarak açılırsa bu satır güncellenir.
+	/* Sayı sayısı kilitli: 87'nin 3'e düşmesi testin kapsamının çöktüğü anlamına
+	   gelir ve o an kırmızı yanmalı.
 
-	   87'ydi: "Gece Hattı"nın düşen üç sayfası birer altyazı taşıyordu
-	   (bkz. tools/tasi-icerik.mjs → DUSEN_SAYFALAR). */
-	it('84 benzersiz metin tarıyor', () => {
-		expect(texts.length).toBe(84);
+	   87'ydi → 84 oldu ("Gece Hattı"nın düşen üç sayfası birer altyazı
+	   taşıyordu, bkz. tools/tasi-icerik.mjs → DUSEN_SAYFALAR) → tekrar 87:
+	   söyleşi 8 soru + 8 cevap getirdi, "Fener Ustası"nın 15 repliği gitti
+	   (karar 1.42). */
+	it('87 benzersiz metin tarıyor', () => {
+		expect(texts.length).toBe(87);
 	});
 
 	it('en az bir tanesinde gerçekten biçim işareti var', () => {

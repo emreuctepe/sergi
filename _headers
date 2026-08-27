@@ -10,7 +10,7 @@
 #
 #     cache-control: public, max-age=0, must-revalidate
 #
-# Yani okur sayıyı ikinci kez açtığında 17 görselin her biri için bir koşullu
+# Yani okur sayıyı ikinci kez açtığında 26 görselin her biri için bir koşullu
 # istek gidiyordu. İçerik değişmediği için hepsi 304 dönüyor ama gidiş-dönüş
 # duruyor; mobil bağlantıda tam da bu görünür.
 # ============================================================================

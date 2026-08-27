@@ -12,9 +12,9 @@ kararları için [YORUM-SISTEMI.md](YORUM-SISTEMI.md).
 | | |
 |---|---|
 | **Aktif adım** | Faz 1 — tuval, bloklar, içerik (**1a–1e bitti**, sırada 1f) |
-| **Son tamamlanan** | **1e — sahneler**: `paper`, `portrait`, `sumi` prototiple birebir çiziliyor |
+| **Son tamamlanan** | **Söyleşi gerçek içerikle değişti**: "Fener Ustası" (uydurma) → KargaManga röportajı, 9 sayfa · her soru-cevap kendi snap'inde · 20. blok tipi `figure` (karar 1.42–1.43) |
 | **Sonraki dosya** | 1f — `estimateMinutes()`, mod seçici, konum koruma, tanıtım kartları |
-| **Çalışır durum** | `pnpm dev` → http://localhost:5173/sayi/2026-09 · `lint` · `check` (453 dosya) · `test:unit` (286 test) · `test:e2e` (14 test) · `wrangler deploy --dry-run` hepsi yeşil |
+| **Çalışır durum** | `pnpm dev` → http://localhost:5173/sayi/2026-09 · `lint` · `check` (451 dosya) · `test:unit` (306 test) · `test:e2e` (14 test) · `wrangler deploy --dry-run` hepsi yeşil |
 | **Canlı** | **https://sergi.muhammedemreuctepe.workers.dev/sayi/2026-09** (Cloudflare Workers, `main`'e her push). Prototip arşivi → https://emreuctepe.github.io/sergi/ |
 
 **Ortam notu:** Node 22 LTS gerekiyor (Vite 8 Node 20+ istiyor). Konteynerde
@@ -28,7 +28,7 @@ Bunlar tartışıldı ve kapandı; yeniden açmak için yeni bir sebep gerekir.
 
 | Konu | Karar |
 |---|---|
-| 1.0'da kaç sayı | **Tek**: "Kızıl Mevsim" (2026-09), bugünkü hâliyle |
+| 1.0'da kaç sayı | **Tek**: "Kızıl Mevsim" (2026-09). ~~bugünkü hâliyle~~ — içerik 1.42'de editöryel olarak açıldı |
 | Tohum yorumlar | **Girmiyor.** Yorum katmanı boş açılır — uydurma kişileri gerçek okur gibi sunmuyoruz |
 | Keşfet + jeton ekonomisi | **Kapsam dışı** |
 | Dil seçici (TR/EN/JA) | **Kapsam dışı** — 1.0 tek dilli, sıfır çeviri varken üç dil vaat etmek yalan olur |
@@ -103,13 +103,30 @@ Backend yok; sayı baştan sona okunuyor. **1.0'ın en büyük tek teslimatı.**
 - [ ] **1f** `IntroCard.scene` → `SceneName`; `string` bırakılmış tek sahne alanı
 - [ ] `tokens.css`'ten kullanılmayan sayı temalarını (2026-08/10/11) ayıkla
 
-**Doğrulama:** 26 sayfa telefonda ve masaüstünde akıcı; min 17 / mid 22 / full 25
+### İçerik · Söyleşi
+
+- [x] **"Fener Ustası" → KargaManga röportajı** (karar 1.42) — uydurma söyleşi
+      gerçeğiyle değişti. 4 sayfa / 18 blok → **9 sayfa / 30 blok**: açılış +
+      8 soru-cevap, her soru-cevap KENDİ snap'inde, cevabın altında o cevaba
+      eşlik eden çizim. Sayı 26→**31 sayfa**, 87→**99 blok**, derinlik
+      17/22/25 → **19/26/30**. Bölümün ayak izi 2/3/4 → **4/7/9**
+- [x] **20. blok tipi: `figure`** (karar 1.43) — metnin altına oturan tek görsel
+- [x] **9 görsel** `static/assets/2026-09/soylesi/` altına (banner + 8 çizim);
+      17→**26 kaynak**, 47→**59 türev**
+- [x] Prototip paritesi kapandı: `content/parity.test.ts` → `integrity.test.ts`,
+      `tools/tasi-icerik.mjs` emekli
+- [ ] "Haiku Tamamla"nın 3. maddesi hâlâ Fener Ustası'na yaslanıyor
+      (`issue.ts`, *"kâğıdın ardında / ses alçalıyor"* → "Fenerin içinde").
+      Bulmaca `içerik-bağlı` etiketli ve dayandığı yazı artık sayıda yok
+
+**Doğrulama:** 31 sayfa telefonda ve masaüstünde akıcı; min 19 / mid 26 / full 30
 sayfa; mod değişince okunan yer kaybolmuyor; `prefers-reduced-motion` sadeleşiyor.
 
 ⚠️ Aşağıdaki "1a–1d'de doğrulandı" paragrafları O GÜNÜN sayılarını taşıyor
 (29 sayfa / 90 blok / 18-24-28). Rakamlar 1e'de değişti; paragraflar tarih
 kaydı olduğu için geriye dönük düzeltilmedi. Güncel sayı yukarıdaki satırda,
-kanıtı `validate.test.ts` ile `parity.test.ts`'te.
+kanıtı `validate.test.ts` ile `integrity.test.ts`'te. (O paragraflardaki
+`content/parity.test.ts` adı da tarihî: dosya 1.42'de `integrity.test.ts` oldu.)
 
 **1a'da doğrulandı:** `src/lib/content/parity.test.ts` taşınan sayıyı prototiple
 her çalıştırmada karşılaştırıyor (11 test). Sayımlar tuttu: 9 bölüm, 29 sayfa,
@@ -255,14 +272,14 @@ Kod değil, karar. Hiçbiri çözülmeden 1.0 çıkamaz.
    düzeltmesi editöryel (aşağıda 6. madde).
 5. **`min` modun vaadi zayıf:** `sozluk`, `gece-hatti` ve manga hiç kısalmıyor;
    gerçek ayrışma yalnız `kizil-mevsim` + `soylesi`'de. Editöryel iş: ya min sürümleri
-   yazılacak ya vaat dürüstleştirilecek.
+   yazılacak ya vaat dürüstleştirilecek. (1.42'de `soylesi` 4/7/9'a genişledi —
+   ayrışması arttı ama madde kapanmadı, diğer bölümler hâlâ tek sürümlü.)
 6. **Taşan üç sayfa nasıl düzelecek?** (4. maddenin devamı) Üç seçenek:
    `fit: 'scroll'`e almak (en ucuz, ama `son-kunye` 1343px — o sayfa tuvalde
    bir sayfa olmayı hak etmiyor), metni kısaltmak, ya da sayfayı ikiye bölmek.
-   Karar içeriğe dokunmayı gerektiriyor: `src/content/` klasörünün sahibi
-   `tools/tasi-icerik.mjs`, yani düzeltme ya prototipte yapılıp yeniden
-   taşınacak ya da script'in ömrü bitirilecek. **Yayın öncesi kapanmalı** —
-   şu an okur, üç sayfanın altını hiç göremiyor.
+   Bu maddenin "önce script'in ömrü bitirilmeli" engeli **kalktı**: 1.42'de
+   `src/content/` elle bakımlı hâle geçti, yani üç sayfa doğrudan düzenlenebilir.
+   **Yayın öncesi kapanmalı** — şu an okur, üç sayfanın altını hiç göremiyor.
 
 ---
 
@@ -321,3 +338,6 @@ Kod değil, karar. Hiçbiri çözülmeden 1.0 çıkamaz.
 | 1.39 | Türevler tahmin edilmiyor, MANİFESTTEN okunuyor | Her dosya her boyu alamıyor (`logo.webp` 256px, `kapak.webp` 1200px) ve upscale hem israf hem yalan. "Hep üç boy vardır" varsayımı olmayan bir türevi `srcset`e yazardı — üstelik `<source>` tarayıcıyla eşleştiği için 404 alındığında `<img>`e DÜŞMEZ, okur kırık görsel görür. Bu yüzden `tools/gorsel-turevleri.mjs` bir manifest yazıyor ve 47 türevin her biri ayrı testle diskte aranıyor |
 | 1.40 | `<picture>` sarmalayıcısı için `canvas.css` FORK EDİLMEDİ | Sarmalayıcı `.page__bg > img` çocuk seçicisini kırıyor. Kural `PageBackground.svelte`'in kapsamlı stiline kopyalandı: `canvas.css` prototiple bayt bayt aynı ve 14 KB'lık bir dosyayı tek satır için FORKED listesine taşımak, dosyanın tamamındaki parite güvencesini kaybetmek olurdu. Üç satırlık ikizleme bir dosyalık kör noktadan ucuz. `.manga-panel__art img` torun seçici olduğu için orada değişiklik gerekmedi |
 | 1.41 | 🐞 1.29'daki sahne sayımı EKSİKTİ: 3 değil 7 | Tanıtım kartları da sahne çağırıyor (`leaves`, `waves`, `street`, `torii`) ve sayım onları atlamıştı. Sebep: arka planlar `bg: 'scene:paper'` biçiminde yazılıyor, tanıtım kartları ise `scene: 'leaves'` diye ÇIPLAK bir alan kullanıyor — sayım ilk biçimi arayan bir regex'ti. Tip denetimi de yakalayamadı çünkü `IntroCard.scene` düz `string`; `Background` için kapatılan delik burada açık kalmıştı. Sıkıştırılıp denendi: `check` tam o dört adı sayarak kırmızı yandı. Ders, sayımın kendisinden büyük — bir alanı `string` bırakmak, o alanın doğruluğunu insan dikkatine havale etmek demek |
+| 1.42 | İçerik editöryel olarak AÇILDI: söyleşi gerçek röportajla değişti | "Fener Ustası" uydurma bir söyleşiydi — tohum yorumlar ve uydurma bulmaca istatistikleriyle aynı türden bir borç, ama farkı şu: o ikisi *gösterilmiyordu*, bu okunuyordu. Yerine KargaManga ile yapılmış gerçek röportaj girdi (8 soru-cevap + 8 çizim, kaynak dizgi dosyası). Düzen prototipten alınmadı: PDF iki sütunlu, tuval dikey ve snap'li — taşınan şey yalnız metin ve hangi çizimin hangi cevaba ait olduğu. Her soru-cevap KENDİ sayfasına ayrıldı, yani snap "bir soru, bir cevap, bir çizim" demek oldu. Bedeli önceden biliniyordu ve ödendi: `content/parity.test.ts` prototiple bayt bayt pariteyi bekliyordu ve kendi notu "içerik açılırsa silinecek, esnetilmeyecek" diyordu — silindi, `integrity.test.ts` olarak yalnız sayının kendi tutarlılığı kaldı; `tools/tasi-icerik.mjs` emekli oldu (bugün çalıştırılsa röportajı siler, başına ⛔ yazıldı). CSS paritesi bundan etkilenmedi, orada prototip hâlâ referans |
+| 1.43 | 20. blok tipi: `figure` | Sayının 19 tipinde görsel taşıyan TEK tip `manga`'ydı; bir görseli sayfaya koymanın diğer yolu `bg: 'img:…'`, yani onu sayfanın TAMAMINA sermekti. Söyleşinin istediği bunun tersi: soru-cevap okunur, altında çizim durur. `PageKind`'da zaten bir `figure` vardı ama o yalnız `data-kind` yazan bir etiket. Stil `blocks.css`'e YAZILMADI, bileşenin kapsamlı `<style>`ına girdi — 1.40'ın aynısı: prototiple bayt bayt eşit bir dosyayı tek blok için FORKED'a taşımak, dosyanın tamamındaki parite güvencesini kaybetmek olurdu. Altyazı `<Inline>`'dan geçiyor (`caption` bloğuyla aynı metin türü, farklı davranması tutarsızlık olurdu) ve `alt` zorunlu — manga karesindeki borcun aynısı |
+| 1.44 | 🐞 Banner arka plan olarak DENENDİ ve olmadı | Söyleşinin açılışına KargaManga kanal afişi arka plan yapıldı; tarayıcıda bakılınca 1707×282'lik şeridin `cover` ile 3:4 sayfaya oturduğu, yani ortasından dar bir dilimin altı kat büyütüldüğü görüldü — okunmayan, bulanık bir "AM" parçası. Afiş kendi oranında bir `figure` bloğuna alındı, sayfanın arka planı `scene:portrait` olarak kaldı. Yan fayda: `portrait` sahnesi tek kullanıcısını kaybetmiş oluyordu (e2e'de `SAHNELI_SAYFA` 4→3 diye kırmızı yandı, hatayı bu yakaladı) — geri döndü. Ders: bir görselin "arka plan olur mu" sorusu ancak gerçek oranıyla gerçek tuvalde cevaplanıyor, içerik dosyasına bakarak değil |

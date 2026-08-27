@@ -25,6 +25,7 @@
 	import Caption from './Caption.svelte';
 	import Cover from './Cover.svelte';
 	import Dialog from './Dialog.svelte';
+	import Figure from './Figure.svelte';
 	import H1 from './H1.svelte';
 	import H2 from './H2.svelte';
 	import H3 from './H3.svelte';
@@ -80,6 +81,8 @@
 	<Note {block} {...attrs} />
 {:else if block.t === 'caption'}
 	<Caption {block} {...attrs} />
+{:else if block.t === 'figure'}
+	<Figure {block} {...attrs} />
 {:else if block.t === 'rule'}
 	<Rule {...attrs} />
 {:else if block.t === 'byline'}
