@@ -132,6 +132,11 @@ Backend yok; sayı baştan sona okunuyor. **1.0'ın en büyük tek teslimatı.**
       `/dev/soylesi`de yan yana duruyor; **üretimdeki hiçbir şeye dokunulmadı**
       (`Dialog.svelte`, `Figure.svelte`, `blocks.css` aynı). Seçilen aday
       buradan gerçek bloklara taşınacak, sayfa sonra silinecek
+- [ ] Sekiz adayda soru ×0.9, cevap ×1.25 (istek üzerine). Ayar sekiz yerde
+      değil `.stage`ta iki çarpanda: `--soru-olcek` / `--cevap-olcek`.
+      ⚠️ Yan etki: `Numara`da soru artık cevaptan KÜÇÜK (15.5px ↔ 18.0px), yani
+      "dev display sorusu" fikri tersine döndü — o aday seçilirse çarpandan
+      muaf tutulmalı
 
 **Doğrulama:** 31 sayfa telefonda ve masaüstünde akıcı; min 19 / mid 26 / full 30
 sayfa; mod değişince okunan yer kaybolmuyor; `prefers-reduced-motion` sadeleşiyor.

@@ -619,6 +619,25 @@
 	}
 
 	/* ======================================================================
+	   SORU / CEVAP ÖLÇEĞİ — sekiz adayın ortak ayarı
+	   ----------------------------------------------------------------------
+	   Soru %10 küçüldü, cevap %25 büyüdü. Sekiz adayın her biri kendi tipografik
+	   kaydında (soru kimi yerde --fs-md, kimi yerde --fs-2xs) — o yüzden ayarı
+	   16 ayrı sayı olarak ELLE HESAPLAMAK yerine iki çarpan olarak tutuyoruz:
+	   her aday kendi taban ölçüsünü koruyor, oran hepsinde aynı kayıyor.
+
+	   Yeniden ayarlanacaksa BURASI değişir, aşağıdaki kurallar değil.
+
+	   `.v0` (şu anki hâli) bilerek DIŞARIDA: o kıyas tabanı, yani canlıda ne
+	   varsa onu göstermek zorunda. Ona da uygulanırsa "neyi değiştiriyoruz"
+	   sorusunun cevabı kaybolur.
+	   =================================================================== */
+	.stage {
+		--soru-olcek: 0.9;
+		--cevap-olcek: 1.25;
+	}
+
+	/* ======================================================================
 	   0 · ŞU ANKİ HÂLİ — blocks.css'teki `.dialog` + `.figure`nin kopyası
 	   ----------------------------------------------------------------------
 	   Gerçek bileşenleri çağırmak yerine kopyalandı: `Dialog.svelte` global
@@ -719,7 +738,7 @@
 		inset-inline: var(--pad-page);
 		bottom: calc(var(--pad-page) * 0.55);
 		font-family: var(--font-ui);
-		font-size: var(--fs-sm);
+		font-size: calc(var(--fs-sm) * var(--soru-olcek));
 		font-weight: 600;
 		line-height: var(--lh-snug);
 		color: #fbf6ee;
@@ -751,7 +770,7 @@
 
 	.v1__a {
 		font-family: var(--font-text);
-		font-size: var(--fs-base);
+		font-size: calc(var(--fs-base) * var(--cevap-olcek));
 		line-height: var(--lh-body);
 		text-wrap: pretty;
 	}
@@ -789,7 +808,7 @@
 	.v2__q {
 		position: relative;
 		font-family: var(--issue-display, var(--font-display));
-		font-size: var(--fs-md);
+		font-size: calc(var(--fs-md) * var(--soru-olcek));
 		line-height: var(--lh-tight);
 		letter-spacing: var(--tracking-tight);
 		text-wrap: balance;
@@ -797,7 +816,7 @@
 
 	.v2__a {
 		font-family: var(--font-text);
-		font-size: var(--fs-base);
+		font-size: calc(var(--fs-base) * var(--cevap-olcek));
 		line-height: var(--lh-body);
 		text-wrap: pretty;
 		padding-top: var(--sp-3);
@@ -837,7 +856,7 @@
 		background: var(--paper-raised);
 		box-shadow: var(--shadow-2);
 		font-family: var(--font-manga);
-		font-size: var(--fs-xs);
+		font-size: calc(var(--fs-xs) * var(--soru-olcek));
 		line-height: var(--lh-snug);
 		color: var(--ink);
 		text-wrap: pretty;
@@ -872,7 +891,7 @@
 
 	.v3__a {
 		font-family: var(--font-text);
-		font-size: var(--fs-sm);
+		font-size: calc(var(--fs-sm) * var(--cevap-olcek));
 		line-height: var(--lh-body);
 		text-wrap: pretty;
 	}
@@ -939,7 +958,7 @@
 
 	.v4__q {
 		font-family: var(--font-ui);
-		font-size: var(--fs-xs);
+		font-size: calc(var(--fs-xs) * var(--soru-olcek));
 		font-weight: 700;
 		letter-spacing: 0.01em;
 		line-height: var(--lh-snug);
@@ -952,7 +971,7 @@
 
 	.v4__a {
 		font-family: var(--font-text);
-		font-size: var(--fs-sm);
+		font-size: calc(var(--fs-sm) * var(--cevap-olcek));
 		line-height: var(--lh-body);
 		text-wrap: pretty;
 	}
@@ -999,7 +1018,7 @@
 
 	.v5__q {
 		font-family: var(--issue-display, var(--font-display));
-		font-size: var(--fs-sm);
+		font-size: calc(var(--fs-sm) * var(--soru-olcek));
 		font-style: italic;
 		line-height: var(--lh-snug);
 		color: var(--accent);
@@ -1009,7 +1028,7 @@
 
 	.v5__a {
 		font-family: var(--font-text);
-		font-size: var(--fs-base);
+		font-size: calc(var(--fs-base) * var(--cevap-olcek));
 		line-height: var(--lh-body);
 		text-wrap: pretty;
 	}
@@ -1065,7 +1084,7 @@
 		background: var(--ink);
 		color: var(--paper);
 		font-family: var(--font-ui);
-		font-size: var(--fs-xs);
+		font-size: calc(var(--fs-xs) * var(--soru-olcek));
 		font-weight: 700;
 		line-height: var(--lh-snug);
 		text-wrap: pretty;
@@ -1073,7 +1092,7 @@
 
 	.v6__a {
 		font-family: var(--font-text);
-		font-size: var(--fs-base);
+		font-size: calc(var(--fs-base) * var(--cevap-olcek));
 		line-height: var(--lh-body);
 		text-wrap: pretty;
 	}
@@ -1115,7 +1134,7 @@
 		inset-inline: var(--pad-page);
 		top: var(--sp-4);
 		font-family: var(--font-ui);
-		font-size: var(--fs-xs);
+		font-size: calc(var(--fs-xs) * var(--soru-olcek));
 		font-weight: 700;
 		line-height: var(--lh-snug);
 		color: #fff;
@@ -1131,7 +1150,7 @@
 
 	.v7__a {
 		font-family: var(--font-text);
-		font-size: var(--fs-base);
+		font-size: calc(var(--fs-base) * var(--cevap-olcek));
 		line-height: var(--lh-body);
 		color: #e2d9cc;
 		text-wrap: pretty;
@@ -1164,7 +1183,7 @@
 
 	.v8__q {
 		font-family: var(--font-ui);
-		font-size: var(--fs-2xs);
+		font-size: calc(var(--fs-2xs) * var(--soru-olcek));
 		font-weight: 600;
 		letter-spacing: var(--tracking-wide);
 		line-height: var(--lh-snug);
@@ -1180,7 +1199,7 @@
 
 	.v8__a {
 		font-family: var(--issue-display, var(--font-display));
-		font-size: var(--fs-lg);
+		font-size: calc(var(--fs-lg) * var(--cevap-olcek));
 		line-height: var(--lh-tight);
 		letter-spacing: var(--tracking-tight);
 		text-wrap: pretty;
