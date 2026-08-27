@@ -12,9 +12,9 @@ kararları için [YORUM-SISTEMI.md](YORUM-SISTEMI.md).
 | | |
 |---|---|
 | **Aktif adım** | Faz 1 — tuval, bloklar, içerik (**1a–1e bitti**, sırada 1f) |
-| **Son tamamlanan** | **Söyleşi gerçek içerikle değişti**: "Fener Ustası" (uydurma) → KargaManga röportajı, 9 sayfa · her soru-cevap kendi snap'inde · 20. blok tipi `figure` (karar 1.42–1.43) |
+| **Son tamamlanan** | **Söyleşi gerçek içerikle değişti**: "Fener Ustası" (uydurma) → KargaManga röportajı, 9 sayfa · her soru-cevap kendi snap'inde · 20. blok tipi `figure` · açılışta çizerin karga portresi (karar 1.42–1.45) |
 | **Sonraki dosya** | 1f — `estimateMinutes()`, mod seçici, konum koruma, tanıtım kartları |
-| **Çalışır durum** | `pnpm dev` → http://localhost:5173/sayi/2026-09 · `lint` · `check` (451 dosya) · `test:unit` (306 test) · `test:e2e` (14 test) · `wrangler deploy --dry-run` hepsi yeşil |
+| **Çalışır durum** | `pnpm dev` → http://localhost:5173/sayi/2026-09 · `lint` · `check` (451 dosya) · `test:unit` (303 test) · `test:e2e` (14 test) · `wrangler deploy --dry-run` hepsi yeşil |
 | **Canlı** | **https://sergi.muhammedemreuctepe.workers.dev/sayi/2026-09** (Cloudflare Workers, `main`'e her push). Prototip arşivi → https://emreuctepe.github.io/sergi/ |
 
 **Ortam notu:** Node 22 LTS gerekiyor (Vite 8 Node 20+ istiyor). Konteynerde
@@ -106,13 +106,21 @@ Backend yok; sayı baştan sona okunuyor. **1.0'ın en büyük tek teslimatı.**
 ### İçerik · Söyleşi
 
 - [x] **"Fener Ustası" → KargaManga röportajı** (karar 1.42) — uydurma söyleşi
-      gerçeğiyle değişti. 4 sayfa / 18 blok → **9 sayfa / 30 blok**: açılış +
+      gerçeğiyle değişti. 4 sayfa / 18 blok → **9 sayfa / 29 blok**: açılış +
       8 soru-cevap, her soru-cevap KENDİ snap'inde, cevabın altında o cevaba
-      eşlik eden çizim. Sayı 26→**31 sayfa**, 87→**99 blok**, derinlik
+      eşlik eden çizim. Sayı 26→**31 sayfa**, 87→**98 blok**, derinlik
       17/22/25 → **19/26/30**. Bölümün ayak izi 2/3/4 → **4/7/9**
 - [x] **20. blok tipi: `figure`** (karar 1.43) — metnin altına oturan tek görsel
-- [x] **9 görsel** `static/assets/2026-09/soylesi/` altına (banner + 8 çizim);
-      17→**26 kaynak**, 47→**59 türev**
+- [x] **9 görsel** `static/assets/2026-09/soylesi/` altına (açılış kapağı +
+      8 çizim); 17→**26 kaynak**, 47→**56 türev**
+- [x] Açılış arka planı: çizerin karga portresi (karar 1.45). Kanal afişi iki
+      kez denendi, ikisi de tutmadı (1.44)
+- [ ] ⚠️ Açılış kapağının kaynağı **405×720** — arka plan için önerilen
+      1200×1600'ün çok altında, büyük ekranda yumuşak. Yüksek çözünürlüklü
+      kopyası bulunursa değiştirilecek (aynı dosya adı, sonra türev script'i)
+- [ ] `portrait` sahnesi artık HİÇBİR sayfa tarafından çağrılmıyor (tek
+      kullanıcısı `sy-acilis`'ti). Kodu duruyor; 1f'de ya kullanıcı bulur ya
+      kayıttan düşer
 - [x] Prototip paritesi kapandı: `content/parity.test.ts` → `integrity.test.ts`,
       `tools/tasi-icerik.mjs` emekli
 - [ ] "Haiku Tamamla"nın 3. maddesi hâlâ Fener Ustası'na yaslanıyor
@@ -341,3 +349,4 @@ Kod değil, karar. Hiçbiri çözülmeden 1.0 çıkamaz.
 | 1.42 | İçerik editöryel olarak AÇILDI: söyleşi gerçek röportajla değişti | "Fener Ustası" uydurma bir söyleşiydi — tohum yorumlar ve uydurma bulmaca istatistikleriyle aynı türden bir borç, ama farkı şu: o ikisi *gösterilmiyordu*, bu okunuyordu. Yerine KargaManga ile yapılmış gerçek röportaj girdi (8 soru-cevap + 8 çizim, kaynak dizgi dosyası). Düzen prototipten alınmadı: PDF iki sütunlu, tuval dikey ve snap'li — taşınan şey yalnız metin ve hangi çizimin hangi cevaba ait olduğu. Her soru-cevap KENDİ sayfasına ayrıldı, yani snap "bir soru, bir cevap, bir çizim" demek oldu. Bedeli önceden biliniyordu ve ödendi: `content/parity.test.ts` prototiple bayt bayt pariteyi bekliyordu ve kendi notu "içerik açılırsa silinecek, esnetilmeyecek" diyordu — silindi, `integrity.test.ts` olarak yalnız sayının kendi tutarlılığı kaldı; `tools/tasi-icerik.mjs` emekli oldu (bugün çalıştırılsa röportajı siler, başına ⛔ yazıldı). CSS paritesi bundan etkilenmedi, orada prototip hâlâ referans |
 | 1.43 | 20. blok tipi: `figure` | Sayının 19 tipinde görsel taşıyan TEK tip `manga`'ydı; bir görseli sayfaya koymanın diğer yolu `bg: 'img:…'`, yani onu sayfanın TAMAMINA sermekti. Söyleşinin istediği bunun tersi: soru-cevap okunur, altında çizim durur. `PageKind`'da zaten bir `figure` vardı ama o yalnız `data-kind` yazan bir etiket. Stil `blocks.css`'e YAZILMADI, bileşenin kapsamlı `<style>`ına girdi — 1.40'ın aynısı: prototiple bayt bayt eşit bir dosyayı tek blok için FORKED'a taşımak, dosyanın tamamındaki parite güvencesini kaybetmek olurdu. Altyazı `<Inline>`'dan geçiyor (`caption` bloğuyla aynı metin türü, farklı davranması tutarsızlık olurdu) ve `alt` zorunlu — manga karesindeki borcun aynısı |
 | 1.44 | 🐞 Banner arka plan olarak DENENDİ ve olmadı | Söyleşinin açılışına KargaManga kanal afişi arka plan yapıldı; tarayıcıda bakılınca 1707×282'lik şeridin `cover` ile 3:4 sayfaya oturduğu, yani ortasından dar bir dilimin altı kat büyütüldüğü görüldü — okunmayan, bulanık bir "AM" parçası. Afiş kendi oranında bir `figure` bloğuna alındı, sayfanın arka planı `scene:portrait` olarak kaldı. Yan fayda: `portrait` sahnesi tek kullanıcısını kaybetmiş oluyordu (e2e'de `SAHNELI_SAYFA` 4→3 diye kırmızı yandı, hatayı bu yakaladı) — geri döndü. Ders: bir görselin "arka plan olur mu" sorusu ancak gerçek oranıyla gerçek tuvalde cevaplanıyor, içerik dosyasına bakarak değil |
+| 1.45 | Söyleşinin açılışı: kanal afişi DEĞİL, çizerin karga portresi | 1.44'te afiş arka plan olmaktan çıkıp kendi oranında bir `figure` bloğuna alınmıştı; o da tutmadı — 1707×282'lik bir şerit dikey bir açılış sayfasının ortasında kartvizit gibi duruyor, sayfanın sesini kurmuyor. Yerine çizerin kendi karga portresi geldi: dikey, tuvalin oranına yakın (0.56 ↔ masaüstünde 0.75, telefonda 0.53) ve bölümün tonu zaten bu. Ölçüldü: masaüstünde dikey %25 kırpılıyor (üstteki "KARGAMANGA" filigranı gidiyor, kompozisyon kazanıyor), telefonda neredeyse birebir oturuyor. ⚠️ Bilinen borç: kaynak **405×720**, yani 1.38'in arka plan için hesapladığı 1200×1600'ün çok altında — masaüstü retina'da 1120×1493 gerekiyor, elde 405×720 var, ~2.8× büyütülüyor. Karanlık ve yüksek kontrastlı bir çizim olduğu için taşıyor ama yumuşaklık görülüyor; yüksek çözünürlüklü kopya bulunursa dosya değişecek. Yan etki: `portrait` sahnesi tek kullanıcısını kaybetti, `SAHNELI_SAYFA` 4→3 (e2e bunu yakaladı) |

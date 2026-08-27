@@ -115,8 +115,16 @@ test('gezinme düğmeleri uçlarda kapanıyor', async ({ page }) => {
    hiçbir şey göstermez.
    ======================================================================= */
 
-/** `bg: "scene:…"` diyen dört sayfa — ed-1, bl-1 (paper), sy-acilis, son-kunye. */
-const SAHNELI_SAYFA = 4;
+/**
+ * `bg: "scene:…"` diyen üç sayfa — ed-1, bl-1 (paper), son-kunye (sumi).
+ *
+ * Dörttü: `sy-acilis` `scene:portrait` kullanıyordu, söyleşinin açılışı çizerin
+ * kendi karga portresine geçince (karar 1.45) bıraktı. `portrait` sahnesi kayıtlı
+ * ama artık HİÇBİR sayfa çağırmıyor — silinmedi, çünkü kodu duruyor ve 1f'de
+ * tanıtım kartları sahne kadrosunu zaten yeniden açacak. O gün ya bir kullanıcı
+ * bulur ya kayıttan düşer.
+ */
+const SAHNELI_SAYFA = 3;
 
 test('çizilmiş sahneler sayfaya basılıyor', async ({ page }) => {
 	const scenes = page.locator('.page__bg > svg.art');

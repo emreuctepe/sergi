@@ -119,7 +119,7 @@ describe('görsel yolları', () => {
 	}
 
 	it('içerik 26 görsel dosyasına atıfta bulunuyor', () => {
-		/* 17'ydi: söyleşi 8 çizim + 1 açılış banner'ı getirdi (karar 1.42). */
+		/* 17'ydi: söyleşi 8 çizim + 1 açılış arka planı getirdi (karar 1.42). */
 		expect(referenced.size).toBe(26);
 	});
 
@@ -146,10 +146,10 @@ describe('görsel yolları', () => {
 		}
 	);
 
-	it('manifest 59 türev sayıyor', () => {
-		/* 47'ydi: söyleşinin 8 çizimi birer boy (kaynakları 400px, upscale yok),
-		   banner'ı dört boy getirdi. */
-		expect(turevListesi).toHaveLength(59);
+	it('manifest 56 türev sayıyor', () => {
+		/* 47'ydi: söyleşinin 8 çizimi + açılış kapağı birer boy getirdi. Dokuzu da
+		   400-405px kaynaklar, yani tek türev — upscale yok (karar 1.39). */
+		expect(turevListesi).toHaveLength(56);
 	});
 
 	it.each(turevListesi.sort())('static/%s var', (rel) => {

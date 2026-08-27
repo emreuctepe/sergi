@@ -33,7 +33,12 @@ export const soylesi: Section = {
 			kind: 'opener',
 			fit: 'contain',
 			bleed: 'full',
-			bg: 'scene:portrait',
+			/* Kanal afişi (1707×282) önce arka plan, sonra kendi oranında bir blok
+			   olarak denendi; ikisi de tutmadı (karar 1.44). Yerine çizerin kendi
+			   karga portresi geldi — dikey, tuvalin oranına yakın ve bölümün sesi
+			   zaten bu. ⚠️ Kaynak 405×720, yani arka plan için önerilen 1200×1600'ün
+			   altında; büyük ekranda yumuşak görünüyor (karar 1.45). */
+			bg: 'img:assets/2026-09/soylesi/kapak.webp',
 			scene: 'mask-wipe',
 			blocks: [
 				{ t: 'kicker', id: 'sy-acilis:0', text: 'Röportaj', invert: true },
@@ -43,18 +48,6 @@ export const soylesi: Section = {
 					id: 'sy-acilis:2',
 					invert: true,
 					text: 'Küçük yaşlardan itibaren manga-anime kültürüne ilgi duyan ve zamanla kendisi de bu alanda eserler üretmeye çalışan bir çizer.'
-				},
-				/* Banner ARKA PLAN olarak denendi ve olmadı: 1707×282'lik bir şerit
-				   3:4 sayfaya `cover` ile oturunca ortasından dar bir dilim altı kat
-				   büyütülüyor — okunmayan, bulanık bir "AM" parçası kalıyor. Kendi
-				   oranında bir blok olarak duruyor; sayfanın arka planı yine
-				   `scene:portrait`. */
-				{
-					t: 'figure',
-					id: 'sy-acilis:3',
-					invert: true,
-					img: 'assets/2026-09/soylesi/banner.webp',
-					alt: 'KargaManga kanal afişi: fırça darbeleriyle yazılmış “KARGAMANGA” ve altında カルガマンガ.'
 				}
 			]
 		},

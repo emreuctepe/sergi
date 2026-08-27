@@ -7,7 +7,7 @@
    üstüne kurulu:
 
      1. 20 tipin hepsinin bir bileşeni var mı? (`Block.svelte` dağıtıcısı)
-     2. Sayının 99 bloğunun 99'u da çiziliyor ve ANKRAJINI taşıyor mu?
+     2. Sayının 98 bloğunun 98'i de çiziliyor ve ANKRAJINI taşıyor mu?
 
    Bileşenler `svelte/server` ile sunucuda çiziliyor — tarayıcı kurmadan gerçek
    çıktıya bakmanın yolu bu. Aranan şey görünüm değil SÖZLEŞME: sınıf, ankraj
@@ -212,15 +212,15 @@ describe('söyleşi', () => {
 /* ==========================================================================
    SAYININ TAMAMI
    --------------------------------------------------------------------------
-   Asıl test bu: 99 bloğun 99'u da çiziliyor mu, ankrajları eksiksiz mi?
+   Asıl test bu: 98 bloğun 98'i de çiziliyor mu, ankrajları eksiksiz mi?
    ======================================================================= */
 
 describe('2026-09 sayısının tamamı', () => {
 	const blocks = content.sections.flatMap((s) => s.pages.flatMap((p) => p.blocks));
 	const drawn = blocks.map((block, i) => draw(block, i));
 
-	it('99 blok', () => {
-		expect(blocks).toHaveLength(99);
+	it('98 blok', () => {
+		expect(blocks).toHaveLength(98);
 	});
 
 	it('hiçbiri boş çizilmiyor', () => {

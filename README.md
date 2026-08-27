@@ -263,7 +263,7 @@ zaten verimli sıkıştırılmış; ağırlık ince dokudan geliyor. Kazanç iki
 Hangi dosyanın hangi boyları olduğu
 [`gorsel-turevleri.json`](src/lib/content/gorsel-turevleri.json)'da yazılı ve
 bileşen bunu **tahmin etmiyor, okuyor**: eksik bir AVIF `<source>` ile eşleşip
-404 alır ve `<img>`e geri DÜŞMEZ — okur kırık görsel görür. 59 türevin her biri
+404 alır ve `<img>`e geri DÜŞMEZ — okur kırık görsel görür. 56 türevin her biri
 ayrı testle diskte aranıyor.
 
 Yeni görsel eklerken: dosyayı `static/assets/` altına koy, script'i çalıştır,
