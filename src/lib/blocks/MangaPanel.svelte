@@ -7,7 +7,7 @@
 <script lang="ts">
 	import { assetUrl, avifSrcset } from '$lib/content/assets';
 	import type { MangaPanel } from '$lib/content/types';
-	import { subAttrs } from './attrs';
+	import { cizimAttrs, subAttrs } from './attrs';
 	import MangaBubble from './MangaBubble.svelte';
 
 	let { panel, blockId, index }: { panel: MangaPanel; blockId: string; index: number } = $props();
@@ -26,12 +26,15 @@
 			<!-- `.manga-panel__art img` TORUN seçici, `<picture>` onu bozmuyor. -->
 			<picture>
 				{#if avif}<source type="image/avif" srcset={avif} sizes={SIZES} />{/if}
+				<!-- `cizimAttrs`: sağ tık menüsü + sürükleme kapalı. Gerekçesi ve
+				     neyin ENGELLENMEDİĞİ attrs.ts'te yazıyor. -->
 				<img
 					src={assetUrl(panel.img)}
 					sizes={SIZES}
 					alt={panel.alt ?? ''}
 					loading="lazy"
 					decoding="async"
+					{...cizimAttrs}
 				/>
 			</picture>
 		{/if}
@@ -45,3 +48,19 @@
 		<MangaBubble {bubble} />
 	{/each}
 </figure>
+
+<style>
+	/* Karenin kendisi seçilemez ve sürüklenemez — `cizimAttrs`in CSS tarafı,
+	   gerekçesi attrs.ts'te. Stil burada çünkü `blocks.css` prototiple bayt
+	   bayt eşit tutuluyor (styles/parity.test.ts) ve katmansız bileşen stili
+	   zaten onu eziyor.
+
+	   Kural yalnız GÖRSELE iniyor: balonlar (`.manga-bubble`) HTML ve
+	   seçilebilir kalmalı — okurun bir repliği alıntılaması derginin
+	   yorum sisteminin kendisi. */
+	.manga-panel__art img {
+		user-select: none;
+		-webkit-user-drag: none;
+		-webkit-touch-callout: none; /* iOS: uzun basınca çıkan kaydet menüsü */
+	}
+</style>

@@ -34,3 +34,40 @@ export function subAttrs(blockId: string, kind: string, index: number) {
 		'data-block-kind': `${kind}-item`
 	};
 }
+
+/* ============================================================================
+   ÇİZERİN KENDİ İŞİ — kazara kaldırmayı zorlaştıran öznitelikler
+   ----------------------------------------------------------------------------
+   YALNIZCA KargaManga'nın çizimlerinde kullanılır: manga kareleri
+   (MangaPanel.svelte) ve söyleşi çizimleri (Figure.svelte). Künyede ikisi de
+   "telif sahibinde, izinle" diye geçiyor.
+
+   ⚠️ SAYFA ARKA PLANLARINA UYGULANMAZ ve bu bir ihmal değil, zorunluluk:
+   o 11 görsel Wikimedia Commons'tan CC lisanslı geliyor ve CC BY-SA 4.0
+   §2(a)(5)(B) lisans alanın "etkin teknolojik önlem" uygulamasını açıkça
+   yasaklıyor. Künyede o lisansları verip görselleri kilitlemek kendi
+   künyemizle çelişmek olurdu (bkz. 08-son.ts → "Görseller").
+
+   ⚠️ BU KORUMA DEĞİL, CAYDIRICI. Görselin adresi sayfa kaynağında düz duruyor;
+   `/assets/2026-09/kapali-kapilar/01.webp` adresini açan, ağ sekmesine bakan
+   ya da ekran görüntüsü alan herkes görsele ulaşır. Engellenen tek şey KAZARA
+   ve KOLAY kaldırma: sağ tık menüsü, sürükleyip sekmeye bırakma, seçip
+   kopyalama. Bunu gerçek bir kilit sanmak, olmayan bir güvenceye yaslanmaktır.
+
+   Seçim engeli bilerek yalnız GÖRSELDE: derginin yorum sistemi metin seçmeye
+   dayanıyor (docs/YORUM-SISTEMI.md), metne `user-select: none` vermek Faz 3'ü
+   doğmadan öldürürdü.
+
+   Faz 3 notu: prototip `#pages` üstünde zaten `contextmenu`u kapatıyor ama
+   BAŞKA bir sebeple — uzun basma → koordinat pini (comments.js). O geldiğinde
+   iki engel çakışmaz, çünkü bu yalnız görselin kendisinde duruyor.
+   ========================================================================= */
+
+export const cizimAttrs = {
+	/* Enumerated bir öznitelik, boolean değil: dizgi olarak verilmezse Svelte
+	   `false`u yok sayıp özniteliği hiç basmaz ve sürükleme açık kalır.
+	   `as const` de şart — literal olmadan tip `string`e genişliyor ve
+	   Svelte'in `'true' | 'false'` beklentisini karşılamıyor. */
+	draggable: 'false',
+	oncontextmenu: (e: Event) => e.preventDefault()
+} as const;

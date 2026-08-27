@@ -13,7 +13,7 @@
 <script lang="ts">
 	import { assetUrl, avifSrcset } from '$lib/content/assets';
 	import type { FigureBlock } from '$lib/content/types';
-	import type { BlockAttrs } from './attrs';
+	import { cizimAttrs, type BlockAttrs } from './attrs';
 	import Inline from './Inline.svelte';
 
 	let { block, ...attrs }: { block: FigureBlock } & BlockAttrs = $props();
@@ -28,7 +28,16 @@
 <figure {...attrs} class={['figure', attrs.class]}>
 	<picture>
 		{#if avif}<source type="image/avif" srcset={avif} sizes={SIZES} />{/if}
-		<img src={assetUrl(block.img)} sizes={SIZES} alt={block.alt} loading="lazy" decoding="async" />
+		<!-- `cizimAttrs`: söyleşi çizimleri de KargaManga'nın — manga kareleriyle
+		     aynı muamele. Gerekçesi ve sınırları attrs.ts'te. -->
+		<img
+			src={assetUrl(block.img)}
+			sizes={SIZES}
+			alt={block.alt}
+			loading="lazy"
+			decoding="async"
+			{...cizimAttrs}
+		/>
 	</picture>
 	<!-- `caption` bloğuyla aynı metin türü, aynı muamele: satır içi biçimleme geçerli. -->
 	{#if block.caption}<figcaption><Inline text={block.caption} /></figcaption>{/if}
@@ -48,6 +57,13 @@
 		height: auto;
 		display: block;
 		border-radius: var(--radius-md);
+
+		/* `cizimAttrs`in CSS tarafı — manga karesindekiyle aynı, gerekçesi
+		   attrs.ts'te. Altyazı (`figcaption`) DIŞARIDA kalıyor: o dergi metni,
+		   seçilip alıntılanabilmeli. */
+		user-select: none;
+		-webkit-user-drag: none;
+		-webkit-touch-callout: none;
 	}
 
 	/* `.caption` bloğuyla aynı ölçü — ikisi de görsel altı yazısı. */
