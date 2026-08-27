@@ -34,7 +34,22 @@
 	} from './geometry';
 	import Page from './Page.svelte';
 
-	let { content, depth = 'full' }: { content: IssueContent; depth?: Depth } = $props();
+	let {
+		content,
+		depth = 'full',
+		inert = false
+	}: {
+		content: IssueContent;
+		depth?: Depth;
+		/**
+		 * Üstünde bir katman varken (tanıtım, mod seçici) tuval çekilir: `inert`
+		 * odağı ve işaretçiyi keser. Klavyeyi KESMEZ — `onKey` belgeye bağlı ve
+		 * `inert` belge düzeyindeki dinleyiciyi durdurmuyor, o yüzden aşağıda
+		 * ayrıca sınanıyor. Olmasaydı okur tanıtımı okurken arkadaki sayı ok
+		 * tuşlarıyla sessizce ilerlerdi.
+		 */
+		inert?: boolean;
+	} = $props();
 
 	setIssueContext(() => content.issue);
 
@@ -222,6 +237,7 @@
 	   ======================================================================= */
 
 	function onKey(event: KeyboardEvent) {
+		if (inert) return;
 		if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
 
 		/* Yazarken boşluk tuşu sayfa çevirmemeli. */
@@ -322,7 +338,7 @@
 
 <a class="skip-link" href="#pages">İçeriğe atla</a>
 
-<div id="shell" data-letterbox={letterbox} data-chrome={chrome}>
+<div id="shell" data-letterbox={letterbox} data-chrome={chrome} {inert}>
 	<header class="band band--top">
 		<div class="band__center">
 			<div class="band__issue">

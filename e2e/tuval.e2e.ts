@@ -17,6 +17,7 @@
    ========================================================================= */
 
 import { expect, test, type Page } from '@playwright/test';
+import { tanitimiAtla } from './prefs';
 
 const SAYI = '/sayi/2026-09';
 
@@ -32,6 +33,10 @@ const percent = (page: Page) =>
 	page.locator('[role="progressbar"]').getAttribute('aria-valuenow').then(Number);
 
 test.beforeEach(async ({ page }) => {
+	/* Bu dosyanın konusu tuval; tanıtım kartları (tanitim.e2e.ts) ilk ziyarette
+	   tuvali `inert` yapıp önüne geçiyor. Okur "dergiyi daha önce açmış" olarak
+	   giriyor — mod tercihi yine de yok, yani akış prerender'daki `full`. */
+	await tanitimiAtla(page);
 	await page.goto(SAYI);
 	await expect(page.locator('.page')).toHaveCount(SAYFA_SAYISI);
 });
