@@ -104,9 +104,10 @@ describe('taşınan sayının metinleri', () => {
 	   87'ydi → 84 oldu ("Gece Hattı"nın düşen üç sayfası birer altyazı
 	   taşıyordu, bkz. tools/tasi-icerik.mjs → DUSEN_SAYFALAR) → tekrar 87:
 	   söyleşi 8 soru + 8 cevap getirdi, "Fener Ustası"nın 15 repliği gitti
-	   (karar 1.42). */
-	it('87 benzersiz metin tarıyor', () => {
-		expect(texts.length).toBe(87);
+	   (karar 1.42) → 88: sy-7'ye muhabirin karşılığı olan ikinci balon
+	   eklendi. */
+	it('88 benzersiz metin tarıyor', () => {
+		expect(texts.length).toBe(88);
 	});
 
 	it('en az bir tanesinde gerçekten biçim işareti var', () => {

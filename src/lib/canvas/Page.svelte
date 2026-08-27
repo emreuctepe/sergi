@@ -135,9 +135,15 @@
 		border-radius: 0;
 	}
 
-	/* SORU — çizimle aynı gözde, alta yaslı. Figürün alt marjı (`--balon-tasma`)
-	   satırı o kadar uzattığı için balon tam o kadar taşıyor: ayrıca negatif
-	   marj vermeye gerek yok.
+	/* AÇILIŞ SORUSU — çizimle aynı gözde, alta yaslı. Figürün alt marjı
+	   (`--balon-tasma`) satırı o kadar uzattığı için balon tam o kadar taşıyor:
+	   ayrıca negatif marj vermeye gerek yok.
+
+	   `:first-child` şart ve sınırı anlatıyor: çizimle eşleşen soru sayfanın
+	   AÇILIŞ bloğu. Sayfada ikinci bir soru balonu olabilir (sy-7'de muhabirin
+	   karşılığı var) ve o balon akışta, cevabın altında durmalı. Bu kural
+	   `:first-child` olmadan onu da 1. satıra koyup açılış balonunun ÜSTÜNE
+	   yığardı — iki balon aynı gözde üst üste.
 
 	   ⚠️ `z-index` süs değil: soru DOM'da çizimden ÖNCE geliyor (blok sırası
 	   kilitli — `sy-N:0` soru, `sy-N:2` çizim) ve aynı gözü paylaşan iki öğede
@@ -146,7 +152,7 @@
 	   resmin altında kaldığı için hiç fark edilmiyor, yalnız uzun sorularda
 	   ortaya çıkıyordu. `.dialog--q` konumunu Dialog.svelte'den zaten alıyor
 	   (kuyruk için `position: relative`), yığın burada sıralanıyor. */
-	.page[data-kind='interview'] :global(.dialog--q) {
+	.page[data-kind='interview'] .page__inner > :global(.dialog--q:first-child) {
 		grid-row: 1;
 		grid-column: 1;
 		align-self: end;

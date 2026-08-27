@@ -237,8 +237,9 @@ describe('2026-09 sayısının tamamı', () => {
 	const blocks = content.sections.flatMap((s) => s.pages.flatMap((p) => p.blocks));
 	const drawn = blocks.map((block, i) => draw(block, i));
 
-	it('98 blok', () => {
-		expect(blocks).toHaveLength(98);
+	/* 98 → 99: sy-7'ye muhabirin karşılığı olan ikinci balon eklendi. */
+	it('99 blok', () => {
+		expect(blocks).toHaveLength(99);
 	});
 
 	it('hiçbiri boş çizilmiyor', () => {

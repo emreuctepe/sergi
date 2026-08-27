@@ -26,12 +26,13 @@ const pages = content.sections.flatMap((s) => s.pages);
 const blocks = pages.flatMap((p) => p.blocks);
 
 describe('2026-09 içerik bütünlüğü', () => {
-	it('9 bölüm · 31 sayfa · 98 blok', () => {
+	it('9 bölüm · 31 sayfa · 99 blok', () => {
 		/* Sayılar 26/87'ydi: söyleşi 4 sayfa / 18 bloktan 9 sayfa / 29 bloğa
-		   çıktı — her soru-cevap kendi snap'ine ayrıldı (karar 1.42). */
+		   çıktı — her soru-cevap kendi snap'ine ayrıldı (karar 1.42).
+		   98 → 99: sy-7'ye muhabirin karşılığı olan ikinci balon eklendi. */
 		expect(content.sections).toHaveLength(9);
 		expect(pages).toHaveLength(31);
-		expect(blocks).toHaveLength(98);
+		expect(blocks).toHaveLength(99);
 	});
 
 	it('20 blok tipinin hepsi kullanılıyor ve hepsi kayıtlı', () => {

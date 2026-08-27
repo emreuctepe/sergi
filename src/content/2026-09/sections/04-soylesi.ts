@@ -239,7 +239,16 @@ export const soylesi: Section = {
 					id: 'sy-7:2',
 					img: 'assets/2026-09/soylesi/07-ask.webp',
 					alt: 'Yan yana duran bir kız ve bir erkek; kızın arkasında gökkuşağı renginde bir halka.'
-				}
+				},
+				/* Muhabirin kısa karşılığı — sayfadaki İKİNCİ balon. Sayının tek
+				   yeri: başka hiçbir sayfada cevaptan sonra söz alınmıyor.
+
+				   `who: 'q'` çünkü ses muhabirin; blok tipi de balonu getiriyor
+				   (cevap köşeli anlatı kutusu, soru balon). Yerleşimi sıradan
+				   geliyor: Page.svelte'de yalnız sayfanın İLK sorusu çizimle
+				   aynı ızgara gözüne konuyor, bu yüzden buradaki balon cevabın
+				   ALTINA akıyor — kural `:first-child` ile sınırlı. */
+				{ t: 'dialog', id: 'sy-7:3', who: 'q', text: 'peki tamam sdjkfbds' }
 			]
 		},
 		{
