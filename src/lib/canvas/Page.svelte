@@ -69,3 +69,87 @@
 		{/each}
 	</div>
 </section>
+
+<style>
+	/* ======================================================================
+	   SÖYLEŞİ SAYFASI — "Balon" düzeni
+	   ----------------------------------------------------------------------
+	   Sekiz soru-cevap sayfası (sy-1…sy-8) burada kuruluyor. Açılış sayfası
+	   DIŞARIDA: `kind: 'opener'` taşıdığı için `data-kind` "interview" değil
+	   "opener" oluyor ve beğenilen o tasarım ellenmiyor.
+
+	   NEDEN İÇERİK DEĞİL DÜZEN DEĞİŞTİ
+	   Blok sırası kilitli: `sy-N:0` soru, `sy-N:1` cevap, `sy-N:2` çizim ve
+	   integrity.test.ts her kimliği `sayfaId:index` olmaya zorluyor. Blokları
+	   görsel sıraya dizmek kimlikleri kaydırırdı, kimlikler de yorum ankrajı
+	   (docs/YORUM-SISTEMI.md §2.1) — sekiz sayfalık bir tasarım tercihi için
+	   okurların yorumları sayfa seviyesine düşerdi.
+
+	   Çözüm ızgara: DOM sırası olduğu gibi kalıyor, yerleşim `grid-row` ile
+	   veriliyor. Ayrıca ızgara, akışın yapamadığı tek şeyi yapıyor — çizimle
+	   balonu AYNI GÖZE koyup üst üste bindiriyor.
+
+	         satır 1 │ çizim  +  soru balonu (alta yaslı, çizmenin üstünde)
+	         satır 2 │ cevap kutusu
+	         satır 3+│ kalanlar (sy-8'de `rule` + `note`) kendiliğinden dizilir
+
+	   Kurallar `:global()` çünkü hedefler başka bileşenlerin kök öğeleri
+	   (Dialog.svelte, Figure.svelte). Kapsam yine de dar: hepsi bu bileşenin
+	   kendi `.page` öğesinden iniyor ve yalnız `data-kind="interview"` iken.
+	   =================================================================== */
+	.page[data-kind='interview'] {
+		/* Balonun çizimin ALTINA taşan payı. Kuyruk da bu boşluğun içinde
+		   duruyor — sayı büyürse balon resimden kopar, küçülürse kuyruk
+		   cevap kutusuna girer. */
+		--balon-tasma: 9cqi;
+	}
+
+	.page[data-kind='interview'] .page__inner {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: var(--sp-4);
+	}
+
+	/* blocks.css bloklar arasına `margin-top` koyuyor; ızgarada aralığı
+	   `row-gap` veriyor, ikisi üst üste binmesin.
+
+	   `:not(.figure)` şart: figürün marjı SÜS DEĞİL, düzenin kendisi (aşağıya
+	   bak — üstte sayfa dolgusunu geri alıyor, altta balona yer açıyor). O
+	   muafiyet olmadan buradaki sıfırlama figür kuralını eziyordu; ikisi de
+	   benim kuralım ama bu seçici daha özgül, yani sessizce kazanıyordu. */
+	.page[data-kind='interview'] .page__inner > :global(.blk + .blk:not(.figure)) {
+		margin-top: 0;
+	}
+
+	/* ÇİZİM — tam kanıyor. Kaynak bir makale fotoğrafı değil, VİDEO KARESİ;
+	   kenar boşluğuna alınıp köşesi yuvarlatılınca "resim" gibi duruyordu,
+	   oysa sayfanın zemini olması gerekiyor. Negatif marjlar sayfanın kendi
+	   dolgusunu geri alıyor (canvas.css `.page` → 1.35 dikey / 1 yatay). */
+	.page[data-kind='interview'] :global(.figure) {
+		grid-row: 1;
+		grid-column: 1;
+		margin: calc(var(--pad-page) * -1.35) calc(var(--pad-page) * -1) var(--balon-tasma);
+	}
+
+	.page[data-kind='interview'] :global(.figure img) {
+		border-radius: 0;
+	}
+
+	/* SORU — çizimle aynı gözde, alta yaslı. Figürün alt marjı (`--balon-tasma`)
+	   satırı o kadar uzattığı için balon tam o kadar taşıyor: ayrıca negatif
+	   marj vermeye gerek yok.
+
+	   ⚠️ `z-index` süs değil: soru DOM'da çizimden ÖNCE geliyor (blok sırası
+	   kilitli — `sy-N:0` soru, `sy-N:2` çizim) ve aynı gözü paylaşan iki öğede
+	   sonra gelen üste boyanır. Onsuz çizim balonun üstüne biniyor ve sorunun
+	   ÜST SATIRLARI görünmez oluyordu — üstelik sessizce: kısa sorularda balon
+	   resmin altında kaldığı için hiç fark edilmiyor, yalnız uzun sorularda
+	   ortaya çıkıyordu. `.dialog--q` konumunu Dialog.svelte'den zaten alıyor
+	   (kuyruk için `position: relative`), yığın burada sıralanıyor. */
+	.page[data-kind='interview'] :global(.dialog--q) {
+		grid-row: 1;
+		grid-column: 1;
+		align-self: end;
+		z-index: 1;
+	}
+</style>

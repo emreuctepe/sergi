@@ -201,11 +201,29 @@ describe('künye satırı', () => {
 });
 
 describe('söyleşi', () => {
-	it('soruda "S", cevapta adın baş harfi', () => {
-		expect(draw({ t: 'dialog', id: 'x:0', who: 'q', text: '?' })).toContain(
-			'<span class="dialog__who">S</span>'
-		);
-		expect(draw(SAMPLES.dialog)).toContain('<span class="dialog__who">N</span>');
+	/* Rozet ("S" / adın baş harfi) "Balon" düzeniyle birlikte kalktı: soruyu
+	   balonun kendisi işaretliyor, cevabı da anlatı kutusunun künyesindeki TAM
+	   ad. Bu test o kararı tutuyor — rozet sessizce geri gelirse kırmızı yanar. */
+	it('soruda işaret yok, cevapta adın tamamı yazıyor', () => {
+		const soru = draw({ t: 'dialog', id: 'x:0', who: 'q', text: '?' });
+		expect(soru).toContain('dialog--q');
+		expect(soru).not.toContain('dialog__who');
+		expect(soru).not.toContain('dialog__name');
+
+		/* Sınıf listesine göre eşleşiyor, tam dizgiye göre değil: Dialog artık
+		   kendi kapsamlı stilini taşıdığı için Svelte her öğeye bir kapsam
+		   sınıfı (`svelte-xxxxxx`) ekliyor ve o karma stil her değiştiğinde
+		   değişir. Test tasarımı tutmalı, derleyicinin karmasını değil. */
+		const cevap = draw(SAMPLES.dialog);
+		expect(cevap).not.toContain('dialog__who');
+		expect(cevap).toMatch(/<span class="dialog__name[^"]*">Nur<\/span>/);
+	});
+
+	/* Ad isteğe bağlı (`DialogBlock.name?`) — adsız bir cevap boş künye
+	   basmamalı, yoksa kutunun tepesinde sebepsiz bir boşluk kalır. */
+	it('adsız cevapta künye hiç basılmıyor', () => {
+		const adsiz = draw({ t: 'dialog', id: 'x:0', who: 'a', text: 'Cevap.' });
+		expect(adsiz).not.toContain('dialog__name');
 	});
 });
 

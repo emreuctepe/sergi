@@ -7,10 +7,18 @@
 	   rozeti, soru sans, cevap serif, altında görsel. Sekiz kez tekrarlanan bir
 	   sohbet dökümü gibi duruyor; dergi sayfası gibi durmuyor.
 
-	   Bu sayfa sekiz AYRI aday tasarım gösterir. Hiçbiri henüz üretimde değil:
-	   `Dialog.svelte` ve `Figure.svelte` ellenmedi, `blocks.css` ellenmedi
-	   (parity.test.ts onu prototiple bayt bayt eşit tutuyor). Seçim yapıldıktan
-	   sonra kazanan buradan çıkarılıp gerçek bloklara taşınacak.
+	   Bu sayfa sekiz AYRI aday tasarım gösterir.
+
+	   ✅ SEÇİM YAPILDI: 3 · BALON kazandı ve üretime taşındı. Artık sy-1…sy-8'in
+	   canlı hâli bu — uygulaması `Dialog.svelte` (balon + anlatı kutusu) ile
+	   `Page.svelte` (ızgara: balonu çizimle örtüştüren yer). `blocks.css` yine
+	   ELLENMEDİ; parity.test.ts onu prototiple bayt bayt eşit tutuyor, o yüzden
+	   tasarım katmansız bileşen stili olarak yazıldı (bkz. Dialog.svelte başı).
+
+	   Sayfa neden silinmedi: yedi aday, seçilmeyen yolu ve nedenini taşıyor —
+	   "bunu da denedik" bilgisi kararın kendisi kadar değerli. Ama artık bir
+	   AYNA DEĞİL: kartlar üretimin kopyası, kendi işaretlemeleriyle çiziliyor.
+	   Tasarım değişecekse gerçek bloklar değişir, bu kartlar değil.
 
 	   Adaylar çizerin KENDİ görsel dilinden türetildi: tarama çizgisi, hâle
 	   konturu, yüksek kontrast, 20:9 sinema karesi. Kaynaklar 400×180 civarı,
@@ -368,11 +376,20 @@
 
 <main>
 	<header>
-		<p class="kicker">Faz 1f · dev · üretime girmedi</p>
+		<p class="kicker">Faz 1f · dev · seçim yapıldı</p>
 		<h1>Röportaj sayfası — sekiz aday</h1>
 		<p class="tagline">
 			<code>sy-1…sy-8</code> için sekiz ayrı tasarım. Açılış sayfası (<code>sy-acilis</code>) kapsam
-			dışı. Hiçbiri henüz gerçek bloklara dokunmuyor — seçilen buradan taşınacak.
+			dışı. <strong>3 · Balon kazandı ve üretime taşındı</strong> — artık
+			<code>/sayi/2026-09</code>'da sekiz sayfanın hâli bu. Bu sayfa kararın kaydı olarak duruyor:
+			yedi aday çizilmemiş yolu gösteriyor.
+		</p>
+		<p class="tagline">
+			⚠️ Kartlar üretimin AYNASI DEĞİL, kopyası: kazanan buradan
+			<code>Dialog.svelte</code>
+			+ <code>Page.svelte</code>'ye elle taşındı. Gerçek sayfada balon çizimle ızgarada örtüşüyor;
+			burada kendi işaretlemesiyle çiziliyor. Tasarımı değiştirmek için gerçek bloklara git —
+			buradaki kartı düzenlemek hiçbir şeyi değiştirmez.
 		</p>
 
 		<div class="controls">
@@ -410,11 +427,13 @@
 		<!-- Kıyas tabanı önce: "neyi beğenmedik" gözün önünde dursun. -->
 		<figure class="card card--base">
 			<figcaption>
-				<span class="tag tag--base">şu anki hâli</span>
+				<span class="tag tag--base">eski hâli</span>
 				<span class="pid">{icerikFor(0).page.id}</span>
 			</figcaption>
 			<div class="stage"><div class="stage__inner">{@render mevcut(icerikFor(0))}</div></div>
-			<p class="fikir">Sekiz sayfa boyunca değişmiyor: rozet, soru, cevap, görsel.</p>
+			<p class="fikir">
+				Balon'dan ÖNCEKİ hâli — sekiz sayfa boyunca değişmiyordu: rozet, soru, cevap, görsel.
+			</p>
 		</figure>
 
 		{#each variants as v, i (v.id)}
@@ -628,9 +647,13 @@
 
 	   Yeniden ayarlanacaksa BURASI değişir, aşağıdaki kurallar değil.
 
-	   `.v0` (şu anki hâli) bilerek DIŞARIDA: o kıyas tabanı, yani canlıda ne
-	   varsa onu göstermek zorunda. Ona da uygulanırsa "neyi değiştiriyoruz"
-	   sorusunun cevabı kaybolur.
+	   `.v0` (Balon'dan önceki hâli) bilerek DIŞARIDA: o kıyas tabanı, yani
+	   DEĞİŞTİRDİĞİMİZ şeyi göstermek zorunda. Ona da uygulanırsa "neyi
+	   değiştirdik" sorusunun cevabı kaybolur.
+
+	   Bu iki çarpan Balon'la birlikte üretime de geçti — orada Dialog.svelte'in
+	   içinde, `.dialog` üstünde duruyorlar. İkisi ELLE eşlenik: buradaki değer
+	   değişirse canlı sayfa değişmez.
 	   =================================================================== */
 	.stage {
 		--soru-olcek: 0.9;
@@ -638,11 +661,14 @@
 	}
 
 	/* ======================================================================
-	   0 · ŞU ANKİ HÂLİ — blocks.css'teki `.dialog` + `.figure`nin kopyası
+	   0 · BALON'DAN ÖNCEKİ HÂLİ — blocks.css'teki `.dialog` + `.figure` kopyası
 	   ----------------------------------------------------------------------
 	   Gerçek bileşenleri çağırmak yerine kopyalandı: `Dialog.svelte` global
 	   `.dialog` sınıfını kullanıyor, Svelte kapsamı ona işlemiyor ve kart
 	   içinde ölçüleri denetleyemiyorduk. Kıyas tabanı olarak birebir yeter.
+
+	   ⚠️ Bu kopya artık Dialog.svelte'i İZLEMİYOR: orada rozet kalktı, burada
+	   duruyor. Bilerek — kart "eskiden neydi"yi göstermek için var.
 	   =================================================================== */
 	.v0 {
 		padding: calc(var(--pad-page) * 1.35) var(--pad-page);
