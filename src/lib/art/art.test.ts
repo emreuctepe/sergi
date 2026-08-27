@@ -19,9 +19,12 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-import { rng } from './rng';
+import { fallenLeaves } from './leaves';
+import { rng, round } from './rng';
 import { SEAL_SEED, SUMI_SEED, sealCuts, sumiInk } from './sumi';
 import { SCENE_NAMES } from './scenes';
+import { streetSigns } from './street';
+import { RING_RADII, seigaiha } from './waves';
 
 const require = createRequire(import.meta.url);
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -109,15 +112,92 @@ describe('sumi ↔ prototip', () => {
 	});
 });
 
+describe('leaves ↔ prototip', () => {
+	/* `<g transform="translate(x,y) rotate(r) scale(s)" opacity="o">` */
+	const groups = [
+		...art
+			.scene('leaves')
+			.matchAll(
+				/<g transform="translate\((-?[\d.]+),(-?[\d.]+)\) rotate\((-?[\d.]+)\) scale\(([\d.]+)\)" opacity="([\d.]+)">.*?fill="(var\(--accent[-\d]*\))"/g
+			)
+	].map((m) => ({ x: +m[1], y: +m[2], rotate: +m[3], scale: +m[4], opacity: +m[5], tone: m[6] }));
+
+	it('on yedi yaprak, hepsi aynı yerde ve aynı tonda', () => {
+		expect(groups).toHaveLength(17);
+		expect(fallenLeaves()).toEqual(groups);
+	});
+});
+
+describe('street ↔ prototip', () => {
+	const signs = [
+		...art
+			.scene('street')
+			.matchAll(
+				/<rect x="([\d.]+)" y="(\d+)" width="(\d+)" height="(\d+)" rx="2" fill="(var\(--accent[-\d]*\))" opacity="([\d.]+)"\/>/g
+			)
+	].map((m) => ({
+		/* Prototip `x`i hiç yuvarlamıyor (`243.53674962744117`); port bir
+		   basamağa indiriyor — bu dosyadaki tek bilinçli ayrılma ve 300 birimlik
+		   bir tuvalde görünmez. Karşılaştırma o yuvarlamayı geri uyguluyor,
+		   yani hâlâ prototipin sayısı referans. */
+		x: round(+m[1], 1),
+		y: +m[2],
+		width: +m[3],
+		height: +m[4],
+		tone: m[5],
+		opacity: +m[6]
+	}));
+
+	it('dokuz tabela, hepsi aynı yerde ve aynı ölçüde', () => {
+		expect(signs).toHaveLength(9);
+		expect(streetSigns()).toEqual(signs);
+	});
+});
+
+describe('waves ↔ prototip', () => {
+	const wavesSvg = art.scene('waves');
+	const groups = [...wavesSvg.matchAll(/<g opacity="([\d.]+)"[^>]*>(.*?)<\/g>/g)].map((m) => ({
+		opacity: +m[1],
+		circles: [...m[2].matchAll(/<circle cx="(-?\d+)" cy="(\d+)" r="(\d+)"\/>/g)].map((c) => ({
+			cx: +c[1],
+			cy: +c[2],
+			r: +c[3]
+		}))
+	}));
+
+	it('90 öbek, aynı merkezlerde ve aynı saydamlıkta', () => {
+		expect(groups).toHaveLength(90);
+		expect(seigaiha()).toEqual(
+			groups.map((g) => ({ cx: g.circles[0].cx, cy: g.circles[0].cy, opacity: g.opacity }))
+		);
+	});
+
+	it('her öbekte dört çember, dıştan içe aynı yarıçaplar', () => {
+		for (const g of groups) expect(g.circles.map((c) => c.r)).toEqual([...RING_RADII]);
+	});
+});
+
 describe('sahne kaydı', () => {
 	it('kayıtlı her sahne prototipte de var', () => {
 		for (const name of SCENE_NAMES) expect(art.has(name), `${name} prototipte yok`).toBeTruthy();
 	});
 
 	it("yalnız 2026-09'un kullandığı sahneler taşındı", () => {
-		/* Prototipte 22 sahne var; 19'u yalnız 2026-10'a ait ve 1.0'a girmiyor
+		/* Prototipte 22 sahne var; 15'i yalnız 2026-10'a ait ve 1.0'a girmiyor
 		   (bkz. docs/BUILD-TODO.md karar 1.29). Sayı burada kilitli ki "bir
-		   sahne daha lazım" kararı diff'te görünsün. */
-		expect([...SCENE_NAMES].sort()).toEqual(['paper', 'portrait', 'sumi']);
+		   sahne daha lazım" kararı diff'te görünsün.
+
+		   Liste 1e'de üçtü ve EKSİKTİ: sayfa arka planları üçünü çağırıyor ama
+		   tanıtım kartları dört tane daha istiyor (karar 1.41). Dördü 1f'te
+		   geldi — `leaves`, `street`, `torii`, `waves`. */
+		expect([...SCENE_NAMES].sort()).toEqual([
+			'leaves',
+			'paper',
+			'portrait',
+			'street',
+			'sumi',
+			'torii',
+			'waves'
+		]);
 	});
 });

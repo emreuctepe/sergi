@@ -8,9 +8,13 @@
 -->
 <script lang="ts">
 	import type { SceneName } from './scenes';
+	import Leaves from './Leaves.svelte';
 	import Paper from './Paper.svelte';
 	import Portrait from './Portrait.svelte';
+	import Street from './Street.svelte';
 	import Sumi from './Sumi.svelte';
+	import Torii from './Torii.svelte';
+	import Waves from './Waves.svelte';
 
 	let { name }: { name: SceneName } = $props();
 
@@ -20,12 +24,20 @@
 	}
 </script>
 
-{#if name === 'paper'}
+{#if name === 'leaves'}
+	<Leaves />
+{:else if name === 'paper'}
 	<Paper />
 {:else if name === 'portrait'}
 	<Portrait />
+{:else if name === 'street'}
+	<Street />
 {:else if name === 'sumi'}
 	<Sumi />
+{:else if name === 'torii'}
+	<Torii />
+{:else if name === 'waves'}
+	<Waves />
 {:else}
 	{bilinmeyenSahne(name)}
 {/if}

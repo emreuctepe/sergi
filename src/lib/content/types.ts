@@ -371,10 +371,18 @@ export interface Section {
    TANITIM (intro)
    ======================================================================= */
 
-/** İlk ziyarette gösterilen kaydırmalı kartlar, ~12 saniye. */
+/**
+ * İlk ziyarette gösterilen kaydırmalı kartlar, ~12 saniye.
+ *
+ * `scene` bir zamanlar düz `string`ti ve bu, `Background` için kapatılan
+ * deliğin burada açık kalması demekti: yazım hatası derleme hatası değildi.
+ * Daha kötüsü, sahneleri "kim çağırıyor" diye sayarken bu kartlar atlandı —
+ * `bg: 'scene:…'` biçimini arayan sayım çıplak alanı görmedi ve 1e "üç sahne
+ * yeter" diye kapandı, oysa yedi gerekiyordu (karar 1.41).
+ */
 export interface IntroCard {
-	/** art.ts sahne adı — kartın arka planı. */
-	scene: string;
+	/** Kartın arka planı — `src/lib/art/` sahne kaydından. */
+	scene: SceneName;
 	big: string;
 	small: string;
 	/** Son kart: mod seçimine geçiş düğmesini taşır. */
