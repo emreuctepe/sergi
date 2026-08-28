@@ -81,9 +81,15 @@ test('noktalar kaydırmayı izliyor', async ({ page }) => {
 	await expect(page.locator('.intro__dots i[data-on="true"]')).toHaveAttribute('data-i', '2');
 });
 
-/* Üç çıkış da aynı kapıdan: katman kalkıyor, tuval geri geliyor, tercih
-   yazılıyor. Ayrı ayrı sınanıyorlar çünkü üçü ayrı yerden `finish()` çağırıyor
-   ve biri bağlanmadan kalırsa ötekiler bunu gizler. */
+/* Üç çıkış da aynı kapıdan: katman kalkıyor, ARKASINDAN MOD SEÇİCİ geliyor,
+   tercih yazılıyor. Ayrı ayrı sınanıyorlar çünkü üçü ayrı yerden `finish()`
+   çağırıyor ve biri bağlanmadan kalırsa ötekiler bunu gizler.
+
+   Tanıtımın çıkışı tuvali GERİ VERMİYOR — üçüncü kart "üç okuma derinliği"
+   diye söz veriyor ve seçim hemen arkasından geliyor ki söz havada kalmasın.
+   Yani okurun ilk ziyarette gördüğü kapı sayısı iki; testin de ikisinden de
+   geçmesi gerekiyor, yoksa "tuval geri geldi" iddiası seçicinin altında
+   ölçülür ve her zaman kırmızı yanar. */
 for (const [ad, cikis] of [
 	['son karttaki düğme', (page: Page) => page.locator('.intro__start').click()],
 	['Atla', (page: Page) => page.locator('.intro__skip').click()],
@@ -102,15 +108,30 @@ for (const [ad, cikis] of [
 		await cikis(page);
 
 		await expect(host(page)).toHaveCount(0);
+
+		/* Kartlar gitti ama tuval HÂLÂ çekili: sıra seçicide. */
+		await expect(page.locator('.modal')).toBeVisible();
+		await expect(page.locator('#shell')).toHaveAttribute('inert', '');
+
+		/* İlk seçim atlanamıyor — kapatma düğmesi YOK. Olsaydı okur, hiç
+		   sormadığımız bir varsayılanla okumaya başlardı. */
+		await expect(page.locator('.modal__x')).toHaveCount(0);
+
+		/* Tanıtımın tercihi GERÇEKTEN uygulamanın anahtarına yazılıyor mu? Bu
+		   iddia aynı zamanda e2e/prefs.ts'teki ikizlenmiş anahtarı sabitliyor.
+		   Mod henüz yok: seçici tam da onu sormak için açık. */
+		const araKayit = await page.evaluate((key) => localStorage.getItem(key), PREFS_KEY);
+		expect(araKayit && JSON.parse(araKayit)).toMatchObject({ seenIntro: true, depth: null });
+
+		await page.locator('.depth-card').nth(2).click();
+
+		/* İkinci kapı da kapandı: tuval geri döndü, klavye yine sayfa çeviriyor. */
+		await expect(page.locator('.modal')).toHaveCount(0);
 		await expect(page.locator('#shell')).not.toHaveAttribute('inert', '');
-
-		/* Tercih GERÇEKTEN uygulamanın anahtarına yazılıyor mu? Bu iddia aynı
-		   zamanda e2e/prefs.ts'teki ikizlenmiş anahtarı da sabitliyor. */
-		const kayit = await page.evaluate((key) => localStorage.getItem(key), PREFS_KEY);
-		expect(kayit && JSON.parse(kayit).seenIntro).toBe(true);
-
-		/* Tuval geri döndü: klavye yine sayfa çeviriyor. */
 		await page.keyboard.press('ArrowDown');
 		await expect(page.locator('#folio-page')).toHaveText(/^02 \//);
+
+		const kayit = await page.evaluate((key) => localStorage.getItem(key), PREFS_KEY);
+		expect(kayit && JSON.parse(kayit)).toMatchObject({ seenIntro: true, depth: 'full' });
 	});
 }

@@ -19,8 +19,9 @@
 -->
 <script lang="ts">
 	import { setIssueContext } from '$lib/content/context';
-	import { flow } from '$lib/content/flow';
+	import { flow, nearestVisible } from '$lib/content/flow';
 	import type { Depth, IssueContent } from '$lib/content/types';
+	import { depthName } from '$lib/overlays/depths';
 	import {
 		dockFit,
 		indexAt,
@@ -37,10 +38,17 @@
 	let {
 		content,
 		depth = 'full',
-		inert = false
+		inert = false,
+		ondepthclick
 	}: {
 		content: IssueContent;
 		depth?: Depth;
+		/**
+		 * Banttaki mod çipine dokunulunca. Verilmezse çip HİÇ ÇİZİLMİYOR —
+		 * hiçbir şey yapmayan bir düğme okura verilmiş yalan bir sözdür
+		 * (bkz. bileşenin başındaki not).
+		 */
+		ondepthclick?: () => void;
 		/**
 		 * Üstünde bir katman varken (tanıtım, mod seçici) tuval çekilir: `inert`
 		 * odağı ve işaretçiyi keser. Klavyeyi KESMEZ — `onKey` belgeye bağlı ve
@@ -135,8 +143,30 @@
 		frame = requestAnimationFrame(() => {
 			frame = 0;
 			update();
+			/* Ankraj YALNIZ buradan ve `apply()`ten tazeleniyor: ikisi de okurun
+			   gerçekten hareket ettiği anlar. `update()`in içine konulmuştu ve
+			   sessizce bozuyordu — mod değişince akış effect'i de `update()`
+			   çağırıyor, o an tarayıcı kaydırmayı kısalan belgeye çoktan
+			   sıkıştırmış oluyor ve ankraj "okurun olduğu yer"den "belgenin
+			   sonu"na dönüşüyordu. Ölçüldü: `sy-5`teki okur `min`e geçince
+			   ankraj `son-1` olarak okunuyordu, yani konum koruma kendi
+			   kaydettiği yanlış yere sadakatle gidiyordu. */
+			anchorId = items[current]?.page.id ?? anchorId;
 		});
 	}
+
+	/**
+	 * Okurun EN SON hangi sayfada olduğu — okuma modu değişince buraya dönülüyor.
+	 *
+	 * `current` bir İNDEKS ve mod değişince aynı indeks bambaşka bir sayfaya
+	 * denk geliyor (`min` 19, `full` 30 sayfa). Kalıcı olan tek şey kimlik,
+	 * o yüzden ankraj kimlikle tutuluyor. Reaktif DEĞİL: yalnız olay
+	 * işleyicileri okuyor ve yazıyor — `metrics` ile aynı gerekçe.
+	 *
+	 * Yalnız İKİ yerden tazeleniyor, ikisi de okurun gerçekten yer değiştirdiği
+	 * anlar: `onScroll` (kaydırma oturunca) ve `apply` (gezinme hedefi).
+	 */
+	let anchorId: string | null = null;
 
 	function update() {
 		if (!scroller || !metrics.length) return;
@@ -152,7 +182,9 @@
 		const viewH = scroller.clientHeight;
 
 		/* Yumuşak kaydırma sürerken okunan sayfayı KONUMDAN türetmiyoruz: yol
-		   henüz yarıda ve türetilen sayfa hâlâ eskisi olurdu (bkz. `settleAt`). */
+		   henüz yarıda ve türetilen sayfa hâlâ eskisi olurdu (bkz. `settleAt`).
+
+		   ⚠️ ANKRAJ BURADA YAZILMIYOR — gerekçesi `onScroll`da. */
 		if (Date.now() >= settleAt) current = indexAt(metrics, top, viewH);
 
 		/* İlerleme çubuğu her zaman gerçek konumdan: o bir vaat değil, ölçüm. */
@@ -202,22 +234,35 @@
 		return Date.now() < settleAt ? settleTop : (scroller?.scrollTop ?? 0);
 	}
 
-	function apply(step: Step) {
+	function apply(step: Step, instant = false) {
 		if (!scroller) return;
-		const smooth = !reducedMotion();
+		const smooth = !instant && !reducedMotion();
 		const top = step.kind === 'scroll' ? step.top : (metrics[step.index]?.top ?? 0);
 
-		if (step.kind === 'page') current = step.index;
+		if (step.kind === 'page') {
+			current = step.index;
+			/* Ankraj gezinmeyle birlikte yazılıyor: yumuşak kaydırma sürerken
+			   `update()` konumdan türetmeyi bıraktığı için (`settleAt`) tek
+			   güncel kaynak burası. */
+			anchorId = items[step.index]?.page.id ?? anchorId;
+		}
 		settleTop = top;
 		settleAt = Date.now() + (smooth ? 500 : 50);
 
-		scroller.scrollTo({ top, behavior: smooth ? 'smooth' : 'auto' });
+		/* `'instant'` — `'auto'` DEĞİL. `auto`, "elementin CSS'teki
+		   `scroll-behavior`ına uy" demek ve `.pages` orada `smooth`
+		   (`canvas.css:108`). Yani `instant = true` diye çağrılan gezinme
+		   sessizce YUMUŞAK kalıyordu: karar JS'te veriliyor, uygulaması CSS'e
+		   bırakılıyordu. Ölçüldü — mod değişimindeki konum düzeltmesi ~600 ms
+		   süren bir süzülmeye dönüşüyor, okur yeni düzenin içinden geçtiğini
+		   görüyordu; aşağıdaki effect'in "kaydırma ANİ" sözünün tam tersi.
+		   İkinci kurban `prefers-reduced-motion` okuru: CSS `scroll-behavior`ı
+		   o medya sorgusunda çevirmiyor (yalnız `[data-motion="off"]`
+		   çeviriyor), yani `reducedMotion()` doğru karar verip kararını
+		   uygulayamıyordu. İki değeri de açıkça yazmak ikisini de kapatıyor. */
+		scroller.scrollTo({ top, behavior: smooth ? 'smooth' : 'instant' });
 	}
 
-	/* Dışa açılmıyor: şu an tuvalin dışından kimse gezdirmiyor. Kimliğe göre
-	   gitme (`goToId`) Faz 1f'in işi — okuma modu değişince okurun yerini
-	   koruyacak olan o. Kullanılmayan bir API'yi şimdiden yazmak, kullanıldığı
-	   gün yanlış olduğunu keşfedeceğimiz bir API yazmaktır. */
 	function goTo(index: number) {
 		apply({ kind: 'page', index });
 	}
@@ -276,11 +321,57 @@
 	});
 
 	$effect(() => {
-		/* `items` değişince (okuma modu — Faz 1f) yeniden ölç. */
+		/* `items` değişince (okuma modu) yeniden ölç. */
 		void items;
 		readMetrics();
 		measure();
 		update();
+	});
+
+	/**
+	 * KONUM KORUMA — mod değişince okur bıraktığı yerde kalıyor.
+	 *
+	 * Kendi effect'inde, çünkü tetikleyicisi akışın yeniden çizilmesi değil
+	 * MODUN DEĞİŞMESİ: aynı modda yeniden ölçülmek okuru yerinden oynatmamalı.
+	 * İlk koşu (`lastDepth === null`) montaj; orada korunacak bir yer yok.
+	 *
+	 * Kaydırma BİR KARE SONRA. Effect çalıştığında sayfalar DOM'dan yeni
+	 * kalkmış oluyor ve tarayıcı hem düzeni hem kaydırma sınırını daha
+	 * hesaplamamış; o anda verilen `scrollTo` kısalan belgeye sıkıştırılıp
+	 * yutuluyordu (ölçüldü: 8390'a sürüldü, bir sonraki koşuda konum hâlâ
+	 * 14486'ydı). Bir kare beklemek düzenin oturmasını garanti ediyor.
+	 *
+	 * Ankrajın karşılığı yeni akışta olmayabilir (okur `km-4`teyken `min`e
+	 * geçerse o sayfa artık yok); `nearestVisible` en yakın görünür sayfayı
+	 * veriyor ve kuralı orada yazılı. Karşılık yoksa hiç kıpırdamıyoruz:
+	 * yanlış bir yere atlamaktansa olduğu yerde kalmak daha az zarar verir.
+	 *
+	 * Kaydırma ANİ: okur bir mod seçti, yeni düzenin içinden yumuşakça
+	 * süzülmesini izlemek istemiyor.
+	 */
+	let lastDepth: Depth | null = null;
+
+	$effect(() => {
+		const next = depth;
+		const previous = lastDepth;
+		lastDepth = next;
+		if (previous === null || previous === next || !anchorId) return;
+
+		const target = nearestVisible(content, anchorId, next);
+		if (!target) return;
+
+		const frame = requestAnimationFrame(() => {
+			readMetrics();
+			const index = items.findIndex((item) => item.page.id === target);
+			if (index >= 0) apply({ kind: 'page', index }, true);
+		});
+		return () => cancelAnimationFrame(frame);
+	});
+
+	/* Banttaki çipin sinyal çubukları ve sayfa düzeni buradan besleniyor
+	   (`canvas.css` → `:root[data-depth="…"]`). */
+	$effect(() => {
+		document.documentElement.dataset.depth = depth;
 	});
 
 	$effect(() => {
@@ -341,6 +432,30 @@
 <div id="shell" data-letterbox={letterbox} data-chrome={chrome} {inert}>
 	<header class="band band--top">
 		<div class="band__center">
+			<!--
+				MOD ÇİPİ — okurun modunu görebildiği ve değiştirebildiği tek yer.
+				Prototipte bir de menü vardı; o Faz 2+ ve gelmeden bu düğme
+				olmasaydı seçim TEK YÖNLÜ olurdu: tanıtım "üç okuma derinliği"
+				diye söz veriyor, seçici "istediğin an değiştirebilirsin" diyor
+				ve okurun elinde hiçbir kapı olmuyordu.
+
+				Çubuklar `canvas.css`'te `:root[data-depth]`ten doluyor.
+			-->
+			{#if ondepthclick}
+				<button
+					class="depth-chip"
+					type="button"
+					aria-haspopup="dialog"
+					aria-label="Okuma modu: {depthName(depth)} — değiştir"
+					onclick={ondepthclick}
+				>
+					<span class="depth-chip__bars" aria-hidden="true"><i></i><i></i><i></i></span>
+					<!-- Görünen etiket yalnız ad: bant dar ve çip başlığın yanında
+					     duruyor. "Okuma modu" bağlamı `aria-label`da; çubuklar da
+					     zaten hangi kademede olduğumuzu gösteriyor. -->
+					<span class="depth-chip__label">{depthName(depth)}</span>
+				</button>
+			{/if}
 			<div class="band__issue">
 				<span class="band__issue-no">{String(content.issue.number).padStart(2, '0')}</span>
 				<span class="band__issue-name">{content.issue.title}</span>

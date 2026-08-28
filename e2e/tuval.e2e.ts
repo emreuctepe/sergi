@@ -17,7 +17,7 @@
    ========================================================================= */
 
 import { expect, test, type Page } from '@playwright/test';
-import { tanitimiAtla } from './prefs';
+import { sayiyaGir, tanitimiAtla } from './prefs';
 
 const SAYI = '/sayi/2026-09';
 
@@ -33,11 +33,12 @@ const percent = (page: Page) =>
 	page.locator('[role="progressbar"]').getAttribute('aria-valuenow').then(Number);
 
 test.beforeEach(async ({ page }) => {
-	/* Bu dosyanın konusu tuval; tanıtım kartları (tanitim.e2e.ts) ilk ziyarette
-	   tuvali `inert` yapıp önüne geçiyor. Okur "dergiyi daha önce açmış" olarak
-	   giriyor — mod tercihi yine de yok, yani akış prerender'daki `full`. */
+	/* Bu dosyanın konusu tuval; tanıtım kartları (tanitim.e2e.ts) ve arkasından
+	   gelen mod seçici (mod.e2e.ts) ilk ziyarette tuvali `inert` yapıp önüne
+	   geçiyor. Okur ikisini de geçmiş olarak giriyor: tanıtımı görmüş, modu
+	   `full` — bu dosyadaki her sayım (`SAYFA_SAYISI`) o moda ait. */
 	await tanitimiAtla(page);
-	await page.goto(SAYI);
+	await sayiyaGir(page, SAYI);
 	await expect(page.locator('.page')).toHaveCount(SAYFA_SAYISI);
 });
 

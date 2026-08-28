@@ -11,7 +11,7 @@
 	stilini taşıyor (karar 1.40).
 -->
 <script lang="ts">
-	import { assetUrl, avifSrcset } from '$lib/content/assets';
+	import { assetUrl, avifSrcset, GORSEL_SIZES as SIZES } from '$lib/content/assets';
 	import type { FigureBlock } from '$lib/content/types';
 	import { cizimAttrs, type BlockAttrs } from './attrs';
 	import Inline from './Inline.svelte';
@@ -22,7 +22,6 @@
 
 	/* Manga karesiyle aynı cömert değer: tuval masaüstünde 560 CSS px'te
 	   sabit, sayfa onun neredeyse tamamı. */
-	const SIZES = '(max-width: 640px) 100vw, 600px';
 </script>
 
 <figure {...attrs} class={['figure', attrs.class]}>

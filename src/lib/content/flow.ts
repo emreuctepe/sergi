@@ -31,6 +31,36 @@ export function flow(content: IssueContent, depth: Depth): FlowItem[] {
 	return out;
 }
 
+/**
+ * Okuma modu değişince okurun yeri: `pageId` yeni akışta yoksa ona EN YAKIN
+ * görünür sayfa. Bulunamazsa `null`.
+ *
+ * Bir sayfa moddan moda kayboluyor (`km-4` yalnız `full`'de var) ve okur tam
+ * oradayken mod değiştirebiliyor. Karşılığı yoksa sayı başa sarmamalı — okur
+ * yerini kaybetmiş olur ve mod değiştirmenin bedeli "baştan başlamak" olurdu.
+ *
+ * Arama iki yönlü ama GERİYE öncelikli: eşit uzaklıkta geride kalan sayfa
+ * kazanıyor, çünkü ileri atlamak okunmamış içeriğin üstünden geçmek demek.
+ * Geri düşmek en fazla okunmuş bir sayfayı tekrar gösterir.
+ *
+ * Aday listesi akış değil SAYININ TAMAMI: `pageId` yeni derinlikte görünmüyor,
+ * yani yeni akışta hiç yok. Nerede durduğunu ancak tam sırada bulabiliyoruz.
+ */
+export function nearestVisible(content: IssueContent, pageId: string, depth: Depth): string | null {
+	const all = content.sections.flatMap((section) => section.pages);
+	const at = all.findIndex((page) => page.id === pageId);
+	if (at < 0) return null;
+	if (pageVisible(all[at], depth)) return pageId;
+
+	for (let d = 1; d < all.length; d++) {
+		const back = all[at - d];
+		if (back && pageVisible(back, depth)) return back.id;
+		const forward = all[at + d];
+		if (forward && pageVisible(forward, depth)) return forward.id;
+	}
+	return null;
+}
+
 /* ==========================================================================
    OKUMA SÜRESİ TAHMİNİ
    --------------------------------------------------------------------------

@@ -28,7 +28,7 @@
 <script lang="ts">
 	import Scene from '$lib/art/Scene.svelte';
 	import { isSceneName } from '$lib/art/scenes';
-	import { assetUrl, avifSrcset } from '$lib/content/assets';
+	import { assetUrl, avifSrcset, GORSEL_SIZES as SIZES } from '$lib/content/assets';
 	import type { Background } from '$lib/content/types';
 
 	/** `eager`: yalnız sayının İLK sayfası. Gerekçe aşağıda. */
@@ -40,12 +40,6 @@
 	});
 
 	const avif = $derived(source.kind === 'img' ? avifSrcset(source.value) : null);
-
-	/* Tuval ölçüldü: telefonda 390 CSS px, masaüstünde 560'ta sabitleniyor
-	   (3:4 letterbox yüksekliğe sıkıştığı için geniş ekranda büyümüyor).
-	   600 biraz cömert — az indirmektense fazla indirmek yeğ, çünkü eksiği
-	   bulanık bir fotoğraf demek. */
-	const SIZES = '(max-width: 640px) 100vw, 600px';
 </script>
 
 {#if source.kind === 'img'}

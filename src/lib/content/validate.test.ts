@@ -19,6 +19,7 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
+import { gorselYollari } from './assets';
 import { flow } from './flow';
 import { formatProblems, validateIssue } from './validate';
 import type { Depth, IssueContent } from './types';
@@ -103,20 +104,14 @@ describe('görsel yolları', () => {
 	 * İçerikte adı geçen bütün dosya yolları — sayfa arka planı, `figure` bloğu,
 	 * manga karesi, logo.
 	 *
-	 * ⚠️ Yeni bir blok tipi görsel taşımaya başlarsa BURAYA da yazılmalı: bu küme
-	 * eksikse aşağıdaki iki denetim (dosya var mı, türevi üretilmiş mi) o görseli
-	 * hiç görmez ve sessizce geçer.
+	 * Liste bir zamanlar BURADA elle duruyordu ve başında "yeni bir blok tipi
+	 * görsel taşımaya başlarsa burayı da güncelle" uyarısı vardı. Yükleme ekranı
+	 * aynı listeyi isteyince `assets.ts`'e taşındı — ikinci kopya, o uyarıyı iki
+	 * katına çıkarmak olurdu. Şimdi bu testin denetlediği küme, yükleme ekranının
+	 * indirdiği kümenin TA KENDİSİ: biri eksikse öteki de eksik ve test bunu
+	 * söylüyor.
 	 */
-	const referenced = new Set<string>();
-	for (const page of pages) {
-		if (page.bg?.startsWith('img:')) referenced.add(page.bg.slice(4));
-		for (const block of page.blocks) {
-			if (block.t === 'figure') referenced.add(block.img);
-			if (block.t !== 'manga') continue;
-			if (block.mark?.img) referenced.add(block.mark.img);
-			for (const panel of block.panels) if (panel.img) referenced.add(panel.img);
-		}
-	}
+	const referenced = new Set(gorselYollari(content));
 
 	it('içerik 26 görsel dosyasına atıfta bulunuyor', () => {
 		/* 17'ydi: söyleşi 8 çizim + 1 açılış arka planı getirdi (karar 1.42). */

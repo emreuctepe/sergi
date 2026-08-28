@@ -5,7 +5,7 @@
 	değil KAREYE düşer; "4. karedeki bakış" demek bunun üstünde duruyor.
 -->
 <script lang="ts">
-	import { assetUrl, avifSrcset } from '$lib/content/assets';
+	import { assetUrl, avifSrcset, GORSEL_SIZES as SIZES } from '$lib/content/assets';
 	import type { MangaPanel } from '$lib/content/types';
 	import { cizimAttrs, subAttrs } from './attrs';
 	import MangaBubble from './MangaBubble.svelte';
@@ -17,7 +17,6 @@
 	/* Kare düzene göre sayfanın yarısı da olabiliyor tamamı da ("plan" düzeni).
 	   Arka planla aynı cömert değer kullanılıyor: dar vermek bulanık kare
 	   demek, geniş vermenin bedeli ise burada küçük (kaynaklar 1080px). */
-	const SIZES = '(max-width: 640px) 100vw, 600px';
 </script>
 
 <figure class="manga-panel" data-panel={index} {...subAttrs(blockId, 'manga', index)}>
