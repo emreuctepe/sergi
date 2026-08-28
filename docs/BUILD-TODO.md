@@ -11,7 +11,7 @@ kararları için [YORUM-SISTEMI.md](YORUM-SISTEMI.md).
 
 | | |
 |---|---|
-| **Aktif adım** | Faz 1 — tuval, bloklar, içerik (**1a–1f bitti**) |
+| **Aktif adım** | Faz 1 — tuval, bloklar, içerik. **Adımların hepsi (1a–1f) bitti, bölüm KAPANMADI**: geriye harfsiz 5 madde kaldı (biri 1f'e havale edilmişti — `portrait` sahnesi hâlâ kullanıcısız) |
 | **Son tamamlanan** | **1f kapandı ve takım yeşil**: mod seçici, konum koruma, yükleme ekranı ve tanıtım kartları yerinde. Kapanışta bir ürün hatası çıktı — `instant` diye çağrılan gezinme aslında yumuşak kaydırıyordu (karar 1.50) |
 | **Sonraki dosya** | Faz 2 — sırada ne olduğu henüz seçilmedi |
 | **Çalışır durum** | `pnpm dev` → http://localhost:5173/sayi/2026-09 · `lint` · `check` (469 dosya) · `test:unit` (338 test) · `test:e2e` (31 test) · `wrangler deploy --dry-run` hepsi yeşil |
@@ -121,7 +121,11 @@ Backend yok; sayı baştan sona okunuyor. **1.0'ın en büyük tek teslimatı.**
       kopyası bulunursa değiştirilecek (aynı dosya adı, sonra türev script'i)
 - [ ] `portrait` sahnesi artık HİÇBİR sayfa tarafından çağrılmıyor (tek
       kullanıcısı `sy-acilis`'ti). Kodu duruyor; 1f'de ya kullanıcı bulur ya
-      kayıttan düşer
+      kayıttan düşer.
+      ⚠️ **1f kapandı, bu madde kapanmadı.** Tanıtım kartları umut edilen
+      kullanıcıyı getirmedi: beşi de `paper`/`leaves`/`waves`/`street`/`torii`
+      çağırıyor. Yani sahne bugün ölü kod — karar (kullanıcı bul ya da
+      `scenes.ts` kaydından düş) hâlâ bekliyor
 - [x] Prototip paritesi kapandı: `content/parity.test.ts` → `integrity.test.ts`,
       `tools/tasi-icerik.mjs` emekli
 - [ ] "Haiku Tamamla"nın 3. maddesi hâlâ Fener Ustası'na yaslanıyor
