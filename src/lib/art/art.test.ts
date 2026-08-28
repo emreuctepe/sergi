@@ -183,17 +183,20 @@ describe('sahne kaydı', () => {
 	});
 
 	it("yalnız 2026-09'un kullandığı sahneler taşındı", () => {
-		/* Prototipte 22 sahne var; 15'i yalnız 2026-10'a ait ve 1.0'a girmiyor
+		/* Prototipte 22 sahne var; 16'sı yalnız 2026-10'a ait ve 1.0'a girmiyor
 		   (bkz. docs/BUILD-TODO.md karar 1.29). Sayı burada kilitli ki "bir
 		   sahne daha lazım" kararı diff'te görünsün.
 
 		   Liste 1e'de üçtü ve EKSİKTİ: sayfa arka planları üçünü çağırıyor ama
 		   tanıtım kartları dört tane daha istiyor (karar 1.41). Dördü 1f'te
-		   geldi — `leaves`, `street`, `torii`, `waves`. */
+		   geldi — `leaves`, `street`, `torii`, `waves`.
+
+		   Sonra YEDİDEN ALTIYA indi: `portrait` kullanıcısını 1.45'te kaybetti
+		   ve 1f tanıtımı da onu çağırmayınca 1.51'de kayıttan düştü. Yani bu
+		   liste yalnız büyümüyor — çağıranı kalmayan sahne buradan çıkıyor. */
 		expect([...SCENE_NAMES].sort()).toEqual([
 			'leaves',
 			'paper',
-			'portrait',
 			'street',
 			'sumi',
 			'torii',

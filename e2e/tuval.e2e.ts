@@ -125,10 +125,12 @@ test('gezinme düğmeleri uçlarda kapanıyor', async ({ page }) => {
  * `bg: "scene:…"` diyen üç sayfa — ed-1, bl-1 (paper), son-kunye (sumi).
  *
  * Dörttü: `sy-acilis` `scene:portrait` kullanıyordu, söyleşinin açılışı çizerin
- * kendi karga portresine geçince (karar 1.45) bıraktı. `portrait` sahnesi kayıtlı
- * ama artık HİÇBİR sayfa çağırmıyor — silinmedi, çünkü kodu duruyor ve 1f'de
- * tanıtım kartları sahne kadrosunu zaten yeniden açacak. O gün ya bir kullanıcı
- * bulur ya kayıttan düşer.
+ * kendi karga portresine geçince (karar 1.45) bıraktı. `portrait` o gün kayıtta
+ * "1f'de ya kullanıcı bulur ya kayıttan düşer" notuyla bırakılmıştı; 1f'in
+ * tanıtım kartları onu çağırmadı ve sahne 1.51'de kayıttan DÜŞTÜ. Kayıtta artık
+ * kullanıcısız sahne yok: sayfa arka planları `paper` ve `sumi`yi, tanıtım
+ * kartları `paper`, `leaves`, `waves`, `street`, `torii`yi çağırıyor — `paper`
+ * ikisinde birden.
  */
 const SAHNELI_SAYFA = 3;
 
