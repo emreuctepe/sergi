@@ -1,0 +1,60 @@
+/* ============================================================================
+   MANGA FONTU — tek satırlık anahtar
+   ----------------------------------------------------------------------------
+   Bu dosyanın prototipte karşılığı YOK; parite listesinde `LOCAL` olarak geçer
+   (bkz. parity.test.ts).
+
+   Neden AYRI dosya: `--font-manga` `tokens.css:43`te, yani `:root`un içinde —
+   ve `parity.test.ts` `:root`tan sonrasını prototiple BAYT BAYT donduruyor.
+   Fontu orada değiştirmek, `blocks.css` için 1.40/1.43/1.47/1.49'da dört kez
+   ödemeyi reddettiğimiz bedeli ödemek olurdu: bir dosyalık parite güvencesini
+   tek satır için bırakmak. Anime Ace'in `@font-face`'i orada KALIYOR (test
+   varlığını ayrıca şart koşuyor); burada yalnız seçim yapılıyor.
+
+   Neden KATMANSIZ: `app.css:23` bunu zaten sözleşme olarak yazmış — katmansız
+   CSS her zaman `@layer`lıyı ezer. Yani buradaki `:root`, `tokens.css`'inki
+   `@layer tokens` içinde olduğu için onu dosya sırasından BAĞIMSIZ olarak
+   geçersiz kılıyor. Aynı düzenek 1.47'de `Dialog.svelte` için kullanılmıştı.
+   ⚠️ Bu dosya bir katmana alınırsa override sessizce çalışmayı bırakır —
+   `parity.test.ts` tam da bunu ölçüyor.
+
+   ⚠️ FONTU DEĞİŞTİRMEK: aşağıdaki `--manga-family` satırı, o kadar. Yedek
+   yığın ve fontu tüketen üç yer (`blocks.css:686`, `blocks.css:736`,
+   `Dialog.svelte`) olduğu gibi kalır.
+   ========================================================================= */
+
+/* Bad Comic — GGBotNet, SIL Open Font License 1.1.
+   Kaynak: https://ggbot.itch.io/bad-comic-font (BadComic_Font_0_98)
+   Lisans metni fontun YANINDA durmak zorunda: static/fonts/BadComic-OFL.txt.
+   OFL 1.1 fontun lisansıyla birlikte dağıtılmasını şart koşuyor — bu yüzden
+   o dosya "eklenmese de olur" değil, lisansın kendi gereği.
+
+   Türkçe kapsam: yazar 93 dil sayıyor ve Türkçe listede. Kurulunca ÖLÇÜLECEK,
+   listeye güvenilmeyecek: ç Ç ğ Ğ ı İ ö Ö ş Ş ü Ü, … ve uzun tire (— –).
+   Anime Ace'te uzun tire YOKTU ve bu tokens.css:19'da yazılı bir borç; aday
+   fontun aynı deliği taşımadığı doğrulanmalı. */
+@font-face {
+  font-family: "Bad Comic";
+  src: url("/fonts/badcomic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ─── ANAHTAR ─────────────────────────────────────────────────────────────
+     Kayıtlı aileler:
+       "Bad Comic"  → OFL 1.1, ticari kullanıma açık, yayına uygun
+       "Anime Ace"  → lisanssız; @font-face'i tokens.css:25'te duruyor
+
+     ŞU AN "Anime Ace" SEÇİLİ ve bu geçici: Bad Comic'in dosyası henüz
+     static/fonts/ altında değil. Boş bir aileye geçmek balonları sessizce
+     Comic Sans'a düşürür ve canlı sayı görsel olarak geriler — dosya
+     düştüğü an bu satır "Bad Comic" olacak.
+     ──────────────────────────────────────────────────────────────────────── */
+  --manga-family: "Anime Ace";
+
+  /* Yedek yığın tokens.css:41-42'nin gerekçesiyle aynı: yedek --font-ui değil
+     sans yığını, çünkü font inmezse balon yine çizgi roman kaydında kalmalı. */
+  --font-manga: var(--manga-family), "Comic Sans MS", var(--font-ui);
+}

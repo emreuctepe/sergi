@@ -11,10 +11,10 @@ kararları için [YORUM-SISTEMI.md](YORUM-SISTEMI.md).
 
 | | |
 |---|---|
-| **Aktif adım** | Faz 1 — tuval, bloklar, içerik. **Adımların hepsi (1a–1f) bitti, bölüm KAPANMADI**: geriye harfsiz 4 madde kaldı — üçü editöryel/dış bağımlılık, biri (`tokens.css` temizliği) parite sözleşmesine dokunuyor (karar 1.52) |
-| **Son tamamlanan** | **1f kapandı ve takım yeşil**: mod seçici, konum koruma, yükleme ekranı ve tanıtım kartları yerinde. Kapanışta bir ürün hatası çıktı — `instant` diye çağrılan gezinme aslında yumuşak kaydırıyordu (karar 1.50) |
-| **Sonraki dosya** | Faz 2 — sırada ne olduğu henüz seçilmedi |
-| **Çalışır durum** | `pnpm dev` → http://localhost:5173/sayi/2026-09 · `lint` · `check` (468 dosya) · `test:unit` (338 test) · `test:e2e` (31 test) · `wrangler deploy --dry-run` hepsi yeşil |
+| **Aktif adım** | **0.1 Erken Erişim yayını** (faz dışı, aşağıda kendi bölümü). Faz 1 hâlâ KAPANMADI: harfsiz 4 madde duruyor — üçü editöryel/dış bağımlılık, biri (`tokens.css` temizliği) parite sözleşmesine dokunuyor (karar 1.52) |
+| **Son tamamlanan** | **Manga fontu anahtarı** (karar 1.53): font seçimi `tokens.css`'ten çıkıp katmansız `fonts.css`'e alındı — parite bozulmadan, tek satırla değişebilir hâlde. Bad Comic (OFL) dosyası bekleniyor |
+| **Sonraki dosya** | Bad Comic `static/fonts/` altına → anahtar çevrilir → 0.1 GitHub Pages'e |
+| **Çalışır durum** | `pnpm dev` → http://localhost:5173/sayi/2026-09 · `lint` · `check` (468 dosya) · `test:unit` (**343** test) · `test:e2e` (31 test) · `wrangler deploy --dry-run` hepsi yeşil |
 | **Canlı** | **https://sergi.muhammedemreuctepe.workers.dev/sayi/2026-09** (Cloudflare Workers, `main`'e her push). Prototip arşivi → https://emreuctepe.github.io/sergi/ |
 
 **Ortam notu:** Node 22 LTS gerekiyor (Vite 8 Node 20+ istiyor). Konteynerde
@@ -265,6 +265,42 @@ işi değil. AVIF desteklemeyen tarayıcı kaynak webp'e düşüyor, hiçbir kay
 
 ---
 
+### 🚀 0.1 Erken Erişim — faz dışı yayın
+
+Fazların akışını kesmeyen, kendi başına yaşayan bir yayın. Gerekçe: sayı
+**bugünkü hâliyle okunabilir durumda** ve yorum altyapısı olmadan da bir dergi.
+
+**Ölçüldü — "vanilla'ya çevirmek" gerekmiyor:** `prerender = true` (karar 1.36)
+zaten sunucusuz çalışan bir statik site üretiyor. `.svelte-kit/cloudflare/`
+8,3 MB: `sayi/2026-09.html` 74 KB (30 sayfa, 246 `data-block`, 12 satır içi
+SVG sahne, 26 `<picture>`), `_app/` 253 KB, `assets/`, `fonts/`. `src/` içinde
+Supabase'e ya da herhangi bir uca giden **0 dosya** var — bağımsızlık zaten
+sağlanmış durumda. Elle vanilla port ~400-500 satır isterdi ve mod seçici,
+tanıtım, folio, klavye gezinmeyi kaybettirirdi; klasörü kopyalamak 0 satır.
+
+- [x] Manga fontu anahtarı — karar 1.53
+- [ ] Bad Comic (OFL 1.1, GGBotNet) `static/fonts/badcomic.ttf` + `BadComic-OFL.txt`
+      ⚠️ Kurulunca Türkçe kapsam ÖLÇÜLECEK, yazarın dil listesine güvenilmeyecek:
+      ç Ç ğ Ğ ı İ ö Ö ş Ş ü Ü, … ve uzun tire (— –). Anime Ace'te tire yoktu
+- [ ] `--manga-family` → `"Bad Comic"` (tek satır; parite testi dosya yoksa kırmızı)
+- [ ] GitHub Pages, ayrı yol (prototip arşivinin yanına)
+- [ ] ⚠️ `<meta name="description">` **iki kez** basılıyor — `+layout.svelte:15`
+      `brand.tagline`, `+page.svelte:90` `issue.subtitle`. Tarayıcı ilkini alıyor,
+      yani paylaşım önizlemesinde sayının alt başlığı değil derginin genel
+      sloganı çıkıyor. Yayından önce tek satırlık düzeltme
+- [ ] ⚠️ Favicon hâlâ SVELTE LOGOSU ve data URI olarak `<head>`e gömülü
+      (blocker #2). 0.1 bile olsa sekmede başka bir markanın işareti duracak
+
+**0.1 için bilerek kabul edilenler** (1.0'da kapanacak):
+
+| Ne | Karar |
+|---|---|
+| `animeace2_reg.ttf` yayında KALIYOR | Kullanıcı kararı: 0.1 erken erişim. Font CSS'te seçili olmasa da `/fonts/animeace2_reg.ttf` adresinden inebilir durumda — yani lisanssız font dağıtılmaya devam ediyor. **Blocker #4 açık kalır**, 1.0'da ya lisans alınır ya dosya `static/`ten çıkar |
+| Taşan üç sayfa | `km-acilis`, `km-imza`, `son-kunye` — altı kırpık çıkıyor (soru 6) |
+| Yorum, kimlik, bulmaca istatistiği | Yok; Faz 2-4 hiç başlamadı. 0.1'in vaadi zaten yalnız OKUMAK |
+
+---
+
 ## 🚧 Yayın blocker'ları
 
 Kod değil, karar. Hiçbiri çözülmeden 1.0 çıkamaz.
@@ -374,4 +410,5 @@ Kod değil, karar. Hiçbiri çözülmeden 1.0 çıkamaz.
 | 1.49 | Çizerin işine kazara-kaldırma engeli — ama YALNIZ onun işine | Manga kareleri ve söyleşi çizimleri seçilebiliyor, sürüklenebiliyor ve sağ tıkla yeni sekmede açılabiliyordu. Üçü de kapatıldı: `attrs.ts` → `cizimAttrs` (`draggable="false"` + `contextmenu` iptali) ve bileşen kapsamlı `user-select: none` / `-webkit-user-drag` / `-webkit-touch-callout` (`MangaPanel.svelte`, `Figure.svelte`). Stil yine `blocks.css`'e girmedi — bayt bayt parite (1.40/1.43/1.47'nin aynısı). **Asıl karar kapsamdı ve künye belirledi:** 08-son.ts'e göre manga + söyleşi çizimleri "telif sahibinde, izinle" ama 11 sayfa arka planı Wikimedia Commons'tan CC0/CC BY/CC BY-SA geliyor. CC BY-SA 4.0 §2(a)(5)(B) lisans alanın "etkin teknolojik önlem" uygulamasını açıkça yasaklıyor, yani o görselleri kilitlemek kendi künyemizle çelişirdi — arka planlar bilerek DOKUNULMADAN bırakıldı ve ölçülerek doğrulandı (`user-select: auto`, `draggable` yok). İkinci sınır: engel yalnız GÖRSELDE, metinde değil. Derginin yorum sistemi metin seçmeye dayanıyor (docs/YORUM-SISTEMI.md); manga balonları da HTML ve seçilebilir kaldı, çünkü bir repliği alıntılamak Faz 3'ün kendisi. ⚠️ Dürüstlük notu koda yazıldı: **bu koruma değil caydırıcı.** Görsel adresi sayfa kaynağında düz duruyor, `/assets/…` doğrudan açılıyor, ağ sekmesi ve ekran görüntüsü duruyor. Engellenen tek şey kazara ve kolay kaldırma; bunu kilit sanmak olmayan bir güvenceye yaslanmak olur. Faz 3 notu: prototip `#pages` üstünde `contextmenu`u zaten kapatıyor ama BAŞKA sebeple (uzun basma → koordinat pini, comments.js); bu engel görselin kendisinde durduğu için o geldiğinde çakışmaz |
 | 1.50 | 🐞 `instant` diye çağrılan gezinme aslında YUMUŞAK kaydırıyordu — kararı JS veriyor, uygulamayı CSS'e bırakıyordu | 1f'in sonunda iki test kırmızı kaldı ve ikisi de "testin hatası" diye devralınmıştı. Biri değildi. `apply(step, instant = true)` `scrollTo`ya `behavior: 'auto'` geçiyordu; `auto` "anında" demek DEĞİL, "elementin CSS'teki `scroll-behavior`ına uy" demek — ve `.pages` orada `smooth` (`canvas.css:108`). Yani konum korumanın "kaydırma ANİ: okur yeni düzenin içinden süzülmesini izlemek istemiyor" diye yazılı sözü, her seferinde tam tersine çevriliyordu. Ölçüldü (kare kare `scrollTop`): mod değişiminden sonra düzeltme ~40 karede, ~600 ms süzülerek yapılıyordu; düzeltmeden sonra üç durum kaldı — `top=5136 n=30` → `top=5136 n=19` → `top=2880 n=19`, yani tek sıçrayış, akış kısaldıktan **17 ms** (bir kare) sonra. İkinci kurban `prefers-reduced-motion` okuruydu: `tokens.css` o medya sorgusunda yalnız SÜRELERİ 1 ms'ye indiriyor, `scroll-behavior`ı çevirmiyor (onu yalnız `[data-motion="off"]` çeviriyor) — yani `reducedMotion()` doğru karar verip kararını uygulayamıyordu. `'smooth'`/`'instant'` iki değeri de açıkça yazmak ikisini birden kapatıyor. **Devralınan teşhis yanlıştı ve ölçümle düştü:** ankrajın görünüm yüksekliğine göre yanlış tahmin edildiği, çözümün de tuvalin `goToId`'yi dışa açması olduğu sanılıyordu; oysa 1280×720'de folio `08 / 30` diyordu, yani ankraj tam da `km-4`'tü. `goToId` YAZILMADI — Modal.svelte'in alıntıladığı kural ("kullanılmadan yazılmasın") yerinde duruyor, çünkü ortada onu isteyen bir kullanıcı yoktu, geç kalmış bir `await` vardı. Yanına iki düzenek hatası çıktı: (a) konum koruma bilerek BİR KARE sonra çalışıyor ama iddia `expect(await …)` ile tek atışlıktı — o kareye denk gelince `scrollTop` hâlâ eski akışın konumu oluyor ve yeni akışta başka sayfaya düşüyordu (`km-4` → `gh-5`); üstelik kardeş test aynı yarışı taşıyıp tesadüfen yeşil yanıyordu. (b) `addInitScript` HER gezinmede — `reload()` dahil — yeniden çalışıyor ve tercihi koşulsuz yazıyordu, yani "seçim kalıcı" testi uygulamanın kaydettiğini düzeneğin eziyor olmasını ölçüyordu. Ders, 1.44 ve 1.47'nin aynısı: kırmızı bir testin nerede yanıldığını okumakla değil ÖLÇMEKLE bulunuyor — burada ölçülen şey tarayıcının kaydırmayı ne zaman ve kimin sözüyle yaptığıydı |
 | 1.51 | `portrait` sahnesi kayıttan DÜŞTÜ — kayıt yalnız büyüyen bir liste değil | Sahne 1.45'te tek kullanıcısını (`sy-acilis`) kaybetmiş ve kayda **"1f'de ya kullanıcı bulur ya kayıttan düşer"** notuyla bırakılmıştı. 1f geldi: tanıtımın beş kartı `paper`/`leaves`/`waves`/`street`/`torii` çağırdı, `portrait`i çağıran çıkmadı — yani not bir erteleme değil bir koşuldu ve koşul gerçekleşmedi. `Portrait.svelte` silindi, `SCENE_NAMES` 7→**6**, `Scene.svelte`'in dalı ve `art.test.ts`'in kilitli listesi güncellendi. Karar 1.29'un aynısı: 2026-10'a ait 16 sahne zaten "hiçbir sayfanın çağırmayacağı, gözle doğrulanamayan kod olurdu" diye taşınmamıştı — `portrait` bugün tam olarak o kategoride ve ayrıcalığı yalnız bir zamanlar kullanılmış olması olurdu. Geri dönüşü ucuz: kod git'te duruyor, 2026-10 çağırdığı gün gözle doğrulanabilir bir sayfayla geri gelir. Kayıtta artık kullanıcısız sahne yok |
+| 1.53 | Manga fontu anahtarı: seçim `tokens.css`'ten ÇIKTI, parite bozulmadı | Blocker #4 (Anime Ace lisanssız) için OFL alternatifi eklenecekti ve "iki satır" görünüyordu: bir `@font-face`, bir `--font-manga`. İkincisi tuzaktı — `--font-manga` `tokens.css:43`te, yani `:root`un İÇİNDE, ve `parity.test.ts` `:root`tan sonrasını prototiple bayt bayt donduruyor (`strip()`). Orada tek kelime değiştirmek 1.52'nin reddettiği takasın aynısı olurdu. Çözüm dosyanın kendisini hiç ellememek: seçim yeni ve KATMANSIZ bir `fonts.css`'e alındı — `app.css:23` "katmansız CSS her zaman `@layer`lıyı ezer" diye zaten yazılıydı, 1.47'de `Dialog.svelte` için kullanılan düzeneğin aynısı. `tokens.css` bayt bayt aynı kaldı, FORKED nedeni büyümedi. Anahtar gerçekten tek satır: `--manga-family`. **Üç sessiz kırılma yolu teste bağlandı** ve ikisi bilerek bozulup kırmızı yandığı görüldü: (a) import bir `layer()`e alınırsa override ölür — ekranda tek belirti "balon biraz farklı duruyor"; (b) seçilen ailenin `@font-face`'i yoksa balon yedeğe düşer; (c) `@font-face`in gösterdiği dosya `static/` altında yoksa font 404 verir ve yine sessizce yedeğe düşer — 1.39'un "yol tahmin edilmiyor, diskte aranıyor" deseni. (c) özellikle kıymetli: font dosyası gelmeden anahtarı çevirmeyi engelliyor, ki bu tam da yapılacak hata. Dördüncü test klasörün kendisini kapatıyor — `MIRRORED ∪ FORKED ∪ LOCAL` artık dizinin TAMAMI olmak zorunda, yani parite durumu yazılmamış bir CSS dosyası eklenemiyor. Seçim şimdilik `"Anime Ace"`te BIRAKILDI: dosya gelmeden çevirmek canlı sayıyı Comic Sans'a düşürürdü. 338→343 test |
 | 1.52 | `tokens.css` temizliği YAPILMADI — "ucuz" sanılan madde parite sözleşmesine çarptı | Faz 1'in açık maddelerinden biri "kullanılmayan sayı temalarını (2026-08/10/11) `tokens.css`'ten ayıkla" diyordu ve ucuz görünüyordu: ~120 satır ölü CSS, tek kullanılan tema 2026-09. Ama `parity.test.ts` `tokens.css`'i prototiple BAYT BAYT bağlıyor — `:root`tan sonraki gövdenin tamamı aynı olmak zorunda ve testin kendi yorumu neyin korunduğunu sayıyor: *"bütün palet, ölçek ve **sayı temaları**"*. Yani üç tema bloğunu silmek, dosyanın tek ayrıcalığını (`FORKED`: yalnızca `@font-face` yolu) genişletip 17 bin satırlık referansa karşı sessiz sapma güvencesini bırakmak demek. Kazanç ~2 KB ölü CSS (gzip'te eser miktar, çalışma zamanı maliyeti sıfır — `:root[data-issue="2026-08"]` hiç eşleşmiyor); bedel `blocks.css` için 1.40/1.43/1.47/1.49'da **dört kez** ödenmeyi reddetmiş olduğumuz bedelin aynısı. Tema blokları ayrıca ölü değil bir KAYIT: 2026-10'un neon pembesi `--accent-2` yorumunda gerekçe olarak geçiyor. Madde kapatılmadı ama fiyatı artık yazılı — bir gün silinecekse, `tokens` `MIRRORED`dan tamamen çıkarılıp nedeni yazılarak silinir; kaçamak olarak değil |

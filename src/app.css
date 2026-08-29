@@ -36,3 +36,9 @@
 @import './lib/styles/comments.css' layer(comments);
 @import './lib/styles/overlays.css' layer(overlays);
 @import './lib/styles/puzzles.css' layer(puzzles);
+
+/* KATMANSIZ ve bilerek: manga fontunun seçimi. `tokens.css` `--font-manga`yı
+   `@layer tokens` içinde tanımlıyor ve o dosya prototiple bayt bayt bağlı;
+   seçimi katmansız bir dosyaya almak, pariteyi bozmadan ezmenin yolu.
+   Bir layer() eklemek override'ı SESSİZCE öldürür — parity.test.ts ölçüyor. */
+@import './lib/styles/fonts.css';
