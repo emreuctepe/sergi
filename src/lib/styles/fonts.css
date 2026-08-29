@@ -25,17 +25,27 @@
 
 /* Bad Comic — GGBotNet, SIL Open Font License 1.1.
    Kaynak: https://ggbot.itch.io/bad-comic-font (BadComic_Font_0_98)
-   Lisans metni fontun YANINDA durmak zorunda: static/fonts/BadComic-OFL.txt.
-   OFL 1.1 fontun lisansıyla birlikte dağıtılmasını şart koşuyor — bu yüzden
-   o dosya "eklenmese de olur" değil, lisansın kendi gereği.
+   Lisans metni fontun YANINDA: static/fonts/BadComic-OFL.txt. OFL 1.1 fontun
+   lisansıyla birlikte dağıtılmasını şart koşuyor — o dosya "eklenmese de olur"
+   değil, lisansın kendi gereği.
 
-   Türkçe kapsam: yazar 93 dil sayıyor ve Türkçe listede. Kurulunca ÖLÇÜLECEK,
-   listeye güvenilmeyecek: ç Ç ğ Ğ ı İ ö Ö ş Ş ü Ü, … ve uzun tire (— –).
-   Anime Ace'te uzun tire YOKTU ve bu tokens.css:19'da yazılı bir borç; aday
-   fontun aynı deliği taşımadığı doğrulanmalı. */
+   ⚠️ RESERVED FONT NAME: "Bad Comic". OFL'de subset almak da "Modified
+   Version" sayılıyor (bileşen SİLMEK de değişiklik). Faz 6 "subset + woff2"
+   planlıyor — o gün alınacak subset bu adı TAŞIYAMAZ, yeniden adlandırılması
+   gerekir. Bugünkü dosya değiştirilmemiş orijinal, yani ad serbest.
+
+   Türkçe kapsam yazarın dil listesine güvenilmeden, fontun kendi `cmap`
+   tablosundan ÖLÇÜLDÜ (1.221 kod noktası): ç Ç ğ Ğ ı İ ö Ö ş Ş ü Ü, …,
+   tırnaklar ve tireler TAM. Anime Ace'te olmayan – (en dash) ve — (em dash)
+   burada VAR, yani tokens.css:19'daki "balon metinlerinde uzun tire kullanma"
+   borcu bu fontla kapanıyor.
+
+   woff2 seçildi: aynı fontun TTF'i 518 KB, woff2 128 KB. Yine de Anime Ace'in
+   61 KB'ından büyük — fontta 1.221 glif var, sayının kullandığı ise bir avuç.
+   Subset Faz 6'nın işi (ve yukarıdaki ad kısıtını doğuruyor). */
 @font-face {
   font-family: "Bad Comic";
-  src: url("/fonts/badcomic.ttf") format("truetype");
+  src: url("/fonts/badcomic.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -47,12 +57,10 @@
        "Bad Comic"  → OFL 1.1, ticari kullanıma açık, yayına uygun
        "Anime Ace"  → lisanssız; @font-face'i tokens.css:25'te duruyor
 
-     ŞU AN "Anime Ace" SEÇİLİ ve bu geçici: Bad Comic'in dosyası henüz
-     static/fonts/ altında değil. Boş bir aileye geçmek balonları sessizce
-     Comic Sans'a düşürür ve canlı sayı görsel olarak geriler — dosya
-     düştüğü an bu satır "Bad Comic" olacak.
+     Anime Ace'e dönmek için bu satıra `"Anime Ace"` yaz — o kadar. Dosyası
+     static/fonts/ altında duruyor ve @font-face'i tokens.css'te.
      ──────────────────────────────────────────────────────────────────────── */
-  --manga-family: "Anime Ace";
+  --manga-family: "Bad Comic";
 
   /* Yedek yığın tokens.css:41-42'nin gerekçesiyle aynı: yedek --font-ui değil
      sans yığını, çünkü font inmezse balon yine çizgi roman kaydında kalmalı. */

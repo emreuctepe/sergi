@@ -12,6 +12,11 @@ __pycache__/
 # (2026-09 one-shot: 8.1 MB PNG -> assets/2026-09/kapali-kapilar/ 360 KB)
 prototype/assets/**/kargaMangaKapalıKapılar/
 
+# Font dağıtım arşivleri — aynı gerekçe. Zip 1,5 MB ve içinde aynı fontun
+# otf/ttf/woff/woff2 dördü birden var; depoya giren yalnızca kullanılan tek
+# dosya (static/fonts/badcomic.woff2) ve lisans metni.
+*_Font_*.zip
+
 # --- Node / SvelteKit ------------------------------------------------------
 node_modules
 
