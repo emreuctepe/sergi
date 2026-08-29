@@ -17,7 +17,7 @@ export default defineConfig(
 		     kurallara göre "hatalı" görünür ama düzeltilmeyecek — dokunulmayacak.
 		   - worker-configuration.d.ts: `wrangler types` üretiyor, 573 KB.
 		   - .svelte-kit/: derleme çıktısı. */
-		ignores: ['prototype/**', 'worker-configuration.d.ts', '.svelte-kit/**']
+		ignores: ['prototype/**', 'vanilla/**', 'worker-configuration.d.ts', '.svelte-kit/**']
 	},
 	js.configs.recommended,
 	ts.configs.recommended,

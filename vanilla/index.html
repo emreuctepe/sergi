@@ -1,0 +1,211 @@
+<!doctype html>
+<!--
+  ════════════════════════════════════════════════════════════════════════════
+  sErgi · Sayı 03 — "Kızıl Mevsim" · okuma sürümü
+  ────────────────────────────────────────────────────────────────────────────
+  Bu klasör ana projeden BAĞIMSIZ: derleme adımı yok, sunucu tarafı yok, dış
+  bağımlılık yok. Başka bir yere kopyalanıp statik olarak servis edilirse aynen
+  çalışır.
+
+  Çalıştırmak için (klasörün içinden):   python3 -m http.server 8080
+  Sonra:                                 http://localhost:8080
+
+  ⚠️ Dosyaya çift tıklayarak (file://) AÇILMAZ — sayfalar `fetch` ile
+  yükleniyor ve tarayıcı file:// altında yerel dosya okumaya izin vermiyor.
+  Ayrıntı: BENIOKU.md
+  ════════════════════════════════════════════════════════════════════════════
+-->
+<html lang="tr" data-theme="light" data-issue="2026-09" data-depth="full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="text-scale" content="scale" />
+
+    <title>Kızıl Mevsim · sErgi</title>
+    <meta name="description" content="Sonbaharın ilk haftası, bir şehrin rengi değişirken" />
+    <meta name="theme-color" content="#b8432c" />
+
+    <!--
+      Kapaktaki yaprak damgası. Ana projede burada hâlâ SvelteKit şablonunun
+      turuncu Svelte logosu duruyor (BUILD-TODO blocker #2) — bu klon paylaşmak
+      için var, yani sekmede başka bir markanın işaretini taşıyamaz.
+    -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='-14%20-15%2028%2030'%3E%3Cpath%20d='M0%2013%20C-7.5%207%20-10.5%20-2%20-5.5%20-8.5%20C-3%20-11.8%203%20-11.8%205.5%20-8.5%20C10.5%20-2%207.5%207%200%2013Z'%20fill='%23b8432c'/%3E%3C/svg%3E"
+    />
+
+    <!--
+      Tema, CSS inmeden ÖNCE yazılıyor: sonra yazılsaydı okur bir kare boyunca
+      yanlış temayı görürdü. Betik hata yutuyor çünkü localStorage gizli
+      sekmede ya da sıkı gizlilik ayarında erişilemez olabiliyor.
+    -->
+    <script>
+      try {
+        var t = localStorage.getItem('mag:theme');
+        if (!t || t === 'system') {
+          t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.dataset.theme = t;
+      } catch (e) {
+        /* localStorage kapalı — aydınlıkta kal. */
+      }
+    </script>
+
+    <link rel="stylesheet" href="css/app.css" />
+
+    <!--
+      JS hiç çalışmazsa yükleme ekranı sonsuza kadar "%0"da kalır ve sayının
+      önünü kapatır. Bu satır onu baştan gizliyor.
+    -->
+    <noscript>
+      <style>
+        #loader {
+          display: none !important;
+        }
+      </style>
+    </noscript>
+  </head>
+
+  <body>
+    <!--
+      ══════════════════════════════════════════════════════════════════════
+      SAYININ SIRASI
+      ──────────────────────────────────────────────────────────────────────
+      Aşağıdaki her satır `sayfalar/` altındaki bir klasörü gösteriyor ve
+      sayının sırası TAM OLARAK bu satırların sırası:
+
+        · bir satırı yukarı/aşağı taşı  → sayfa yer değiştirir
+        · bir satırı sil                → sayfa sayıdan çıkar
+        · yeni klasör aç + satır ekle   → sayfa eklenir
+
+      Boş satırlar ve # ile başlayanlar atlanıyor, yani not düşebilirsin.
+
+      Bu liste TEK kaynak: klasör adlarında sıra numarası YOK, çünkü sıra iki
+      yerde yazsaydı ilk taşımada biri yalan söylemeye başlardı.
+
+      `type="text/plain"` — tarayıcı bunu çalıştırmıyor, düz metin olarak
+      okuyor. JSON dizisi yerine düz satırlar: unutulan bir virgül bütün
+      sayıyı kırmasın.
+      ══════════════════════════════════════════════════════════════════════
+    -->
+    <script id="sira" type="text/plain">
+      sayfalar/kapak-1
+      sayfalar/ed-1
+      sayfalar/ed-2
+
+      sayfalar/km-acilis
+      sayfalar/km-min      # yalnız "min" modunda görünür — bkz. bilesen.css §7
+      sayfalar/km-1
+      sayfalar/km-2
+      sayfalar/km-3
+      sayfalar/km-4
+      sayfalar/km-5
+      sayfalar/km-imza
+
+      sayfalar/gh-acilis
+      sayfalar/gh-1
+      sayfalar/gh-5
+
+      sayfalar/sy-acilis
+      sayfalar/sy-1
+      sayfalar/sy-2
+      sayfalar/sy-3
+      sayfalar/sy-4
+      sayfalar/sy-5
+      sayfalar/sy-6
+      sayfalar/sy-7
+      sayfalar/sy-8
+
+      sayfalar/sz-1
+      sayfalar/sz-2
+      sayfalar/sz-3
+
+      sayfalar/bl-1
+
+      sayfalar/mn-kapak
+      sayfalar/mn-1
+
+      sayfalar/son-kunye
+      sayfalar/son-1
+    </script>
+
+    <a class="skip-link" href="#pages">İçeriğe atla</a>
+
+    <!--
+      `inert` bilerek açık doğuyor: açılış akışı bitene kadar (yükleme →
+      tanıtım → mod seçimi) tuval odaklanamaz ve tıklanamaz olmalı. acilis.js
+      sayı hazır olduğunda kaldırıyor.
+    -->
+    <div id="shell" data-letterbox="roomy" data-chrome="on" inert>
+      <header class="band band--top">
+        <div class="band__center">
+          <button
+            class="depth-chip"
+            type="button"
+            aria-haspopup="dialog"
+            aria-label="Okuma modu: Doomreader — değiştir"
+          >
+            <span class="depth-chip__bars" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="depth-chip__label">Doomreader</span>
+          </button>
+          <div class="band__issue">
+            <span class="band__issue-no">03</span>
+            <span class="band__issue-name">Kızıl Mevsim</span>
+          </div>
+        </div>
+        <div
+          class="progress"
+          role="progressbar"
+          aria-label="Okuma ilerlemesi"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+        >
+          <div class="progress__fill" style="width: 0%"></div>
+        </div>
+      </header>
+
+      <main id="canvas" class="canvas" aria-label="Kızıl Mevsim tuvali">
+        <!-- Sayfalar buraya, yukarıdaki sıraya göre diziliyor (okuyucu.js). -->
+        <div id="pages" class="pages" tabindex="-1"></div>
+
+        <div id="folio" class="folio" data-hidden="true" data-overlay="true" aria-hidden="true">
+          <span id="folio-section">Kapak</span>
+          <span id="folio-page">01 / 31</span>
+        </div>
+      </main>
+
+      <footer class="band band--bottom">
+        <div class="band__nav">
+          <button class="band__btn" type="button" aria-label="Önceki sayfa" disabled>
+            <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path d="M18 15l-6-6-6 6"></path>
+            </svg>
+          </button>
+          <button class="band__btn" type="button" aria-label="Sonraki sayfa">
+            <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path d="M6 9l6 6 6-6"></path>
+            </svg>
+          </button>
+        </div>
+      </footer>
+    </div>
+
+    <!--
+      Yükleme ekranı HTML'de duruyor, JS'le sonradan eklenmiyor: sonradan
+      eklenseydi okur bir an bozuk (henüz sayfasız) bir sayı görür, sonra
+      üstü örtülürdü.
+    -->
+    <div id="loader" class="loader" data-cikiyor="false" role="status" aria-live="polite">
+      <p class="loader__pct" aria-label="%0 yüklendi"><span aria-hidden="true">%0</span></p>
+      <p class="loader__line">sayfalar basılıyor…</p>
+    </div>
+
+    <!--
+      Tek giriş noktası açılış akışı; okuyucunun kendisi js/okuyucu.js'te ve
+      buradan çağrılıyor.
+    -->
+    <script type="module" src="js/acilis.js"></script>
+  </body>
+</html>

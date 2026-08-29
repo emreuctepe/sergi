@@ -1,0 +1,37 @@
+/* ============================================================================
+   APP.CSS — küresel stil katmanları
+   ----------------------------------------------------------------------------
+   `index.html` tek bir <link> ile bu dosyayı çağırıyor; sıra buradan geliyor.
+   Sıra <link> etiketlerine bırakılsaydı kırılgan olurdu: bir satır yer
+   değiştirince tema bozulurdu. Aşağıdaki @layer satırı önceliği kaskadın
+   KENDİSİNE yazıyor, dosya sırasına değil — @import'lar karışsa bile öncelik
+   değişmez.
+
+   Katman sırası = önem sırası (sonraki öncekini ezer):
+     tokens   → değişkenler, tema, @font-face
+     base     → iskelet, tipografi sıfırlama
+     canvas   → 3:4 tuval, snap, letterbox, bantlar
+     blocks   → içerik blokları + animasyon presetleri
+     overlays → yükleme ekranı, tanıtım, modal, mod seçici
+     puzzles  → bulmaca yuvası ve çerçevesi
+
+   Ana projedeki `comments.css` (677 satır, yorum sistemi) BU KLONDA YOK:
+   klonun DOM'unda eşleşen tek sınıfı bile bulunmuyor (ölçüldü, 0 eşleşme) ve
+   klonun vaadi zaten yalnız okumak.
+
+   KATMANSIZ CSS HER ZAMAN KAZANIR — en alttaki iki import bu yüzden çıplak.
+   ========================================================================= */
+
+@layer tokens, base, canvas, blocks, overlays, puzzles;
+
+@import './tokens.css' layer(tokens);
+@import './base.css' layer(base);
+@import './canvas.css' layer(canvas);
+@import './blocks.css' layer(blocks);
+@import './overlays.css' layer(overlays);
+@import './puzzles.css' layer(puzzles);
+
+/* KATMANSIZ ve bilerek — ikisi de yukarıdaki katmanları EZMEK için var.
+   Bir layer() eklemek ikisini de sessizce çalışmaz hâle getirir. */
+@import './fonts.css';
+@import './bilesen.css';

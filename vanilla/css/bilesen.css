@@ -1,0 +1,328 @@
+/* ============================================================================
+   BİLEŞEN STİLLERİ — ana projede Svelte bileşenlerinin içinde duran kurallar
+   ----------------------------------------------------------------------------
+   Ana projede bu kuralların hiçbiri `blocks.css`/`canvas.css`e yazılmadı: o iki
+   dosya prototiple BAYT BAYT eşit tutuluyor ve bir dosyalık parite güvencesini
+   birkaç kural için bırakmak dört ayrı kararda (1.40 / 1.43 / 1.47 / 1.49)
+   reddedildi. Bu yüzden bileşenlerin kendi <style> bloklarında yaşıyorlardı.
+
+   Klonda o kısıt yok ama dosya yine ayrı duruyor, çünkü ayrım hâlâ anlamlı:
+   yukarıdaki altı dosya prototipten gelen ORTAK miras, burası ise SvelteKit
+   sürümünde eklenen görünüm. Nereden geldiği belli kalsın.
+
+   ⚠️ Bu dosya KATMANSIZ yükleniyor (app.css'in sonu). Katmanlı bir dosyaya
+   taşınırsa aşağıdaki üç kural sessizce ölür ve tek belirtileri "sayfa biraz
+   farklı duruyor" olur:
+     · `.dialog { display: block }`  → blocks.css'in rozet ızgarası geri gelir
+     · söyleşi ızgarasının `margin-top: 0` sıfırlaması
+     · `.figure img { border-radius: 0 }` (söyleşi içinde)
+
+   Kaynakları: PageBackground.svelte · Page.svelte · Dialog.svelte ·
+   Figure.svelte · MangaPanel.svelte · Loader.svelte
+   ========================================================================= */
+
+/* ==========================================================================
+   1 · SAYFA ARKA PLANI                          (PageBackground.svelte'ten)
+   --------------------------------------------------------------------------
+   `<picture>` sarmalayıcısı `canvas.css:166`'daki `.page__bg > img` doğrudan
+   çocuk seçicisini kırıyor — `<img>` artık torun. Kural oraya yazılmak yerine
+   buraya kopyalandı.
+
+   ⚠️ Bu iki kural silinirse 11 fotoğraf arka planının hepsi bozulur: `picture`
+   düzende bir kutu hâline gelir ve görsel `cover` boyutlamasını kaybeder.
+   ======================================================================= */
+
+/* `<picture>` düzenden çıkıyor; kutu ağacında yalnız `<img>` kalsın. */
+picture {
+  display: contents;
+}
+
+.page__bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ==========================================================================
+   2 · SÖYLEŞİ SAYFASI — "Balon" düzeni                    (Page.svelte'ten)
+   --------------------------------------------------------------------------
+   Sekiz soru-cevap sayfası (sy-1…sy-8) burada kuruluyor. Açılış sayfası
+   DIŞARIDA: `kind: 'opener'` taşıdığı için `data-kind` "interview" değil
+   "opener" oluyor.
+
+   NEDEN AKIŞ DEĞİL IZGARA: blok sırası kilitli — `sy-N:0` soru, `sy-N:1`
+   cevap, `sy-N:2` çizim; kimlikler yorum ankrajı olduğu için görsel sıraya
+   dizilemiyorlar. Izgara DOM sırasını olduğu gibi bırakıp yerleşimi
+   `grid-row` ile veriyor ve akışın yapamadığını yapıyor: çizimle balonu AYNI
+   GÖZE koyup üst üste bindiriyor.
+
+         satır 1 │ çizim  +  soru balonu (alta yaslı, çizimin üstünde)
+         satır 2 │ cevap kutusu
+         satır 3+│ kalanlar (sy-8'de `rule` + `note`) kendiliğinden dizilir
+   ======================================================================= */
+
+.page[data-kind='interview'] {
+  /* Balonun çizimin ALTINA taşan payı. Kuyruk da bu boşluğun içinde duruyor —
+     sayı büyürse balon resimden kopar, küçülürse kuyruk cevap kutusuna girer. */
+  --balon-tasma: 9cqi;
+}
+
+.page[data-kind='interview'] .page__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: var(--sp-4);
+}
+
+/* blocks.css bloklar arasına `margin-top` koyuyor; ızgarada aralığı `row-gap`
+   veriyor, ikisi üst üste binmesin.
+
+   `:not(.figure)` şart: figürün marjı SÜS DEĞİL, düzenin kendisi (aşağıya bak
+   — üstte sayfa dolgusunu geri alıyor, altta balona yer açıyor). O muafiyet
+   olmadan buradaki sıfırlama figür kuralını eziyor; ikisi de bu dosyanın
+   kuralı ama bu seçici daha özgül, yani sessizce kazanıyor. */
+.page[data-kind='interview'] .page__inner > .blk + .blk:not(.figure) {
+  margin-top: 0;
+}
+
+/* ÇİZİM — tam kanıyor. Kaynak bir makale fotoğrafı değil, VİDEO KARESİ; kenar
+   boşluğuna alınıp köşesi yuvarlatılınca "resim" gibi duruyordu, oysa sayfanın
+   zemini olması gerekiyor. Negatif marjlar sayfanın kendi dolgusunu geri
+   alıyor (canvas.css `.page` → 1.35 dikey / 1 yatay). */
+.page[data-kind='interview'] .figure {
+  grid-row: 1;
+  grid-column: 1;
+  margin: calc(var(--pad-page) * -1.35) calc(var(--pad-page) * -1) var(--balon-tasma);
+}
+
+.page[data-kind='interview'] .figure img {
+  border-radius: 0;
+}
+
+/* AÇILIŞ SORUSU — çizimle aynı gözde, alta yaslı. Figürün alt marjı
+   (`--balon-tasma`) satırı o kadar uzattığı için balon tam o kadar taşıyor;
+   ayrıca negatif marj vermeye gerek yok.
+
+   `:first-child` şart ve sınırı anlatıyor: çizimle eşleşen soru sayfanın AÇILIŞ
+   bloğu. Sayfada ikinci bir soru balonu olabilir (sy-7'de muhabirin karşılığı
+   var) ve o balon akışta, cevabın altında durmalı. Bu kural `:first-child`
+   olmadan onu da 1. satıra koyup açılış balonunun ÜSTÜNE yığar.
+
+   ⚠️ `z-index` süs değil: soru DOM'da çizimden ÖNCE geliyor ve aynı gözü
+   paylaşan iki öğede sonra gelen üste boyanır. Onsuz çizim balonun üstüne
+   biniyor ve sorunun ÜST SATIRLARI görünmez oluyor — üstelik sessizce: kısa
+   sorularda balon resmin altında kaldığı için fark edilmiyor, yalnız sy-4 gibi
+   uzun sorularda ortaya çıkıyor. */
+.page[data-kind='interview'] .page__inner > .dialog--q:first-child {
+  grid-row: 1;
+  grid-column: 1;
+  align-self: end;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   3 · SORU / CEVAP                                      (Dialog.svelte'ten)
+   --------------------------------------------------------------------------
+   Soru %10 küçüldü, cevap %25 büyüdü. İki ÇARPAN olarak duruyorlar, dört ayrı
+   `font-size` olarak değil: oran yeniden ayarlanacaksa burası değişir.
+   ======================================================================= */
+
+.dialog {
+  --soru-olcek: 0.9;
+  --cevap-olcek: 1.25;
+
+  /* blocks.css'in rozet + metin ızgarasını kapat: rozet sütunu kalmadı. */
+  display: block;
+}
+
+/* SORU — konuşma balonu. Sağdan fazladan boşluk bilerek: balon sayfayı baştan
+   sona kaplarsa kutuya benzer. Asimetri onu "konuşma" yapan şeylerden biri. */
+.dialog--q {
+  position: relative;
+  margin-right: calc(var(--pad-page) * 0.6);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: 3.2cqi;
+  background: var(--paper-raised);
+  box-shadow: var(--shadow-2);
+}
+
+.dialog--q .dialog__text {
+  font-family: var(--font-manga);
+  font-size: calc(var(--fs-xs) * var(--soru-olcek));
+  line-height: var(--lh-snug);
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+/* Kuyruk: sola yatık üçgen, balonun alt kenarından kareye doğru. Balon çizimin
+   ALTINA taşıyor (yukarıdaki `--balon-tasma`), kuyruk da onun altından
+   çıkıyor — yani üçgen boşluğa değil, resme işaret ediyor. */
+.dialog--q::after {
+  content: '';
+  position: absolute;
+  left: 8cqi;
+  bottom: -2.6cqi;
+  border-inline: 2.4cqi solid transparent;
+  border-top: 3cqi solid var(--paper-raised);
+}
+
+/* CEVAP — manga anlatı kutusu. Balonun tersi: yuvarlak değil köşeli, gölgeli
+   değil konturlu, kâğıdın üstünde yükselmiyor onun içine oyuluyor. İki ses
+   birbirine benzemesin. */
+.dialog--a {
+  padding: var(--sp-3) var(--sp-4);
+  border: 0.4cqi solid var(--ink);
+  background: var(--paper);
+}
+
+.dialog__name {
+  display: block;
+  margin-bottom: var(--sp-2);
+  font-family: var(--font-manga);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+.dialog--a .dialog__text {
+  font-family: var(--font-text);
+  font-size: calc(var(--fs-sm) * var(--cevap-olcek));
+  line-height: var(--lh-body);
+  text-wrap: pretty;
+}
+
+/* ==========================================================================
+   4 · FIGURE BLOĞU                                      (Figure.svelte'ten)
+   --------------------------------------------------------------------------
+   Sayının 20. blok tipi; prototipte karşılığı yok, bu yüzden stilinin tamamı
+   burada (karar 1.43).
+   ======================================================================= */
+
+.figure {
+  margin: 0;
+}
+
+/* Kaynaklar 400px genişlikte ve boyları 180-200 arasında oynuyor. Sabit bir
+   `aspect-ratio` verip kırpmak yerine kendi oranlarında çiziliyorlar: her biri
+   kendi sayfasında tek başına duruyor, aradaki 20 pikselin farkı görünmüyor —
+   kırpılan kompozisyon ise görünürdü. */
+.figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius-md);
+
+  /* Kazara kaldırma engeli — altyazı (`figcaption`) DIŞARIDA kalıyor: o dergi
+     metni, seçilip alıntılanabilmeli. */
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+
+/* `.caption` bloğuyla aynı ölçü — ikisi de görsel altı yazısı. */
+.figure figcaption {
+  margin-block-start: var(--sp-2);
+  font-family: var(--font-ui);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-snug);
+  color: var(--ink-faint);
+  letter-spacing: 0.01em;
+}
+
+/* ==========================================================================
+   5 · MANGA KARESİ                                 (MangaPanel.svelte'ten)
+   --------------------------------------------------------------------------
+   Kural yalnız GÖRSELE iniyor: balonlar (`.manga-bubble`) HTML ve seçilebilir
+   kalmalı. ⚠️ Bu bir koruma DEĞİL, caydırıcı — görselin adresi sayfa
+   kaynağında düz duruyor. Engellenen tek şey kazara ve kolay kaldırma.
+
+   Sayfa arka planlarına bilerek UYGULANMIYOR: 11 arka plan Wikimedia
+   Commons'tan CC BY-SA ile geliyor ve o lisans (§2(a)(5)(B)) "etkin teknolojik
+   önlem" uygulamayı açıkça yasaklıyor — kilitlemek kendi künyemizle çelişirdi.
+   ======================================================================= */
+
+.manga-panel__art img {
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none; /* iOS: uzun basınca çıkan kaydet menüsü */
+}
+
+/* ==========================================================================
+   6 · YÜKLEME EKRANI                                    (Loader.svelte'ten)
+   ======================================================================= */
+
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-sp-3);
+
+  background: var(--backdrop);
+  color: var(--on-backdrop);
+
+  opacity: 1;
+  transition: opacity 200ms ease-out;
+}
+
+.loader[data-cikiyor='true'] {
+  opacity: 0;
+}
+
+.loader__pct {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(44px, 12vmin, 92px);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  /* Rakamlar eşit genişlikte: onsuz sayı her artışta hafifçe kayıyor ve sabit
+     durması gereken tek şey oynuyor. */
+  font-variant-numeric: tabular-nums;
+}
+
+.loader__line {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--ui-fs-sm);
+  letter-spacing: var(--tracking-wide);
+  /* Satır ikinci planda: yüzde ölçüm, bu yalnızca eşlik. */
+  opacity: 0.62;
+  text-align: center;
+  padding-inline: var(--ui-sp-5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   7 · MOD SÜZGECİ — klona ÖZGÜ, ana projede karşılığı yok
+   --------------------------------------------------------------------------
+   Ana projede okuma modu sayfaları DOM'dan ekleyip çıkarıyor (keyed `{#each}`).
+   Klonda hepsi DOM'da duruyor ve yalnızca gizleniyor — istenen "ucuz yöntem".
+
+   `data-mod` her sayfanın kendi özniteliğinde yazılı, ayrı bir liste yok.
+   `~=` boşlukla ayrılmış listede tek kelime arıyor: `data-mod="mid full"`.
+
+   ⚠️ `min` modu `full`ün alt kümesi DEĞİL: `km-min` sayfası yalnız `min`de var
+   (sayının kendisi öyle yazılmış — o sayfa uzun anlatının üç cümlelik özeti).
+   Bu yüzden üç kural da ayrı ayrı yazılıyor, "full'ü göster gerisini gizle"
+   gibi bir kısayol o sayfayı kaybederdi.
+   ======================================================================= */
+
+:root[data-depth='min'] .page:not([data-mod~='min']):not([data-mod~='all']) {
+  display: none;
+}
+
+:root[data-depth='mid'] .page:not([data-mod~='mid']):not([data-mod~='all']) {
+  display: none;
+}
+
+:root[data-depth='full'] .page:not([data-mod~='full']):not([data-mod~='all']) {
+  display: none;
+}

@@ -30,6 +30,12 @@ worker-configuration.d.ts
 # gereksiz yere riske girer.
 /prototype/
 
+# Sayının okuma sürümü: derlemesiz, saf HTML/CSS/JS ve ana projeden BAĞIMSIZ.
+# Prettier'a bırakılmamasının sebebi prototiple aynı — CSS dosyaları buraya
+# `src/lib/styles/`ten kopyalandı ve `diff` ile karşılaştırılabilir kalmalı.
+# Sayfa HTML'leri zaten bir kez prettier'dan geçirilerek üretildi.
+/vanilla/
+
 # Belgeler elle dizilmiş: tablolar hizalı, satırlar 88 sütuna göre kırılmış.
 # Prettier bunları yeniden sararsa karar günlüğünün okunabilirliği bozulur.
 /docs/

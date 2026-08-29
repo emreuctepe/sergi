@@ -1,0 +1,356 @@
+/* ============================================================================
+   TOKENS — tasarım değişkenleri
+   ----------------------------------------------------------------------------
+   İki ayrı ölçek var ve bu bilinçli:
+
+   1) TUVAL ÖLÇEĞİ (--fs-*, --sp-*)  → `cqi` birimi. 3:4 tuvalin genişliğine
+      göre ölçeklenir. İçerik tasarımı bir kez yapılır, her ekranda birebir
+      aynı orantıda görünür. cqi = tuval genişliğinin %1'i.
+
+   2) ARAYÜZ ÖLÇEĞİ (--ui-*)          → `px`/`clamp`. Üst/alt bantlar, modallar,
+      paneller. Bunlar tuvalin dışında yaşar, parmak boyutuna göre ölçülür.
+
+   Sayı teması (--issue-*) sadece renkleri ve yazı tiplerini ezer; düzen sabittir.
+   ========================================================================= */
+
+/* Anime Ace'in @font-face'i BU KLONDA YOK — ana projede tokens.css:25'te duruyor.
+   Sebebi lisans: o font lisanssız (BUILD-TODO blocker #4) ve klon paylaşılmak
+   için var, yani dosyayı dağıtmak borcu büyütürdü. Manga ailesi zaten
+   fonts.css'te "Bad Comic"e (OFL 1.1) çevrili; aşağıdaki --font-manga yığınında
+   duran "Anime Ace" adı bu yüzden hiçbir zaman eşleşmiyor, zararsız. */
+
+:root {
+  /* --- yazı tipi yığınları ------------------------------------------------ */
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua",
+    Georgia, ui-serif, serif;
+  --font-text: Georgia, "Iowan Old Style", "Times New Roman", ui-serif, serif;
+  --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  /* Manga balonu ve sayfa başlığı. Yedek olarak --font-ui değil sans yığını:
+     font yüklenmezse balon yine çizgi roman kaydında kalsın. */
+  --font-manga: "Anime Ace", "Comic Sans MS", var(--font-ui);
+  /* Japonca metin — bilinçli olarak MINCHO (明朝, tırnaklı): derginin Latin
+     gövdesi de tırnaklı, ikisi aynı kayıtta konuşsun. Gothic (ゴシック) istenirse
+     ayrı bir token açılır, bunun içine karıştırılmaz.
+
+     Linux adları ŞART: dağıtımlar bu aileyi "Noto Serif CJK JP" diye kurar,
+     "Noto Serif JP" (alt küme derlemesi) genelde yoktur. Yalnız ikincisi
+     yazılıysa hiçbir ad tutmaz, yığın var(--font-text)'e düşer ve tarayıcı
+     kendi yedeğini seçer — kanji çıkar ama GOTHIC çıkar, mincho değil. Sessiz
+     bir hata: metin görünür, yalnızca yanlış karakterde. */
+  --font-ja: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP",
+    "Source Han Serif JP", "Noto Serif JP", "IPAexMincho", "MS Mincho",
+    var(--font-text);
+
+  /* --- tuval tipografi ölçeği (1.25 modüler) ------------------------------ */
+  --fs-2xs: 2.5cqi;
+  --fs-xs: 2.9cqi;
+  --fs-sm: 3.4cqi;
+  --fs-base: 4.1cqi;
+  --fs-md: 4.9cqi;
+  --fs-lg: 6.2cqi;
+  --fs-xl: 8cqi;
+  --fs-2xl: 10.5cqi;
+  --fs-3xl: 14cqi;
+
+  --lh-tight: 1.1;
+  --lh-snug: 1.28;
+  --lh-body: 1.62;
+  --lh-loose: 1.85;
+
+  --tracking-tight: -0.015em;
+  --tracking-wide: 0.08em;
+  --tracking-caps: 0.16em;
+
+  /* --- tuval boşluk ölçeği ------------------------------------------------ */
+  --sp-1: 1cqi;
+  --sp-2: 2cqi;
+  --sp-3: 3cqi;
+  --sp-4: 4.5cqi;
+  --sp-5: 6cqi;
+  --sp-6: 8cqi;
+  --sp-7: 11cqi;
+  --sp-8: 15cqi;
+  --pad-page: 8cqi; /* sayfa iç kenar boşluğu */
+
+  /* --- güvenli alan (tuval altı) ------------------------------------------
+     Tuvalin altında folio'nun (sayfa künyesi + kâğıt perdesi) yaşadığı şerit.
+     GÖRÜNMEZ: çizgi çizmez, yer kaplamaz — yalnızca "buraya içerik koyma"
+     diyen bir ölçü. Folio'nun kendi konumu da aynı değişkenden türüyor ki
+     ikisi zamanla birbirinden kaymasın.
+
+     Neden gerekli: tam sayfayı dolduran içerik (manga karesi, tam kanamalı
+     görsel) folio'nun arkasından geçiyordu — ölçülen çakışma 15px. */
+  --folio-bottom: calc(var(--pad-page) * 0.42);
+  --safe-bottom: calc(var(--folio-bottom) + 3.4cqi);
+
+  /* --- arayüz ölçeği (tuval dışı) ----------------------------------------- */
+  --ui-fs-xs: clamp(10px, 2.6vmin, 12px);
+  --ui-fs-sm: clamp(12px, 3vmin, 14px);
+  --ui-fs-base: clamp(14px, 3.4vmin, 16px);
+  --ui-fs-lg: clamp(17px, 4.2vmin, 21px);
+  --ui-fs-xl: clamp(21px, 5.4vmin, 28px);
+
+  --ui-sp-1: 4px;
+  --ui-sp-2: 8px;
+  --ui-sp-3: 12px;
+  --ui-sp-4: 16px;
+  --ui-sp-5: 24px;
+  --ui-sp-6: 32px;
+  --ui-sp-7: 48px;
+
+  --ui-band-h: clamp(46px, 8svh, 62px); /* üst / alt bant yüksekliği */
+  --ui-tap: 44px; /* en küçük dokunma hedefi */
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 999px;
+
+  --z-canvas: 1;
+  --z-comment-layer: 20;
+  --z-band: 30;
+  --z-panel: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --z-intro: 70;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+  --dur-fast: 140ms;
+  --dur-base: 260ms;
+  --dur-slow: 520ms;
+  --dur-scene: 900ms;
+
+  /* --- nötr palet (aydınlık) ---------------------------------------------- */
+  --paper: #f5f1e8;
+  --paper-raised: #fffdf8;
+  --paper-sunken: #ebe4d6;
+  --ink: #1b1613;
+  --ink-soft: #4b4038;
+  --ink-faint: #8a7d71;
+  --line: #d9cfbe;
+  --line-soft: #e6ddcd;
+  --backdrop: #241f1a;
+  /* Bantlar tuvalin dışında, --backdrop üzerinde yaşar. Aydınlıkta zemin koyu
+     olduğu için kâğıt rengi okunur; karanlıkta zemin zaten koyu, orada doğru
+     olan mürekkep rengidir. Bu token o seçimi tek yerde tutar. */
+  --on-backdrop: var(--paper);
+  --shadow-1: 0 1px 2px rgb(27 22 19 / 0.06), 0 2px 8px rgb(27 22 19 / 0.05);
+  --shadow-2: 0 4px 12px rgb(27 22 19 / 0.1), 0 12px 32px rgb(27 22 19 / 0.09);
+  --shadow-3: 0 8px 24px rgb(27 22 19 / 0.14), 0 32px 64px rgb(27 22 19 / 0.16);
+  --scrim: rgb(20 16 13 / 0.55);
+  /* Yüzen yüzeylerin (modal, panel, popup) kenar halkası. --ink'e bağlı olduğu
+     için temaya uyar: karanlıkta açık bir çizgi, aydınlıkta koyu bir çizgi —
+     yüzey koyu zeminde eriyip arka planla karışmasın diye. */
+  --edge: inset 0 0 0 1px color-mix(in oklab, var(--ink) 16%, transparent);
+
+  /* --- sayı teması: varsayılan (tema yüklenmezse) ------------------------- */
+  --accent: #b8432c;
+  --accent-soft: #e8c9bf;
+  --accent-ink: #fff8f4;
+  --accent-2: #c98a2b;
+  --accent-3: #3d5a4a;
+
+  /* --- anlamsal ------------------------------------------------------------ */
+  --ok: #3f7d52;
+  --warn: #b07a1e;
+  --danger: #a6392c;
+
+  /* Tamamlanmış işin altını. Bilerek --accent-2'ye bağlı DEĞİL: o token sayı
+     temasının ikinci rengi ve her sayıda altın olmak zorunda değil (2026-10'da
+     neon pembe). Altın her sayıda aynı kalsın, yoksa "tamamladım" işareti
+     sayıdan sayıya renk değiştirir. */
+  --gold: #c08a24;
+
+  color-scheme: light;
+}
+
+/* --- karanlık tema --------------------------------------------------------- */
+:root[data-theme="dark"] {
+  --paper: #15120f;
+  --paper-raised: #1f1b17;
+  --paper-sunken: #0e0c0a;
+  --ink: #ece3d5;
+  --ink-soft: #b6a898;
+  --ink-faint: #7d7063;
+  --line: #342d26;
+  --line-soft: #262019;
+  --backdrop: #0a0908;
+  --on-backdrop: var(--ink);
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.5);
+  --shadow-2: 0 6px 18px rgb(0 0 0 / 0.55);
+  --shadow-3: 0 12px 40px rgb(0 0 0 / 0.65);
+  --scrim: rgb(0 0 0 / 0.66);
+
+  --accent: #e0674b;
+  --accent-soft: #4a2a22;
+  --accent-ink: #1b0f0b;
+  --accent-2: #e2a94a;
+  --accent-3: #6d9a80;
+
+  --ok: #6fbb85;
+  --warn: #dfaa4a;
+  --danger: #e0705f;
+  --gold: #e5bb5e;
+
+  color-scheme: dark;
+}
+
+/* ============================================================================
+   SAYI TEMALARI
+   Her sayı kendi paletini getirir. Çekirdek düzen değişmez — sadece bu blok.
+   Gerçek üründe bu, `content/issues/<yyyy-mm>/theme.css` dosyasından gelir.
+   ========================================================================= */
+
+/* 2026-11 · "Kotoba" (言葉) — washi, sumi, ai, shu
+   Japon dili/edebiyatı sayısının paleti. Zor kısmı 2026-09'dan ayrışmaktı:
+   o da zaten kâğıt + mürekkep + torii kırmızısıydı. Ayrım üç yerden geliyor —
+   (1) mürekkep ve kâğıt SOĞUK (sumi is grafit siyahı, kâğıt kōzo grisi), 2026-09
+   sıcak kahve-krem; (2) --accent-3 çam yeşili değil 藍 (aizome indigo); (3) kırmızı
+   tuğladan gerçek 真朱'ya kaydı, daha turuncu ve daha diri.
+
+   --accent-2 (山吹 altın) bilerek AÇIK ve SICAK: `shoji` sahnesi kâğıdın
+   arkasındaki ışığı ondan karıştırıyor. Buraya koyu bir renk koyulursa
+   o sahne kararır. Yeni tema yazarken bu tokenı açık tut. */
+:root[data-issue="2026-11"] {
+  --accent: #d0451f;
+  --accent-soft: #f5dbd0;
+  --accent-ink: #fffaf7;
+  --accent-2: #c8952f;
+  --accent-3: #27496e;
+  --paper: #f0ebde;
+  --paper-raised: #fbf7ee;
+  --paper-sunken: #dfd8c6;
+  --line: #d3cbb8;
+  --line-soft: #e4dccb;
+  --ink: #15171c;
+  --ink-soft: #3f454e;
+  --ink-faint: #7c838d;
+  --backdrop: #141922;
+  --issue-display: var(--font-display);
+}
+:root[data-issue="2026-11"][data-theme="dark"] {
+  --accent: #e8613a;
+  --accent-soft: #4a2318;
+  --accent-ink: #1a0d08;
+  --accent-2: #e0ac4b;
+  --accent-3: #5b86b8;
+  --paper: #12141a;
+  --paper-raised: #1b1f27;
+  --paper-sunken: #0b0d12;
+  --line: #2b303a;
+  --line-soft: #1e232b;
+  --ink: #e8e3d6;
+  --ink-soft: #a9a698;
+  --ink-faint: #75736a;
+  --backdrop: #070910;
+}
+
+/* 2026-10 · "Gürültü" — karbon, neon, tarama çizgisi
+   Açık modda cyberpunk'ı karanlığa değil SOĞUKLUĞA yaslıyor: kâğıt yerine ekran
+   beyazı. Böylece tema düğmesi anlamını koruyor; sayı iki modda da kendisi.
+   --issue-display mono: başlıklar terminalden konuşuyor. */
+:root[data-issue="2026-10"] {
+  --accent: #00705d;
+  --accent-soft: #d3f5ec;
+  --accent-ink: #f2fffb;
+  --accent-2: #b81167;
+  --accent-3: #5538c4;
+  --paper: #eceff4;
+  --paper-raised: #ffffff;
+  --paper-sunken: #dde2ea;
+  --line: #c6cedb;
+  --line-soft: #dfe4ec;
+  /* Mürekkep de soğuyor: varsayılan sıcak kahve, gri kâğıtta kirli duruyordu. */
+  --ink: #10161d;
+  --ink-soft: #3c4753;
+  --ink-faint: #78838f;
+  --backdrop: #080c12;
+  --issue-display: var(--font-mono);
+}
+:root[data-issue="2026-10"][data-theme="dark"] {
+  --accent: #2bffd4;
+  --accent-soft: #0a2f2a;
+  --accent-ink: #04120f;
+  --accent-2: #ff54a3;
+  --accent-3: #9b7cff;
+  --paper: #0a0e14;
+  --paper-raised: #131c27;
+  --paper-sunken: #05080c;
+  --line: #1f2a38;
+  --line-soft: #141d28;
+  --ink: #dde6f0;
+  --ink-soft: #93a3b5;
+  --ink-faint: #5d6b7b;
+  --backdrop: #04070a;
+}
+
+/* 2026-09 · "Kızıl Mevsim" — kâğıt, mürekkep, torii kırmızısı */
+:root[data-issue="2026-09"] {
+  --accent: #b8432c;
+  --accent-soft: #f0d6cc;
+  --accent-ink: #fff9f6;
+  --accent-2: #c98a2b;
+  --accent-3: #3d5a4a;
+  --paper: #f6f0e4;
+  --paper-raised: #fffcf5;
+  --paper-sunken: #ece3d1;
+  --line: #ddd2bd;
+  --backdrop: #2b211c;
+  --issue-display: var(--font-display);
+}
+:root[data-issue="2026-09"][data-theme="dark"] {
+  --accent: #e0674b;
+  --accent-soft: #4d2c22;
+  --accent-2: #e2a94a;
+  --accent-3: #74a086;
+  --paper: #16120e;
+  --paper-raised: #211a15;
+  --paper-sunken: #0d0a08;
+  --line: #362c23;
+  --backdrop: #080605;
+}
+
+/* 2026-08 · "Mavi Saat" — arşivdeki önceki sayı */
+:root[data-issue="2026-08"] {
+  --accent: #2f5d8a;
+  --accent-soft: #cfdeec;
+  --accent-2: #7b93ad;
+  --accent-3: #35606b;
+  --paper: #eef1f4;
+  --paper-raised: #fbfcfd;
+  --paper-sunken: #dfe5ea;
+  --line: #c9d3dc;
+  --backdrop: #1a2430;
+}
+:root[data-issue="2026-08"][data-theme="dark"] {
+  --accent: #6ea3d8;
+  --accent-soft: #1e3450;
+  --paper: #0f1319;
+  --paper-raised: #171d25;
+  --line: #26303b;
+}
+
+/* ============================================================================
+   ERİŞİLEBİLİRLİK
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 1ms;
+    --dur-base: 1ms;
+    --dur-slow: 1ms;
+    --dur-scene: 1ms;
+  }
+}
+
+/* Kullanıcı ayarlardan hareketi kapattıysa (medya sorgusundan bağımsız) */
+:root[data-motion="off"] {
+  --dur-fast: 1ms;
+  --dur-base: 1ms;
+  --dur-slow: 1ms;
+  --dur-scene: 1ms;
+}

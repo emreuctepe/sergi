@@ -1,0 +1,527 @@
+/* ============================================================================
+   CANVAS — 3:4 tuval, letterbox bantları, snap sayfa motoru
+   ----------------------------------------------------------------------------
+   Tuvalin genişliği üç kısıtın en küçüğüdür:
+     · ekran genişliği
+     · ekran yüksekliğinin 3/4'ü (oranı korumak için)
+     · 560px (masaüstünde "dergi objesi" boyutunu makul tutmak için)
+   ========================================================================= */
+
+:root {
+  --canvas-w: min(100vw, calc(100svh * 3 / 4), 560px);
+
+  /* Tuvalin iki yanında kalan boşluk. Dikey letterbox nasıl bantlara ev
+     sahipliği yapıyorsa, yatay boşluk da masaüstünde menüye ev sahipliği
+     yapar — arayüz yine tuvalin dışında yaşar, okuma alanı bozulmaz. */
+  --canvas-h: calc(var(--canvas-w) * 4 / 3);
+  --gutter: calc((100vw - var(--canvas-w)) / 2);
+
+  /* Sabit menünün genişliğini canvas.js pencereye göre yazar; buradaki değer
+     yalnızca ölçüm yapılmadan önceki ilk karede geçerli. Menü açıkken tuval
+     yarım menü kadar sağa kayar, böylece menü+dergi birlikte ortalanır. */
+  --dock-w: 300px;
+  --dock-gap: var(--ui-sp-5);
+  --dock-shift: calc((var(--dock-w) + var(--dock-gap)) / 2);
+}
+
+/* Telefon: ekran 3:4'ten belirgin biçimde uzun ve tuval zaten ekran genişliğinde.
+   Tuvali 3:4'te bırakırsak altta ve üstte bant boyunu kat kat aşan ölü alan kalır
+   (19.5:9 bir telefonda ekranın %38'i). Bunun yerine tuval, letterbox tam bir bant
+   yüksekliğine inene kadar uzar: bantlar boşluğa tam oturur, ölü alan sıfırlanır.
+   3:4 hâlâ TASARIM ölçüsüdür — sayfa o orana göre kurgulanır, fazla yükseklik
+   tam kanama görsellerin taşma payı olur. Ekranın yanında masa kalan her yerde
+   (tablet, masaüstü) dergi yine 3:4 bir obje olarak durur. */
+@media (max-width: 560px) and (max-aspect-ratio: 3 / 4) {
+  :root {
+    --canvas-h: max(
+      calc(var(--canvas-w) * 4 / 3),
+      calc(100svh - 2 * var(--ui-band-h))
+    );
+  }
+}
+
+#shell {
+  position: relative;
+  z-index: 1;
+  width: var(--canvas-w);
+  height: 100svh;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+:root[data-dock="on"] #shell {
+  transform: translateX(var(--dock-shift));
+}
+
+/* --------------------------------------------------------------------------
+   TUVAL
+   -------------------------------------------------------------------------- */
+.canvas {
+  position: relative;
+  width: 100%;
+  height: var(--canvas-h);
+  container-type: inline-size;
+  container-name: canvas;
+  background: var(--paper);
+  color: var(--ink);
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    background var(--dur-slow) var(--ease-out),
+    transform var(--dur-base) var(--ease-out),
+    border-radius var(--dur-base) var(--ease-out);
+}
+
+/* masaüstü / geniş letterbox: tuval bir "dergi objesi" gibi durur */
+#shell[data-letterbox="roomy"] .canvas {
+  border-radius: 4px;
+  box-shadow: var(--shadow-3);
+}
+/* Karanlıkta gölge siyahın üstüne siyahtır — kâğıt ile zemin arasındaki fark
+   kaybolur, dergi zemine karışır ve geriye kocaman bir siyah alan izlenimi
+   kalır. İnce bir kenar ışığı objeye kenar verir; bir obje ancak kenarı
+   görünüyorsa obje gibi durur. */
+:root[data-theme="dark"] #shell[data-letterbox="roomy"] .canvas {
+  box-shadow:
+    var(--shadow-3),
+    0 0 0 1px color-mix(in oklab, var(--ink) 13%, transparent);
+}
+
+/* yorum katmanı açıkken tuval hafifçe geri çekilir */
+#shell[data-comments="on"] .canvas {
+  transform: scale(0.965);
+  border-radius: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   SAYFA AKIŞI — dikey snap
+   -------------------------------------------------------------------------- */
+.pages {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+}
+.pages::-webkit-scrollbar {
+  display: none;
+}
+:root[data-motion="off"] .pages {
+  scroll-behavior: auto;
+}
+
+.page {
+  position: relative;
+  min-height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: calc(var(--pad-page) * 1.35) var(--pad-page);
+  overflow: hidden;
+}
+
+/* fit: contain — içerik tuvale sığmak zorunda */
+.page[data-fit="contain"] {
+  height: 100%;
+}
+
+/* fit: scroll — sayfa uzayabilir, sonunda bir sonrakine snap olur.
+   Alt boşluk folio'nun altına metin girmesini engeller: güvenli alan +
+   okuma payı. Sabit çarpan yerine --safe-bottom'dan türüyor, böylece
+   folio'nun boyu değişirse burası da kendiliğinden ayarlanır. */
+.page[data-fit="scroll"] {
+  height: auto;
+  justify-content: flex-start;
+  scroll-snap-stop: normal;
+  padding-bottom: calc(var(--safe-bottom) + var(--pad-page) * 1.6);
+}
+
+/* tam kanama (görsel) sayfalar */
+.page[data-bleed="full"] {
+  padding: 0;
+  justify-content: stretch;
+}
+
+.page__inner {
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+/* sayfanın arka plan katmanı (görsel / degrade / doku) */
+.page__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+.page__bg > svg,
+.page__bg > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --------------------------------------------------------------------------
+   FOLIO — sayfa kenarındaki bölüm adı ve sayfa numarası
+   -------------------------------------------------------------------------- */
+.folio {
+  position: absolute;
+  inset-inline: var(--pad-page);
+  bottom: var(--folio-bottom);
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+.folio[data-hidden="true"] {
+  opacity: 0;
+}
+/* folio'nun altında yumuşak bir kâğıt perdesi — uzun sayfalarda metin
+   folio'nun arkasından geçerken okunaklılığı korur */
+.folio::before {
+  content: "";
+  position: absolute;
+  inset: -260% -10% -160%;
+  z-index: -1;
+  background: linear-gradient(to top, var(--paper) 0 58%, transparent);
+  pointer-events: none;
+}
+/* tam kanama sayfalarda perde gereksiz, yazı zaten açık renk */
+.folio[data-overlay="true"] {
+  color: color-mix(in oklab, #fbf6ee 62%, transparent);
+  mix-blend-mode: normal;
+}
+.folio[data-overlay="true"]::before {
+  background: none;
+}
+#folio-page {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   BANTLAR — letterbox alanında yaşayan arayüz
+   -------------------------------------------------------------------------- */
+.band {
+  position: absolute;
+  inset-inline: 0;
+  z-index: var(--z-band);
+  height: var(--ui-band-h);
+  display: flex;
+  align-items: center;
+  gap: var(--ui-sp-2);
+  padding-inline: var(--ui-sp-3);
+  color: var(--on-backdrop);
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+}
+.band--top {
+  top: 0;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.band--bottom {
+  bottom: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  justify-content: space-between;
+}
+
+/* dar ekranda bantlar tuvalin üzerine biner → okunurluk için perde */
+#shell[data-letterbox="tight"] .band {
+  color: var(--ink);
+  backdrop-filter: blur(14px) saturate(1.3);
+  background: color-mix(in oklab, var(--paper) 78%, transparent);
+}
+#shell[data-letterbox="tight"] .band--top {
+  border-bottom: 1px solid color-mix(in oklab, var(--line) 60%, transparent);
+}
+#shell[data-letterbox="tight"] .band--bottom {
+  border-top: 1px solid color-mix(in oklab, var(--line) 60%, transparent);
+}
+
+/* okuma sırasında bantlar sessizleşir (kaydırınca geri gelir) */
+#shell[data-chrome="dim"] .band {
+  opacity: 0.35;
+}
+#shell[data-chrome="dim"] .band:hover,
+#shell[data-chrome="dim"] .band:focus-within {
+  opacity: 1;
+}
+
+.band__btn {
+  display: grid;
+  place-items: center;
+  width: var(--ui-tap);
+  height: var(--ui-tap);
+  border-radius: var(--radius-full);
+  color: inherit;
+  opacity: 0.85;
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out);
+}
+.band__btn:hover {
+  opacity: 1;
+  background: color-mix(in oklab, currentColor 12%, transparent);
+}
+.band__btn .icon {
+  width: 22px;
+  height: 22px;
+}
+.band__btn--text {
+  font-size: var(--ui-fs-sm);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+}
+.band__btn[disabled] {
+  opacity: 0.25;
+  pointer-events: none;
+}
+/* menü sabitken hamburger bir "açık" düğmesidir, kapatma görevi görür */
+#btn-menu[aria-expanded="true"] {
+  opacity: 1;
+  background: color-mix(in oklab, currentColor 15%, transparent);
+}
+
+.band__center {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  line-height: 1.15;
+}
+
+.band__issue {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: var(--ui-fs-xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+.band__issue-no::before {
+  content: "№";
+  margin-right: 2px;
+  opacity: 0.7;
+}
+
+/* --- okuma modu göstergesi (üç çubuk) ------------------------------------- */
+.depth-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 10px 3px 7px;
+  border-radius: var(--radius-full);
+  color: inherit;
+  font-size: var(--ui-fs-sm);
+  font-weight: 600;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.depth-chip:hover {
+  background: color-mix(in oklab, currentColor 14%, transparent);
+}
+.depth-chip__bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+.depth-chip__bars i {
+  width: 3px;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.28;
+  transition:
+    height var(--dur-base) var(--ease-spring),
+    opacity var(--dur-base) var(--ease-out);
+}
+.depth-chip__bars i:nth-child(1) {
+  height: 5px;
+}
+.depth-chip__bars i:nth-child(2) {
+  height: 8.5px;
+}
+.depth-chip__bars i:nth-child(3) {
+  height: 12px;
+}
+:root[data-depth="min"] .depth-chip__bars i:nth-child(1),
+:root[data-depth="mid"] .depth-chip__bars i:nth-child(-n + 2),
+:root[data-depth="full"] .depth-chip__bars i {
+  opacity: 1;
+}
+
+/* --- ilerleme çubuğu ------------------------------------------------------- */
+.progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: color-mix(in oklab, currentColor 18%, transparent);
+}
+.progress__fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+  transition: width var(--dur-base) var(--ease-out);
+}
+
+/* --- yorum katmanı düğmesi ------------------------------------------------- */
+.comment-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 6px 0 12px;
+  border-radius: var(--radius-full);
+  color: inherit;
+  font-size: var(--ui-fs-sm);
+  border: 1px solid color-mix(in oklab, currentColor 26%, transparent);
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+.comment-toggle__label {
+  letter-spacing: var(--tracking-wide);
+}
+.comment-toggle__count {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, currentColor 18%, transparent);
+  font-size: var(--ui-fs-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.comment-toggle[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.comment-toggle[aria-pressed="true"] .comment-toggle__count {
+  background: color-mix(in oklab, var(--accent-ink) 22%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   METİN SEÇİMİ BALONU
+   -------------------------------------------------------------------------- */
+.selection-bubble {
+  position: absolute;
+  z-index: var(--z-comment-layer);
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  border-radius: var(--radius-full);
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: var(--shadow-2);
+  transform: translate(-50%, -120%);
+  animation: pop var(--dur-base) var(--ease-spring);
+}
+.selection-bubble button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: var(--radius-full);
+  color: inherit;
+  font-size: var(--ui-fs-sm);
+  white-space: nowrap;
+}
+.selection-bubble button:hover {
+  background: color-mix(in oklab, var(--paper) 18%, transparent);
+}
+.selection-bubble .icon {
+  width: 16px;
+  height: 16px;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -108%) scale(0.9);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   ÇOK DAR EKRAN AYARLARI
+   -------------------------------------------------------------------------- */
+@media (max-width: 359px) {
+  .comment-toggle__label {
+    display: none;
+  }
+  .band__issue-name {
+    display: none;
+  }
+}
+
+/* --- alt bant yeni düzen: [yukarı aşağı] · [beğen yorum paylaş] ------------- */
+.band--bottom {
+  justify-content: center;
+  gap: 16px;
+}
+.band__nav,
+.band__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.band__act {
+  display: grid;
+  place-items: center;
+  width: var(--ui-tap);
+  height: var(--ui-tap);
+  border-radius: var(--radius-full);
+  color: inherit;
+  opacity: 0.85;
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out);
+}
+.band__act:hover {
+  opacity: 1;
+  background: color-mix(in oklab, currentColor 12%, transparent);
+}
+.band__act .icon {
+  width: 22px;
+  height: 22px;
+}
+/* sahte (henüz işlevsiz) tuşlar soluk durur */
+.band__act[data-fake="true"] {
+  opacity: 0.5;
+}
+
+/* eş okuma toggle: açıkken vurgulu (sahte değil, işlevsel) */
+.band__act--toggle {
+  opacity: 0.85;
+}
+.band__act--toggle[aria-pressed="true"] {
+  color: var(--accent);
+  opacity: 1;
+  background: color-mix(in oklab, var(--accent) 14%, transparent);
+}

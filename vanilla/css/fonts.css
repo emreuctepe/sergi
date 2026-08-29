@@ -1,0 +1,57 @@
+/* ============================================================================
+   MANGA FONTU — tek satırlık anahtar
+   ----------------------------------------------------------------------------
+   Bu dosya `index.html`de EN SON yükleniyor ve bir `@layer`e alınmıyor. Sebebi
+   kaskad: katmansız CSS her zaman `@layer`lıyı ezer, yani buradaki `:root`
+   `tokens.css`'in `@layer tokens` içindeki `--font-manga`sını dosya sırasından
+   bağımsız olarak geçersiz kılıyor.
+
+   ⚠️ Bu dosya bir katmana alınırsa override sessizce çalışmayı bırakır ve tek
+   belirtisi "balonlar biraz farklı duruyor" olur.
+
+   ⚠️ FONTU DEĞİŞTİRMEK: aşağıdaki `--manga-family` satırı, o kadar. Yedek yığın
+   ve fontu tüketen üç yer (`blocks.css:686`, `blocks.css:736`, `bilesen.css`
+   içindeki balon kuralı) olduğu gibi kalır.
+   ========================================================================= */
+
+/* Bad Comic — GGBotNet, SIL Open Font License 1.1.
+   Kaynak: https://ggbot.itch.io/bad-comic-font (BadComic_Font_0_98)
+   Lisans metni fontun YANINDA: fonts/BadComic-OFL.txt. OFL 1.1 fontun
+   lisansıyla birlikte dağıtılmasını şart koşuyor — o dosya "eklenmese de olur"
+   değil, lisansın kendi gereği.
+
+   ⚠️ RESERVED FONT NAME: "Bad Comic". OFL'de subset almak da "Modified
+   Version" sayılıyor (bileşen SİLMEK de değişiklik). Faz 6 "subset + woff2"
+   planlıyor — o gün alınacak subset bu adı TAŞIYAMAZ, yeniden adlandırılması
+   gerekir. Bugünkü dosya değiştirilmemiş orijinal, yani ad serbest.
+
+   Türkçe kapsam yazarın dil listesine güvenilmeden, fontun kendi `cmap`
+   tablosundan ÖLÇÜLDÜ (1.221 kod noktası): ç Ç ğ Ğ ı İ ö Ö ş Ş ü Ü, …,
+   tırnaklar ve tireler TAM. Anime Ace'te olmayan – (en dash) ve — (em dash)
+   burada VAR, yani tokens.css:19'daki "balon metinlerinde uzun tire kullanma"
+   borcu bu fontla kapanıyor.
+
+   woff2 seçildi: aynı fontun TTF'i 518 KB, woff2 128 KB. Yine de Anime Ace'in
+   61 KB'ından büyük — fontta 1.221 glif var, sayının kullandığı ise bir avuç.
+   Subset Faz 6'nın işi (ve yukarıdaki ad kısıtını doğuruyor). */
+@font-face {
+  font-family: "Bad Comic";
+  src: url("../fonts/badcomic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ─── ANAHTAR ─────────────────────────────────────────────────────────────
+     Bu klonda kayıtlı TEK aile "Bad Comic" (OFL 1.1). Ana projede ikinci bir
+     seçenek daha var — "Anime Ace" — ama o font lisanssız olduğu için buraya
+     kopyalanmadı (bkz. tokens.css'in başındaki not). Yani bu satıra başka bir
+     ad yazarsan balon sessizce Comic Sans'a düşer.
+     ──────────────────────────────────────────────────────────────────────── */
+  --manga-family: "Bad Comic";
+
+  /* Yedek yığın tokens.css:41-42'nin gerekçesiyle aynı: yedek --font-ui değil
+     sans yığını, çünkü font inmezse balon yine çizgi roman kaydında kalmalı. */
+  --font-manga: var(--manga-family), "Comic Sans MS", var(--font-ui);
+}
