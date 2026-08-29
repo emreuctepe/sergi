@@ -49,6 +49,29 @@ describe('wrangler.jsonc — Workers, Pages değil', () => {
 	});
 });
 
+describe('vite.config.ts — iki yayın hedefi için base', () => {
+	const vite = readFileSync(resolve(root, 'vite.config.ts'), 'utf-8');
+
+	it('base ortam değişkeninden geliyor, koda gömülü değil', () => {
+		/* Kök yayın (Cloudflare) base'siz, 0.1 (GitHub Pages) `/sergi/0.1`
+		   altında. Sabit yazılırsa ikisinden biri kaçınılmaz olarak kırılır. */
+		expect(vite).toContain('process.env.SERGI_BASE');
+	});
+
+	it('`relative: false` DURUYOR', () => {
+		/* SvelteKit varsayılanı `relative: true` ve o hâlde `base` sayfa başına
+		   göreli bir dizgiye dönüşüyor: `/sayi/2026-09` için `../assets/…`.
+		   Doğru çözülür — ama YALNIZCA sondaki eğik çizgi yokken. Okur
+		   `/sayi/2026-09/` yazarsa aynı yol `/sayi/assets/…` olur ve sayının
+		   bütün görselleri sessizce kırılır.
+
+		   Bu satır silinirse hiçbir şey patlamaz, testler yeşil kalır ve fark
+		   ancak biri sonuna eğik çizgi koyunca görünür — yani sözleşmeye
+		   bağlanmazsa kaybolacak türden bir karar. */
+		expect(vite).toMatch(/relative:\s*false/);
+	});
+});
+
 describe('worker-configuration.d.ts — derleme çıktısına bakmıyor', () => {
 	it('`.svelte-kit` altına başvuru içermiyor', () => {
 		/* `wrangler types` DEĞİŞKEN çıktı üretiyor: `main`'in gösterdiği dosya

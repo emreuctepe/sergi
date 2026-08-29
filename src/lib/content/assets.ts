@@ -7,17 +7,23 @@
    `/sayi/2026-09` gibi bir rotada açılıyor ve göreli yol `/sayi/assets/…`
    olurdu — sessizce kırık bir görsel.
 
-   `base` bilerek eklenmiyor: uygulama alan adının kökünde yayınlanıyor
-   (adapter-cloudflare, `wrangler.jsonc`). Bir gün alt yolda yayınlanırsa
-   `$app/paths`'in `base`'i BURAYA girer, 90 blok içine değil.
+   `base` ARTIK EKLENİYOR ve bu dosyanın kendi öngörüsüydü: "bir gün alt yolda
+   yayınlanırsa `$app/paths`'in `base`'i BURAYA girer, 90 blok içine değil."
+   O gün 0.1 Erken Erişim'le geldi — GitHub Pages sayıyı `…/sergi/0.1` altında
+   servis ediyor. SvelteKit kendi yollarını (`_app/`, `static/` içinden gelen
+   font) base verilince göreliye çeviriyor ama BUNLARI çeviremez: bu yolları
+   üreten SvelteKit değil, bu fonksiyon.
+
+   Kök yayında `base` boş dizgi, yani Cloudflare çıktısı bit düzeyinde aynı.
    ========================================================================= */
 
+import { base } from '$app/paths';
 import turevler from './gorsel-turevleri.json';
 import type { IssueContent } from './types';
 
-/** `assets/2026-09/tren.webp` → `/assets/2026-09/tren.webp` */
+/** `assets/2026-09/tren.webp` → `<base>/assets/2026-09/tren.webp` */
 export function assetUrl(path: string): string {
-	return path.startsWith('/') ? path : `/${path}`;
+	return `${base}${path.startsWith('/') ? path : `/${path}`}`;
 }
 
 /**
@@ -87,6 +93,11 @@ export function avifSrcset(path: string): string | null {
 	const widths = (turevler as Record<string, number[]>)[path];
 	if (!widths?.length) return null;
 
-	const base = path.slice(0, path.lastIndexOf('.'));
-	return widths.map((w) => `${assetUrl(`${base}-${w}.avif`)} ${w}w`).join(', ');
+	/* `govde` — eskiden `base` idi ve ZARARSIZDI: gölgeleme yalnız bu fonksiyonun
+	   kapsamında kalıyor, `assetUrl` base'i kendi modül kapsamından okuyor.
+	   Yine de yeniden adlandırıldı, çünkü `$app/paths`'ten gelen `base` ile aynı
+	   adı taşıyan bir yerel, ileride bu kapsama taşınacak bir satır için sessiz
+	   bir tuzak. Ölçüldü: gölgeleme geri konduğunda testler yeşil kalıyor. */
+	const govde = path.slice(0, path.lastIndexOf('.'));
+	return widths.map((w) => `${assetUrl(`${govde}-${w}.avif`)} ${w}w`).join(', ');
 }
