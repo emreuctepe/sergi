@@ -1,0 +1,40 @@
+# ============================================================================
+# ÖNBELLEK BAŞLIKLARI
+# ----------------------------------------------------------------------------
+# ⚠️ KONUMU DEĞİŞTİ. Eskiden proje kökündeydi, çünkü adapter-cloudflare
+# `static/` altındakini uyarı basıp yok sayıyordu. Adaptör de SvelteKit de
+# gitti; artık `assets.directory` doğrudan `vanilla/` (bkz. kökteki
+# `wrangler.jsonc`), yani bu dosya ONUN İÇİNDE olmak zorunda. Kökte
+# bırakılsaydı sessizce hiçbir şey yapmazdı — Workers `_headers`ı yalnız
+# varlık klasörünün içinde arıyor.
+#
+# Aşağıdaki iki kural, yolları değişmediği için aynen taşındı:
+# `vanilla/assets/…` kökten `/assets/…` olarak sunuluyor.
+#
+# Kalkan tek kural adaptörün kendi ürettiği `/_app/immutable/*`tı — hash'li
+# derleme çıktısı yoktu artık, derleme de yok.
+#
+# NEDEN VAR: bu satırlar olmadan her şey Cloudflare'in varsayılanına kalıyor:
+#
+#     cache-control: public, max-age=0, must-revalidate
+#
+# Yani okur sayıyı ikinci kez açtığında 26 görselin her biri için bir koşullu
+# istek gidiyor. İçerik değişmediği için hepsi 304 dönüyor ama gidiş-dönüş
+# duruyor; mobil bağlantıda tam da bu görünür.
+# ============================================================================
+
+# Sayı varlıkları. Yol sayı klasörünü taşıyor (`assets/2026-09/…`), yani
+# yayınlanmış bir sayının görseli bir daha değişmez — değişmesi gerekiyorsa
+# dosya adı değişmeli.
+#
+# ⚠️ Şimdilik BİR HAFTA, bir yıl değil: 2026-09 hâlâ yapım aşamasında ve
+# görseller yeniden kodlanıyor. Bir yıllık `immutable` verilseydi hem tarayıcı
+# hem Cloudflare kenarı eski dosyayı aylarca tutardı. Yayın günü bu satır
+# `max-age=31536000, immutable` olacak.
+/assets/*
+  Cache-Control: public, max-age=604800
+
+# Font dosya adı sabit ve içeriği yayın öncesi bir kez değişecek (lisans borcu,
+# bkz. BENIOKU.md). Ondan sonra gerçekten değişmez.
+/fonts/*
+  Cache-Control: public, max-age=604800
