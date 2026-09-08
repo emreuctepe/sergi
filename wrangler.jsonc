@@ -1,0 +1,43 @@
+/* ============================================================================
+   CLOUDFLARE — Workers, yalnız statik varlık (SvelteKit YOK)
+   ----------------------------------------------------------------------------
+   Bu dosyanın eski hâli bir SvelteKit Worker'ı yayınlıyordu:
+
+       main              → .svelte-kit/cloudflare/_worker.js
+       assets.directory  → .svelte-kit/cloudflare
+       assets.binding    → ASSETS
+
+   Üçü de gitti, çünkü yayınlanan şey artık derlenmiş bir Worker değil: sayı
+   `vanilla/` altında düz HTML/CSS/JS olarak duruyor ve doğrudan sunuluyor.
+
+   ⚠️ `main` ANAHTARI BİLEREK YOK. Workers, `main`siz bir yapılandırmayı
+   "yalnız statik varlık" dağıtımı olarak kabul ediyor; ortada çalışacak kod
+   olmadığı için giriş noktası da istemiyor. `main` boş bir dosyaya
+   bağlanmaya çalışılsaydı gereksiz bir Worker çalıştırıp her isteği ona
+   sokardık.
+
+   ⚠️ `assets.binding` da YOK ve olmamalı. Bağlama, Worker KODUNUN statiklere
+   erişmesi için var (`env.ASSETS.fetch(...)`). Kod olmayınca bağlanacak bir
+   taraf da yok.
+
+   ⚠️ `name` DEĞİŞTİRİLMEMELİ. Paneldeki Worker projesinin adı bu; değişirse
+   dağıtım aynı yere değil, YENİ bir Worker'a gider ve
+   sergi.muhammedemreuctepe.workers.dev eski sürümde donar.
+
+   ⚠️ PANELDE DERLEME KOMUTU BOŞ OLMALI. Depoda `package.json` yok — komut
+   `pnpm run build` kaldığı sürece dağıtım daha ilk adımda
+   ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND ile düşer. Dağıtım komutu
+   `npx wrangler deploy` olarak kalabilir; wrangler'ı derleme ortamı sağlıyor.
+
+   `not_found_handling` VARSAYILANDA (404) bırakıldı: sayının bütün yolları
+   gerçek dosya. Kök `vanilla/index.html`i, sayfalar da `sayfalar/<id>/sayfa.html`i
+   veriyor; SPA gibi her isteği index'e yönlendirmek olmayan bir dosyayı 200 ile
+   döndürüp kırık bağlantıları gizlerdi.
+   ========================================================================= */
+{
+	"name": "sergi",
+	"compatibility_date": "2026-08-20",
+	"assets": {
+		"directory": "./vanilla"
+	}
+}
