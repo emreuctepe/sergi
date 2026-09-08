@@ -14,7 +14,7 @@
    seçimi CSS sınıfı değiştiriyor. "Altyapı" diye bir şey yok.
    ========================================================================= */
 
-import { MODLAR, baslat, modAyarla, sayfalariDiz } from './okuyucu.js';
+import { MODLAR, baslat, modAyarla, sayfalariDiz, yenidenOlc } from './okuyucu.js';
 import { SAHNELER } from './sahneler.js';
 
 const kabuk = document.getElementById('shell');
@@ -31,6 +31,8 @@ const kap = document.getElementById('pages');
    sayıyı hiç açılmaz hâle getirirdi.
    ======================================================================= */
 
+/* ⚠️ `index.html`in <head>'indeki tema betiği de bu anahtarı okuyor. İkisi
+   ayrışırsa tema sessizce hatırlanmaz olur. */
 const ANAHTAR = 'vanilla:sergi:v1';
 
 function tercihOku() {
@@ -45,9 +47,22 @@ function tercihOku() {
   }
 }
 
+/**
+ * ⚠️ HAM KAYDIN ÜSTÜNE yazıyor, `tercihOku()`nun üstüne DEĞİL.
+ *
+ * `tercihOku` bir SÜZGEÇ: tanıdığı alanları doğrulayıp döndürüyor, geri
+ * kalanını atıyor. Birleştirme onun çıktısı üzerinden yapılınca, süzgecin
+ * bilmediği her alan ilk yazmada siliniyordu — tema tam olarak böyle
+ * kayboldu: okur temayı seçiyor (`{tema}` yazılıyor), sonra modu seçiyor
+ * (`{mod}` yazılıyor) ve ikinci yazma birincinin üstünü örtüyordu.
+ *
+ * Ham kaydın üstüne yazmak bunu yapısal olarak imkânsız kılıyor: yarın
+ * eklenecek bir alan da kendiliğinden korunuyor.
+ */
 function tercihYaz(yama) {
   try {
-    localStorage.setItem(ANAHTAR, JSON.stringify({ ...tercihOku(), ...yama }));
+    const ham = JSON.parse(localStorage.getItem(ANAHTAR) ?? '{}');
+    localStorage.setItem(ANAHTAR, JSON.stringify({ ...ham, ...yama }));
   } catch {
     /* Depolama kapalı — tercih bu oturumda yaşar, sonrakinde sorulur. */
   }
@@ -308,7 +323,33 @@ function tanitimGoster() {
    --------------------------------------------------------------------------
    İki yüzü var: açılışta KAPANMAZ (mod seçilmeden sayı açılmıyor), banttaki
    çipten açılınca kapanabilir.
+
+   İki ayrı soru soruyor ve ikisi farklı davranıyor:
+
+     OKUMA DERİNLİĞİ → seçim modalı KAPATIR. Tek bir karar, verilince iş biter.
+     GÖRÜNÜM (tema)  → seçim modalı AÇIK BIRAKIR. Tema anında uygulanıyor ve
+                       okur arkadaki sayıda sonucu görüyor; kapanan bir modal
+                       "beğenmedim, öbürüne bakayım"ı imkânsız kılardı.
    ======================================================================= */
+
+/* Aydınlık/karanlık dışında üçüncü bir "sistem" seçeneği bilerek YOK. Sistem
+   tercihini izlemek, okurun buradan verdiği kararı ne zaman ezeceği belirsiz
+   bir üçüncü ses eklemek olurdu. Varsayılan (karanlık) `index.html`in
+   <head>'inde, bir kez. */
+const TEMALAR = [
+  { id: 'dark', ad: 'Karanlık', simge: '☾' },
+  { id: 'light', ad: 'Aydınlık', simge: '☀' }
+];
+
+/** Şu anki tema — kaynağı DOM, çünkü onu <head>'deki betik yazıyor. */
+function temaOku() {
+  return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+}
+
+function temaAyarla(tema) {
+  document.documentElement.dataset.theme = tema;
+  tercihYaz({ tema });
+}
 
 const MOD_KARTLARI = [
   {
@@ -364,9 +405,14 @@ function modSecici({ kapanabilir, secili }) {
   host.className = 'modal-host';
   host.dataset.on = 'false';
 
+  /* `data-active` VE `aria-pressed` birlikte: ilki `overlays.css`in seçili
+     kartı boyadığı kanca (§OKUMA MODU SEÇİMİ), ikincisi ekran okuyucununki.
+     Burada önce yalnız `aria-pressed` yazılıyordu ve seçili mod hiç
+     vurgulanmıyordu — CSS'in beklediği öznitelik hiç doğmuyordu. */
   const kartlar = MOD_KARTLARI.map(
     (kart) => `
       <button class="depth-card" type="button" data-mod="${kart.id}"
+              data-active="${kart.id === secili}"
               aria-pressed="${kart.id === secili}">
         <span class="depth-card__icon" aria-hidden="true">${kart.simge}</span>
         <span class="depth-card__main">
@@ -381,6 +427,17 @@ function modSecici({ kapanabilir, secili }) {
       </button>`
   ).join('');
 
+  const simdikiTema = temaOku();
+  const temaDugmeleri = TEMALAR.map(
+    (t) => `
+      <button class="tema-btn" type="button" data-tema="${t.id}"
+              data-active="${t.id === simdikiTema}"
+              aria-pressed="${t.id === simdikiTema}">
+        <span class="tema-btn__simge" aria-hidden="true">${t.simge}</span>
+        ${t.ad}
+      </button>`
+  ).join('');
+
   host.innerHTML = `
     <div class="modal" role="dialog" aria-modal="true" aria-label="Nasıl okumak istersin?">
       <header class="modal__head">
@@ -388,8 +445,11 @@ function modSecici({ kapanabilir, secili }) {
         ${kapanabilir ? '<button class="modal__x" type="button" aria-label="Kapat">✕</button>' : ''}
       </header>
       <div class="depth-pick">
-        <p class="depth-pick__intro">Bu sayıyı nasıl okumak istersin?</p>
         ${kartlar}
+      </div>
+      <div class="tema-sec" role="group" aria-label="Görünüm">
+        <span class="tema-sec__etiket">Görünüm</span>
+        <div class="tema-sec__sira">${temaDugmeleri}</div>
       </div>
     </div>`;
 
@@ -421,6 +481,21 @@ function modSecici({ kapanabilir, secili }) {
 
     for (const dugme of host.querySelectorAll('.depth-card')) {
       dugme.addEventListener('click', () => kapat(dugme.dataset.mod));
+    }
+
+    /* Tema düğmeleri modalı KAPATMIYOR — okur değişikliği arkadaki sayıda
+       görüp fikrini değiştirebilsin. Bu yüzden `kapat()` çağrılmıyor, yalnız
+       basılı hâl güncelleniyor. */
+    const temaDugmeleri = [...host.querySelectorAll('.tema-btn')];
+    for (const dugme of temaDugmeleri) {
+      dugme.addEventListener('click', () => {
+        temaAyarla(dugme.dataset.tema);
+        for (const d of temaDugmeleri) {
+          const secili = String(d === dugme);
+          d.dataset.active = secili;
+          d.setAttribute('aria-pressed', secili);
+        }
+      });
     }
     if (kapanabilir) {
       host.querySelector('.modal__x').addEventListener('click', () => kapat(null));
@@ -479,6 +554,23 @@ async function ac() {
     modAyarla(mod);
     tercihYaz({ mod });
   }
+
+  /* ⚠️ ÖLÇÜM BURADA TAZELENİYOR — `baslat()`teki ilk ölçüm artık bayat.
+     Yeri bilinçli: okur gezinme yetkisini bir sonraki satırda kazanıyor, yani
+     düzeni değiştirebilecek her şey (yükleme ekranı, tanıtım, mod seçici)
+     ARKADA kaldı. Daha erken ölçmek yetmezdi, çünkü aradaki üç perde de
+     kapanırken düzeni oynatabiliyor.
+
+     Bayatlığın kaynağı sıranın kendisi: `baslat()` §460'ta ölçüyor,
+     `yuklemeEkrani()` §470'te `document.fonts.ready`i ve BÜTÜN görselleri
+     bekliyor. Beklediği şey, ölçümü geçersiz kılan şeyin ta kendisi —
+     söyleşi çizimleri ızgara gözünde (akışta) ve `width`/`height` taşımıyor,
+     inmeden önce yükseklikleri sıfır.
+
+     Kaydırma ölçümü zaten tazeliyordu (`okuyucu.js` §419) ama HİÇ kaydırmamış
+     okur oraya uğramıyor: sayı açıldı, içindekiler açıldı, bir bölüme basıldı.
+     O yolda hedef ıskalanıyor ve okur bir önceki sayfada kalıyordu. */
+  yenidenOlc();
 
   /* Sayı artık okunabilir: kabuk `inert` doğmuştu, şimdi kalkıyor. */
   kabuk.removeAttribute('inert');

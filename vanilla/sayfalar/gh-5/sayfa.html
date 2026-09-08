@@ -1,10 +1,22 @@
+<!--
+  gh-5 — havadan: enkazın arasından geçen cadde ve sağda nehir. Foto bölümünün
+  son karesi ve bilerek en "yaşayan" olanı: yolda yürüyenler, bisikletliler,
+  el arabaları var. Buradan `k-son`a (2025 Tokyo) geçiliyor.
+
+  Kadraj bölünüyor (`data-duzen="diptik"`, bkz. css/bilesen.css §10): cadde
+  kadrajı çaprazlama kesiyor ve nehir sağ kenarda: 3:4'e `cover` ile
+  oturtulsaydı nehir tümden kadrajdan çıkardı.
+
+  `--yari-oran` YARIM genişlik / TAM yükseklik: 1600/2 = 800, yükseklik 1118.
+-->
 <section
   class="page page--overlay"
   data-page-id="gh-5"
   data-mod="all"
-  data-section="gece-hatti"
-  data-section-title="Gece Hattı"
+  data-section="kanto-depremi"
+  data-section-title="Kantō Depremi"
   data-kind="photo"
+  data-duzen="diptik"
   data-scene="fade-up"
   data-fit="contain"
   data-bleed="full"
@@ -13,24 +25,29 @@
   aria-roledescription="sayfa"
 >
   <div class="page__bg">
-    <picture
-      ><source
-        type="image/avif"
-        srcset="
-          assets/2026-09/yagmur-600.avif   600w,
-          assets/2026-09/yagmur-900.avif   900w,
-          assets/2026-09/yagmur-1200.avif 1200w
-        "
-        sizes="(max-width: 640px) 100vw, 600px" />
+    <div
+      class="diptik"
+      style="--yari-oran: 800 / 1118"
+      role="img"
+      aria-label="Havadan çekilmiş geniş kare: iki yanı yanmış enkazla kaplı uzun bir cadde, üzerinde yürüyen insanlar, bisikletliler ve el arabaları; sağda nehir ve karşı kıyıda yıkılmış mahalleler."
+    >
       <img
-        class="page__bg-img"
-        src="assets/2026-09/yagmur.webp"
-        sizes="(max-width: 640px) 100vw, 600px"
+        class="diptik__yari"
+        data-yari="sol"
+        src="assets/2026-09/KantoDepremi/Damage-Tokyo-Yokohama-earthquake-1923-1825192360.jpg"
         alt=""
         loading="lazy"
-        fetchpriority="auto"
         decoding="async"
-    /></picture>
+      />
+      <img
+        class="diptik__yari"
+        data-yari="sag"
+        src="assets/2026-09/KantoDepremi/Damage-Tokyo-Yokohama-earthquake-1923-1825192360.jpg"
+        alt=""
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
   </div>
   <div class="page__inner">
     <p
@@ -39,7 +56,8 @@
       data-block-id="gh-5:0"
       data-block-kind="caption"
     >
-      00:44 — Yağmur başladı. Kalabalık kırk saniyede dağıldı.
+      Yangın söndükten sonra cadde yeniden yürünüyor. Yüz bine yakın insan
+      öldü; şehir enkazı kaldırmaya bu yoldan başladı.
     </p>
   </div>
 </section>

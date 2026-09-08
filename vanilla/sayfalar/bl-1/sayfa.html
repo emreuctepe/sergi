@@ -1,3 +1,15 @@
+<!--
+  BULMACA — emoji bilmecesi.
+
+  Sayfa BOŞ doğuyor: sekiz soruyu da şıkları da `js/bulmaca.js` kuruyor, çünkü
+  ekranda aynı anda tek soru var ve hangisi olduğu duruma bağlı. Buradaki tek
+  içerik, JS hiç çalışmazsa okurun görmesi gereken satır — dosyada duruyor ki
+  boş bir sayfa yerine bir açıklama kalsın.
+
+  ⚠️ data-fit="contain": oyun tuvale SIĞMAK ZORUNDA. `.page`te `overflow:
+  hidden` var, taşan şey uyarısız kesilir. Düzenin nasıl esnediği
+  `css/puzzles.css` §DÜZEN'de; soru eklerken oraya bak.
+-->
 <section
   class="page"
   data-page-id="bl-1"
@@ -6,7 +18,7 @@
   data-section-title="Bulmaca"
   data-kind="puzzle"
   data-scene="fade-up"
-  data-fit="scroll"
+  data-fit="contain"
   data-bleed="none"
   data-inview="true"
   role="group"
@@ -31,15 +43,16 @@
       Bu ayın bulmacası
     </h1>
     <p class="lead blk" style="--i: 2" data-block-id="bl-1:2" data-block-kind="lead">
-      Bu ayın bulmacası. Çöz, sonucunu okurlarla karşılaştır.
+      Sekiz soru, hepsi Japonya'dan.
     </p>
     <div
-      class="puzzle-slots blk"
+      class="bulmaca blk"
+      id="bulmaca"
       style="--i: 3"
       data-block-id="bl-1:3"
-      data-block-kind="puzzleSlots"
+      data-block-kind="puzzle"
     >
-      <p class="note">Bulmacalar yükleniyor…</p>
+      <p class="note">Bulmacayı oynamak için JavaScript gerekiyor.</p>
     </div>
   </div>
 </section>

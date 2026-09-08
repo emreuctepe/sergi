@@ -1,288 +1,305 @@
 /* ============================================================================
-   PUZZLES — host tarafı (yuvalar, sonuç kartı, soğuk başlangıç)
-   Bulmacanın kendi görünümü shadow DOM'un içinde; buradaki stiller ona
-   sızmaz. Tema değişkenleri ise kalıtım yoluyla içeri akar — sayı teması
-   bulmacanın rengini kendiliğinden değiştirir.
+   PUZZLES — emoji bilmecesi (bl-1)
+   ----------------------------------------------------------------------------
+   Bu dosya bir bulmaca MOTORUNUN host stilleriydi: `.pslot` yuvaları, `.presult`
+   istatistik kartı, `.cold` soğuk başlangıcı — 288 satır, ana projeden olduğu
+   gibi kopyalanmış. Klonda hiçbiri KULLANILMIYORDU: o sınıfların DOM'da tek bir
+   eşleşmesi yoktu, çünkü klonda motor da yok. Yerini burada tek bir oyun aldı.
+
+   TASARIM: az çizgi, çok boşluk. Dolgu yok, gölge yok, ikon yok; ayrım
+   yalnızca kıl payı çizgiler ve boşluktan geliyor. Renk üç yerde konuşuyor —
+   `--accent` ilerlemede, `--ok` doğruda, `--danger` yanlışta. Üçü de zaten
+   sistemin anlamsal tokenları, yani sayı teması değişince bulmaca da değişiyor.
+
+   ⚠️ BÜTÜN ÖLÇÜLER `cqi`: sayfa 3:4 tuvalin içinde yaşıyor ve tuvalin genişliği
+   ekrana göre değişiyor. `px` yazan bir kutu telefonda dev, masaüstünde minik
+   görünürdü. Tek istisna 1 piksellik çizgiler — onlar kıl payı kalmalı.
+
+   ⚠️ SAYFA `data-fit="contain"`: içerik tuvale sığmak ZORUNDA, çünkü `.page`te
+   `overflow: hidden` var (canvas.css §sayfa) ve taşan şey sessizce kesilir.
+   Düzen bu yüzden baştan sona esnek — §DÜZEN'e bak.
    ========================================================================= */
 
-.puzzle-slots {
-  display: grid;
-  gap: var(--sp-3);
-  margin-top: var(--sp-3);
+/* --------------------------------------------------------------------------
+   DÜZEN
+   İki halkalı bir esneme zinciri, `k-kaynak` sayfasındakiyle aynı desen
+   (bilesen.css §k-kaynak): sayfa dikey esnek bir kutu ve `contain` kipinde
+   yüksekliği belirli; `page__inner` de esnek yapılınca oyun artan alanı alıyor.
+   Başlık kaç satır sararsa sarsın oyun geri kalanına oturuyor.
+
+   `min-height: 0` HER İKİ HALKADA DA şart: onsuz esnek kutu çocuğunu
+   küçültmeyi reddeder ve taşma geri gelir.
+   -------------------------------------------------------------------------- */
+.page[data-page-id="bl-1"] .page__inner {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
-.pslot {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--paper-raised);
-  padding: var(--sp-4);
+/* Başlık `--fs-2xl` değil `--fs-xl`. Sebebi zevk değil DİKEY BÜTÇE: tuval
+   111.7cqi'lik bir iç yükseklik veriyor (133.3 eksi iki kenar boşluğu) ve
+   künye ne alırsa oyundan gidiyor. 2xl'de ölçülen pay emoji sahnesine
+   4.7cqi bırakıyordu — 14cqi'lik emojinin üçte biri. Sayfa taşmıyordu
+   çünkü sahne eziliyordu; emojiler kutularının dışına taşıp şıkların
+   üstüne biniyordu. */
+.page[data-page-id="bl-1"] .h1 {
+  font-size: var(--fs-xl);
+}
+
+.bulmaca {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+/* Sonuç ekranı ile oyun ekranı aynı yeri paylaşıyor; hangisinin görüneceğini
+   kökteki `data-evre` söylüyor. İkisi ayrı sayfa olsaydı okur cevapladıktan
+   sonra kaydırmak zorunda kalırdı. */
+.bulmaca:not([data-evre="sonuc"]) .bulmaca__sonuc,
+.bulmaca[data-evre="sonuc"] .bulmaca__sahne,
+.bulmaca[data-evre="sonuc"] .bulmaca__secenekler,
+.bulmaca[data-evre="sonuc"] .bulmaca__serit {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   İZ — sekiz nokta
+   Kaçıncı sorudayız ve öncekiler nasıl gitti. Bir sayaç ("03 / 08") da aynı
+   şeyi söylerdi ama geçmişi söylemezdi; nokta dizisi ikisini birden taşıyor
+   ve tek satır yer kaplıyor.
+   -------------------------------------------------------------------------- */
+.bulmaca__iz {
+  display: flex;
+  align-items: center;
+  gap: 2cqi;
+  height: 2.6cqi; /* en büyük noktaya göre sabit: dizi büyüyünce satır zıplamasın */
+  padding: 0;
+  list-style: none;
+}
+
+.bulmaca__iz li {
+  width: 1.7cqi;
+  height: 1.7cqi;
+  border-radius: var(--radius-full);
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition:
+    background-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-spring);
+}
+.bulmaca__iz li[data-durum="simdiki"] {
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+  transform: scale(1.5);
+}
+.bulmaca__iz li[data-durum="dogru"] {
+  background: var(--accent);
+  box-shadow: none;
+}
+/* Yanlış da DOLU — boş bırakılsaydı cevaplanmamış soruyla karışırdı. Ayrım
+   renkte: ilerleme rengi değil, sönük mürekkep. */
+.bulmaca__iz li[data-durum="yanlis"] {
+  background: var(--ink-faint);
+  box-shadow: none;
+  opacity: 0.45;
+}
+
+/* --------------------------------------------------------------------------
+   SAHNE — emojiler
+   Sayfanın artan alanının tamamını bu alıyor (`flex: 1 1 0`). Yani ekran
+   uzunsa emojiler ortada nefes alıyor, kısaysa oyun yine de sığıyor.
+   -------------------------------------------------------------------------- */
+.bulmaca__sahne {
+  flex: 1 1 0;
+  min-height: 8cqi;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5cqi;
+  line-height: 1;
+
+  /* ⚠️ SAHNE KENDİ BAŞINA BİR KAP (`container-type: size`) ve bu, emojinin
+     boyunu sahnenin kendi yüksekliğine bağlamanın tek yolu. Aynı numaranın bir
+     örneği daha var: `k-kaynak` planı (bilesen.css §k-kaynak).
+
+     Bedeli şu: bu satırdan sonra çocukların gördüğü `cqi` artık TUVAL değil
+     SAHNE. Emojinin tam boyu bu yüzden aşağıda `em` ile yazılıyor — `em`
+     buradaki `font-size`ı miras alıyor ve o hâlâ tuvale bakıyor. */
+  container-type: size;
+  font-size: 14cqi;
+}
+
+/* Emoji iki tavanın küçüğünü alıyor:
+     1em   → tasarım boyu (14 tuval-cqi)
+     76cqh → sahnenin o anki yüksekliğinin %76'sı
+
+   İkincisi bir güvenlik ağı. Künye iki satır yerine üç satır sarsa (başka bir
+   yazı tipi yığını, daha dar bir tuval) sahne kısalır; sabit bir boy orada
+   sessizce taşar ve `.page`in `overflow: hidden`ı emojinin yarısını keserdi.
+   %76: satır kutusu yazı boyuna eşit (line-height: 1) ama renkli emoji
+   glifleri em kutusunun yaklaşık 1.16 katı; 0.76 × 1.16 = 0.88 < 1. */
+.bulmaca__im {
+  font-size: min(1em, 76cqh);
+  animation: bulmaca-im var(--dur-slow) var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+@keyframes bulmaca-im {
+  from {
+    opacity: 0;
+    transform: translateY(10%) scale(0.86);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   ŞIKLAR
+   Dört satır, kıl payı çerçeve, dolgu yok. `grid-template-columns: 1fr auto`
+   ikinci sütunu işaret (`::after`) için ayırıyor; işaret yalnız cevaptan sonra
+   doğuyor, o zamana kadar sütun sıfır genişlikte kalıyor ve metin yerinden
+   kımıldamıyor.
+   -------------------------------------------------------------------------- */
+.bulmaca__secenekler {
   display: grid;
+  gap: 1.8cqi;
+}
+
+.secenek {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
   gap: var(--sp-2);
-  box-shadow: var(--shadow-1);
-  transition: border-color var(--dur-base) var(--ease-out);
-}
-.pslot[data-done="true"] {
-  border-color: color-mix(in oklab, var(--ok) 45%, transparent);
-}
-
-.pslot__head {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--sp-3);
-  align-items: start;
-}
-.pslot__icon {
-  display: grid;
-  place-items: center;
-  width: 12cqi;
-  height: 12cqi;
+  width: 100%;
+  padding: 2.3cqi 3.4cqi;
+  border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  background: var(--paper-sunken);
-  font-size: 6cqi;
-}
-.pslot__badge {
-  display: inline-block;
+  text-align: start;
   font-family: var(--font-ui);
-  font-size: var(--fs-2xs);
-  font-weight: 700;
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 2px;
-}
-.pslot__badge--editor {
-  color: var(--accent-3);
-}
-.pslot__title {
-  font-family: var(--font-display);
-  font-size: var(--fs-md);
-  line-height: var(--lh-snug);
-  font-weight: 600;
-}
-.pslot__blurb {
-  margin-top: 2px;
-  font-family: var(--font-text);
   font-size: var(--fs-sm);
   line-height: var(--lh-snug);
-  color: var(--ink-soft);
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    opacity var(--dur-base) var(--ease-out);
+}
+.secenek:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.secenek:disabled {
+  cursor: default;
 }
 
-.pslot__facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-  font-family: var(--font-ui);
-  font-size: var(--fs-2xs);
-  color: var(--ink-faint);
-  letter-spacing: 0.04em;
+.secenek[data-durum="dogru"] {
+  border-color: var(--ok);
+  color: var(--ok);
 }
-.pslot__facts span + span::before {
-  content: "·";
-  margin-right: var(--sp-2);
-  opacity: 0.6;
+.secenek[data-durum="dogru"]::after {
+  content: "✓";
+}
+.secenek[data-durum="yanlis"] {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.secenek[data-durum="yanlis"]::after {
+  content: "✕";
+}
+/* Dokunulmamış yanlışlar: siliniyor değil soluyor. Okur ne seçtiğini ve neyin
+   doğru olduğunu görmeye devam ediyor, gerisi geri çekiliyor. */
+.secenek[data-durum="solgun"] {
+  opacity: 0.3;
 }
 
-.pslot__why {
+/* --------------------------------------------------------------------------
+   ŞERİT — hüküm, açıklama, ilerle
+   ⚠️ `min-height` YER AYIRTIYOR: bu şerit soru sorulurken BOŞ duruyor ve
+   cevapla birlikte iki satır metin + bir düğme doğuyor. Yüksekliği içeriğine
+   bırakılsaydı şıklar cevap anında yukarı zıplardı — hem çirkin, hem de tam o
+   anda okurun parmağı ekranda.
+
+   Değer en uzun açıklamaya (6. soru) göre ölçüldü, tahmin değil.
+   -------------------------------------------------------------------------- */
+.bulmaca__serit {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 12cqi;
+}
+
+.bulmaca__not {
   font-family: var(--font-ui);
   font-size: var(--fs-2xs);
   line-height: 1.5;
   color: var(--ink-faint);
-  padding: var(--sp-2);
-  border-radius: var(--radius-sm);
-  background: var(--paper-sunken);
 }
-.pslot__why b {
-  color: var(--ink-soft);
-}
-
-.pslot__done {
-  font-family: var(--font-ui);
-  font-size: var(--fs-2xs);
-  font-weight: 700;
+.bulmaca__not[data-hukum="dogru"] .bulmaca__hukum {
   color: var(--ok);
 }
-
-.pslot__cta {
-  justify-self: start;
-  padding: var(--sp-2) var(--sp-4);
-  border-radius: var(--radius-full);
-  background: var(--accent);
-  color: var(--accent-ink);
-  font-family: var(--font-ui);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  transition: transform var(--dur-fast) var(--ease-spring);
-}
-.pslot__cta:hover {
-  transform: translateY(-1px);
+.bulmaca__not[data-hukum="yanlis"] .bulmaca__hukum {
+  color: var(--danger);
 }
 
-.pslot__body {
-  margin-top: var(--sp-2);
-  padding-top: var(--sp-3);
-  border-top: 1px dashed var(--line);
-}
-
-.pslot--archive {
-  align-items: center;
-  justify-items: center;
-  text-align: center;
-  background: none;
-  border-style: dashed;
-  box-shadow: none;
-  color: var(--ink-faint);
-  font-family: var(--font-ui);
-  font-size: var(--fs-xs);
-}
-.pslot--archive .btn {
-  font: inherit;
-  padding: var(--sp-2) var(--sp-4);
-  border-radius: var(--radius-full);
+.bulmaca__ileri,
+.bulmaca__tekrar {
+  justify-self: end;
+  padding: 2.2cqi 4cqi;
   border: 1px solid var(--line);
-  color: var(--ink);
+  border-radius: var(--radius-full);
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  white-space: nowrap;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+.bulmaca__ileri:hover,
+.bulmaca__tekrar:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 /* --------------------------------------------------------------------------
-   SONUÇ KARTI
+   SONUÇ
+   Tek sayı, tek cümle, tek düğme. İstatistik ızgarası, yüzde çubuğu ve
+   "okurlarla karşılaştır" satırı bilerek YOK: karşılaştıracak okur yok
+   (sunucu yok) ve olmayan bir şeyi vaat eden arayüz yalan söyler.
    -------------------------------------------------------------------------- */
-.presult {
-  margin-top: var(--sp-3);
-  padding: var(--sp-3);
-  border-radius: var(--radius-md);
-  background: var(--paper-sunken);
-  display: grid;
-  gap: var(--sp-2);
-  animation: rise var(--dur-slow) var(--ease-out);
+.bulmaca__sonuc {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  text-align: center;
+  animation: bulmaca-sonuc var(--dur-slow) var(--ease-out);
 }
-@keyframes rise {
+@keyframes bulmaca-sonuc {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
 }
-.presult h4 {
-  font-family: var(--font-ui);
-  font-size: var(--fs-2xs);
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
-.presult__grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--sp-2);
-}
-.presult__stat {
-  text-align: center;
-}
-.presult__stat b {
-  display: block;
-  font-family: var(--font-display);
-  font-size: var(--fs-sm);
-  color: var(--accent);
+
+.bulmaca__skor {
+  font-family: var(--issue-display, var(--font-display));
+  font-size: var(--fs-3xl);
+  line-height: 1;
   font-variant-numeric: tabular-nums;
-}
-.presult__stat span {
-  display: block;
-  font-family: var(--font-ui);
-  font-size: 2.2cqi;
   color: var(--ink-faint);
-  line-height: 1.2;
 }
-.presult__bar {
-  position: relative;
-  height: 6.5cqi;
-  border-radius: var(--radius-full);
-  background: var(--paper-raised);
-  overflow: hidden;
-  display: grid;
-  align-items: center;
-}
-.presult__fill {
-  position: absolute;
-  inset: 0 auto 0 0;
-  background: color-mix(in oklab, var(--accent) 26%, transparent);
-  animation: grow 900ms var(--ease-out);
-}
-@keyframes grow {
-  from {
-    width: 0 !important;
-  }
-}
-.presult__bar span {
-  position: relative;
-  padding-inline: var(--sp-2);
-  font-family: var(--font-ui);
-  font-size: var(--fs-2xs);
-  font-weight: 700;
-}
-.presult__note {
-  font-family: var(--font-ui);
-  font-size: var(--fs-2xs);
-  color: var(--ink-faint);
-  line-height: 1.5;
-}
-.presult__row .btn {
-  font: inherit;
-  font-family: var(--font-ui);
-  font-size: var(--fs-2xs);
-  padding: var(--sp-2) var(--sp-3);
-  border-radius: var(--radius-full);
-  border: 1px dashed var(--line);
-  color: var(--ink-soft);
-}
-.presult__row .btn:disabled {
-  opacity: 0.6;
-  cursor: default;
+.bulmaca__skor b {
+  font-weight: inherit;
+  color: var(--accent);
 }
 
-/* --------------------------------------------------------------------------
-   SOĞUK BAŞLANGIÇ
-   -------------------------------------------------------------------------- */
-.cold {
-  padding: var(--sp-4);
-  border: 1px dashed var(--line);
-  border-radius: var(--radius-lg);
-  display: grid;
-  gap: var(--sp-3);
-  justify-items: center;
-  text-align: center;
-}
-.cold__q {
-  font-family: var(--font-display);
-  font-size: var(--fs-md);
-}
-.cold__row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--sp-2);
-  width: 100%;
-}
-.cold__btn {
-  display: grid;
-  justify-items: center;
-  gap: var(--sp-1);
-  padding: var(--sp-3) var(--sp-1);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--line);
-  background: var(--paper-raised);
+.bulmaca__yorum {
+  max-width: 58cqi;
   font-family: var(--font-ui);
-  font-size: var(--fs-2xs);
-  transition:
-    border-color var(--dur-fast) var(--ease-out),
-    transform var(--dur-fast) var(--ease-spring);
-}
-.cold__btn:hover {
-  border-color: var(--accent);
-  transform: translateY(-2px);
-}
-.cold__icon {
-  font-size: 7cqi;
-}
-.cold__skip {
-  font-family: var(--font-ui);
-  font-size: var(--fs-2xs);
-  color: var(--ink-faint);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+  color: var(--ink-soft);
 }

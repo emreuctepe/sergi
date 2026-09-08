@@ -1,10 +1,22 @@
+<!--
+  gh-1 — sokak seviyesi. Yıkık bina, devrilmiş direkler, yola inen teller ve
+  hattın ortasında kalmış tramvay.
+
+  Kadraj bilerek bölünüyor (`data-duzen="diptik"`, bkz. css/bilesen.css §10):
+  bu karenin iki ucu var — solda çöken bina, sağda ayakta duran tramvay — ve
+  3:4'e `cover` ile oturtulsaydı ikisinden biri kadrajdan çıkardı. Şimdi sol
+  yarı üstte, sağ yarı altta; ikisi de tam.
+
+  `--yari-oran` YARIM genişlik / TAM yükseklik: 1200/2 = 600, yükseklik 855.
+-->
 <section
   class="page page--overlay"
   data-page-id="gh-1"
   data-mod="all"
-  data-section="gece-hatti"
-  data-section-title="Gece Hattı"
+  data-section="kanto-depremi"
+  data-section-title="Kantō Depremi"
   data-kind="photo"
+  data-duzen="diptik"
   data-scene="fade-up"
   data-fit="contain"
   data-bleed="full"
@@ -13,24 +25,29 @@
   aria-roledescription="sayfa"
 >
   <div class="page__bg">
-    <picture
-      ><source
-        type="image/avif"
-        srcset="
-          assets/2026-09/fener-600.avif   600w,
-          assets/2026-09/fener-900.avif   900w,
-          assets/2026-09/fener-1200.avif 1200w
-        "
-        sizes="(max-width: 640px) 100vw, 600px" />
+    <div
+      class="diptik"
+      style="--yari-oran: 600 / 855"
+      role="img"
+      aria-label="Yıkılmış bir köşe binasının önünde caddeyi kaplayan kiremit ve moloz yığını; devrilmiş elektrik direkleri, yere inmiş teller ve hattın ortasında duran bir tramvay."
+    >
       <img
-        class="page__bg-img"
-        src="assets/2026-09/fener.webp"
-        sizes="(max-width: 640px) 100vw, 600px"
+        class="diptik__yari"
+        data-yari="sol"
+        src="assets/2026-09/KantoDepremi/192309-Kanto-Earthquake-003-1053504330.jpg"
         alt=""
         loading="lazy"
-        fetchpriority="auto"
         decoding="async"
-    /></picture>
+      />
+      <img
+        class="diptik__yari"
+        data-yari="sag"
+        src="assets/2026-09/KantoDepremi/192309-Kanto-Earthquake-003-1053504330.jpg"
+        alt=""
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
   </div>
   <div class="page__inner">
     <p
@@ -39,7 +56,8 @@
       data-block-id="gh-1:0"
       data-block-kind="caption"
     >
-      00:12 — Peronda son anons. Kimse acele etmiyor.
+      Üstte kiremit yığınına dönen köşe, altta hattın ortasında kalan tramvay.
+      Ölümlerin çoğu sarsıntıdan değil, arkasından gelen yangından geldi.
     </p>
   </div>
 </section>

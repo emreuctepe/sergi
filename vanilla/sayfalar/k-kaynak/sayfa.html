@@ -1,0 +1,237 @@
+<!--
+  k-kaynak — yazının kaynakçası, çizgi roman sayfası olarak.
+
+  Sekiz kaynak, sekiz bölme. Bölmeler dikdörtgen DEĞİL: kenarları eğik
+  çokgenler ve aralarındaki oluk sayfanın kendi zemini. Stiller
+  `css/bilesen.css` §9'da; buradaki tek şey KOMPOZİSYONUN kendisi — her
+  bölmenin kutusu (`--x --y --g --y-boy`) ve kırpması (`--kes`).
+
+  ⚠️ YERLEŞİM SABİT, "rastgele görünen" ama her açılışta AYNI. Gerekçesi
+  `js/sahneler.js`in başındaki kuralın aynısı: dergi sayfası bir
+  kompozisyondur, her ziyarette yeniden zar atılan bir şey değil. Sabit olduğu
+  için bölmelerin çakışmadığı ve taşmadığı da garanti edilebiliyor.
+
+  ⚠️ ÜÇ AİLE, ÜÇ GÖRÜNÜM — ama HİÇBİRİ LOGO DEĞİL. İşaretler (oynatma üçgeni,
+  serif M, mühürlü belge) kendi çizimimiz. Sayının künyesi telif konusunda
+  açıkça titiz davranıyor ve tescilli bir marka işaretini kopyalamak onunla
+  çelişirdi; renk ve biçim tanıtmaya zaten yetiyor.
+
+  ⚠️ GÖRÜNEN AD KISALTILMIŞ, TAM BAŞLIK `aria-label`DA. Bölmeler küçük ve
+  başlıkların bir kısmı uzun; kısaltma yalnız GÖRÜNENDE, ekran okuyucu ve
+  fareyle bekleyen okur tam başlığı alıyor. Dar tuvalde ad tümden gizleniyor
+  (bkz. bilesen.css §9 sonundaki `@container`), bağlantı yine çalışıyor.
+-->
+<section
+  class="page"
+  data-page-id="k-kaynak"
+  data-mod="mid full"
+  data-section="kanto-depremi"
+  data-section-title="Kantō Depremi"
+  data-kind="article"
+  data-scene="stagger"
+  data-fit="contain"
+  data-bleed="none"
+  data-inview="true"
+  role="group"
+  aria-roledescription="sayfa"
+>
+  <div class="page__inner">
+    <p class="kicker blk" style="--i: 0" data-block-id="k-kaynak:0" data-block-kind="kicker">
+      Kaynakça
+    </p>
+    <h2 class="h2 blk" style="--i: 1" data-block-id="k-kaynak:1" data-block-kind="h2">
+      Bu yazı nereden çıktı
+    </h2>
+
+    <div
+      class="kaynak-plan blk"
+      style="--i: 2"
+      data-block-id="k-kaynak:2"
+      data-block-kind="list"
+      role="list"
+    >
+      <!-- ① üst sıra: iki bölme, oluk sağa yatık -->
+      <a
+        class="kaynak"
+        role="listitem"
+        data-tur="youtube"
+        style="--x: 0%; --y: 0%; --g: 58%; --y-boy: 21%; --kes: 0% 0%, 100% 0%, 86% 100%, 0% 100%"
+        href="https://www.youtube.com/watch?v=HjIFkmyXSzM"
+        target="_blank"
+        rel="noopener"
+        title="7,9'luk Büyük Kanto Depremi… Yerle bir olan Tokyo nasıl yeniden doğdu? — YouTube"
+        aria-label="YouTube videosu: 7,9'luk Büyük Kanto Depremi… Yerle bir olan Tokyo nasıl yeniden doğdu?"
+      >
+        <svg class="kaynak__im" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="1" y="4.5" width="22" height="15" rx="4.5" fill="currentColor"></rect>
+          <path d="M10 8.8 L16.4 12 L10 15.2 Z" fill="#f6e0ac"></path>
+        </svg>
+        <span class="kaynak__yer">YouTube</span>
+        <span class="kaynak__ad">Yerle bir olan Tokyo nasıl yeniden doğdu?</span>
+      </a>
+
+      <a
+        class="kaynak"
+        role="listitem"
+        data-tur="youtube"
+        style="--x: 53%; --y: 0%; --g: 47%; --y-boy: 21%; --kes: 17% 0%, 100% 0%, 100% 100%, 0% 100%"
+        href="https://www.youtube.com/watch?v=v53E2bXOHx8"
+        target="_blank"
+        rel="noopener"
+        title="Tokyo in flames: the earthquake that changed Japan forever — YouTube"
+        aria-label="YouTube videosu: Tokyo in flames, the earthquake that changed Japan forever"
+      >
+        <svg class="kaynak__im" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="1" y="4.5" width="22" height="15" rx="4.5" fill="currentColor"></rect>
+          <path d="M10 8.8 L16.4 12 L10 15.2 Z" fill="#f6e0ac"></path>
+        </svg>
+        <span class="kaynak__yer">YouTube</span>
+        <span class="kaynak__ad">Tokyo in flames</span>
+      </a>
+
+      <!--
+        ② geniş bölme: sempozyum. Çizgi romanda geniş panel "kuruluş kadrajı"
+        demek — sayfadaki tek akademik kaynak, ve tek Japonca olan.
+      -->
+      <a
+        class="kaynak"
+        role="listitem"
+        data-tur="youtube"
+        style="--x: 0%; --y: 23%; --g: 100%; --y-boy: 22%; --kes: 0% 4.5%, 100% 0%, 100% 95.5%, 0% 100%"
+        href="https://www.youtube.com/live/CsphDBdfZLY"
+        target="_blank"
+        rel="noopener"
+        title="関東大震災100年シンポジウム 〜関東大震災から学ぶ今後の都市・インフラ整備〜 — YouTube canlı yayın"
+        aria-label="YouTube canlı yayını: Kantō Depremi 100. yıl sempozyumu — Kantō Depreminden öğrenilenler ışığında gelecekteki şehir ve altyapı düzenlemesi"
+      >
+        <svg class="kaynak__im" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="1" y="4.5" width="22" height="15" rx="4.5" fill="currentColor"></rect>
+          <path d="M10 8.8 L16.4 12 L10 15.2 Z" fill="#f6e0ac"></path>
+        </svg>
+        <span class="kaynak__yer">YouTube · canlı</span>
+        <span class="kaynak__ad" lang="ja">関東大震災100年シンポジウム</span>
+      </a>
+
+      <!-- ③ orta sıra: üç bölme -->
+      <a
+        class="kaynak"
+        role="listitem"
+        data-tur="youtube"
+        style="--x: 0%; --y: 47%; --g: 30%; --y-boy: 23%; --kes: 0% 0%, 100% 0%, 87% 100%, 0% 100%"
+        href="https://www.youtube.com/watch?v=qmwXmsx_YZw"
+        target="_blank"
+        rel="noopener"
+        title="This Powerful 1923 Earthquake Brought Tokyo to Its Knees — YouTube"
+        aria-label="YouTube videosu: This Powerful 1923 Earthquake Brought Tokyo to Its Knees"
+      >
+        <svg class="kaynak__im" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="1" y="4.5" width="22" height="15" rx="4.5" fill="currentColor"></rect>
+          <path d="M10 8.8 L16.4 12 L10 15.2 Z" fill="#f6e0ac"></path>
+        </svg>
+        <span class="kaynak__yer">YouTube</span>
+        <span class="kaynak__ad">1923 Earthquake</span>
+      </a>
+
+      <a
+        class="kaynak"
+        role="listitem"
+        data-tur="medium"
+        style="--x: 29%; --y: 47%; --g: 39%; --y-boy: 23%; --kes: 10% 0%, 100% 0%, 90% 100%, 0% 100%"
+        href="https://medium.com/@darlawrites/the-great-kanto-earthquake-of-1923-92e89db9e74d"
+        target="_blank"
+        rel="noopener"
+        title="The Great Kanto Earthquake of 1923 — Medium"
+        aria-label="Medium yazısı: The Great Kanto Earthquake of 1923"
+      >
+        <svg class="kaynak__im" viewBox="0 0 24 24" aria-hidden="true">
+          <text
+            x="12"
+            y="19"
+            text-anchor="middle"
+            font-family="var(--font-text)"
+            font-size="22"
+            font-weight="700"
+            fill="currentColor"
+          >
+            M
+          </text>
+        </svg>
+        <span class="kaynak__yer">Medium</span>
+        <span class="kaynak__ad">The Great Kanto Earthquake of 1923</span>
+      </a>
+
+      <a
+        class="kaynak"
+        role="listitem"
+        data-tur="medium"
+        style="--x: 67%; --y: 47%; --g: 33%; --y-boy: 23%; --kes: 12% 0%, 100% 0%, 100% 100%, 0% 100%"
+        href="https://medium.com/@noahquinsayas123/100-years-later-remembering-the-1923-great-kanto-earthquake-and-korean-massacre-ab9b1ebec3f9"
+        target="_blank"
+        rel="noopener"
+        title="100 Years Later: Remembering the 1923 Great Kanto Earthquake and Korean Massacre — Medium"
+        aria-label="Medium yazısı: 100 Years Later, Remembering the 1923 Great Kanto Earthquake and Korean Massacre"
+      >
+        <svg class="kaynak__im" viewBox="0 0 24 24" aria-hidden="true">
+          <text
+            x="12"
+            y="19"
+            text-anchor="middle"
+            font-family="var(--font-text)"
+            font-size="22"
+            font-weight="700"
+            fill="currentColor"
+          >
+            M
+          </text>
+        </svg>
+        <span class="kaynak__yer">Medium</span>
+        <span class="kaynak__ad">100 Years Later</span>
+      </a>
+
+      <!--
+        ④ alt sıra: iki resmî belge. Sayfanın dibini onlar tutuyor — mühür
+        kırmızısı (`ATES.kor`) lacivert belgenin üstünde, hanko geleneğine
+        göre.
+      -->
+      <a
+        class="kaynak"
+        role="listitem"
+        data-tur="resmi"
+        style="--x: 0%; --y: 72%; --g: 47%; --y-boy: 28%; --kes: 0% 4%, 100% 0%, 87% 100%, 0% 100%"
+        href="https://www.bousai.go.jp/kantou100/pdf/kantou100_keihatsu_chirashi.pdf"
+        target="_blank"
+        rel="noopener"
+        title="Kantō 100 bilgilendirme broşürü (PDF) — bousai.go.jp, Japonya Kabine Ofisi afet yönetimi"
+        aria-label="PDF belgesi: Kantō 100 bilgilendirme broşürü, Japonya Kabine Ofisi afet yönetimi"
+      >
+        <svg class="kaynak__im" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 2 H15 L19 6 V22 H5 Z" fill="currentColor"></path>
+          <path d="M15 2 L19 6 H15 Z" fill="#1e3348"></path>
+          <circle cx="15.5" cy="16.5" r="4.5" fill="#8f3a1e"></circle>
+        </svg>
+        <span class="kaynak__yer">bousai.go.jp · PDF</span>
+        <span class="kaynak__ad">Kantō 100 broşürü</span>
+      </a>
+
+      <a
+        class="kaynak"
+        role="listitem"
+        data-tur="resmi"
+        style="--x: 44%; --y: 72%; --g: 56%; --y-boy: 28%; --kes: 11% 0%, 100% 4%, 100% 100%, 0% 100%"
+        href="https://www.taishin.metro.tokyo.lg.jp/assets/pdf/tokyo/r8_sokushinkeikaku_2.pdf"
+        target="_blank"
+        rel="noopener"
+        title="Deprem dayanıklılığı teşvik planı (PDF) — Tokyo Valiliği"
+        aria-label="PDF belgesi: Deprem dayanıklılığı teşvik planı, Tokyo Valiliği"
+      >
+        <svg class="kaynak__im" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 2 H15 L19 6 V22 H5 Z" fill="currentColor"></path>
+          <path d="M15 2 L19 6 H15 Z" fill="#1e3348"></path>
+          <circle cx="15.5" cy="16.5" r="4.5" fill="#8f3a1e"></circle>
+        </svg>
+        <span class="kaynak__yer">Tokyo Valiliği · PDF</span>
+        <span class="kaynak__ad">Deprem dayanıklılığı planı</span>
+      </a>
+    </div>
+  </div>
+</section>

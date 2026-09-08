@@ -210,6 +210,15 @@
 .folio[data-overlay="true"]::before {
   background: none;
 }
+/* ⚠️ PERDESİ AÇIK SAYFADA FOLIO DA KOYU. Yukarıdaki kural "tam kanama"yı
+   "koyu" saydığı için folio'yu açığa çeviriyor; `k-son` ise gündüz bir sahne
+   ve alt kenarı neredeyse beyaz perde (bilesen.css §8). Orada folio beyaz
+   üstünde beyazdı — ve tema fark etmiyordu, çünkü yukarıdaki renk de perde de
+   sabit. Kâğıt perdesi geri getirilmiyor: `--paper` karanlık temada koyu ve
+   gündüz sahnenin üstüne koyu bir yama düşerdi. */
+.folio[data-overlay="true"][data-scrim="light"] {
+  color: color-mix(in oklab, #1b1613 78%, transparent);
+}
 #folio-page {
   font-variant-numeric: tabular-nums;
 }
@@ -235,10 +244,13 @@
   top: 0;
   padding-top: env(safe-area-inset-top, 0px);
 }
+/* Düzeni aşağıdaki üç yuvalı ızgara kuruyor (bkz. §alt bant); burada yalnız
+   bandın yeri var. Eskiden burada bir `justify-content: space-between`
+   duruyordu — ızgaraya geçince hükümsüz kaldı ama okuyanı hâlâ tek sıra
+   sanmaya davet ediyordu. */
 .band--bottom {
   bottom: 0;
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  justify-content: space-between;
 }
 
 /* dar ekranda bantlar tuvalin üzerine biner → okunurluk için perde */
@@ -480,16 +492,37 @@
   }
 }
 
-/* --- alt bant yeni düzen: [yukarı aşağı] · [beğen yorum paylaş] ------------- */
+/* --- alt bant: [içindekiler] · [yukarı aşağı] · [tam ekran] -----------------
+   Üç YUVA, tek sıra değil. Önce `justify-content: center` ile tek bir sıraydı
+   ve yan düğmelerin belirip kaybolması ortadaki ileri/geri çiftini yatayda
+   oynatıyordu — manga sayfasına her girişte gezinme düğmeleri kayıyordu.
+
+   `1fr auto 1fr`: orta yuva içeriğine göre daralıp genişliyor ama iki yandaki
+   eşit `fr` payları onu her zaman bandın tam ortasında tutuyor. Yan yuvalar
+   BOŞ da olsa duruyor, yani bir düğmenin gelip gitmesi kimseyi kımıldatmıyor. */
 .band--bottom {
-  justify-content: center;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--ui-sp-2);
 }
 .band__nav,
 .band__actions {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+.band__yan {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.band__yan--sol {
+  justify-content: flex-start;
+}
+.band__yan--sag {
+  justify-content: flex-end;
 }
 .band__act {
   display: grid;

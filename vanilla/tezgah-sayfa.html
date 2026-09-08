@@ -1,0 +1,133 @@
+<!doctype html>
+<!--
+  ════════════════════════════════════════════════════════════════════════════
+  TEZGÂH · SAYFA — tek bir snap sayfasını tuvalde gösterir
+  ────────────────────────────────────────────────────────────────────────────
+  `tezgah-galeri.html` koridoru, `tezgah-odak.html` açılan kartı gösteriyor;
+  burası GENEL amaçlı: sıradaki herhangi bir sayfayı kendi 3:4 tuvalinde tek
+  başına basar. Diptik düzeni (`css/bilesen.css` §10) buradan yargılandı.
+
+  ⚠️ ASIL İŞİ TEK PARÇAYA POZ VERDİRMEK. Sayının kendisi açılış akışıyla
+  (yükleme → tanıtım → mod) başlıyor; burada o akış yok, sayfa tek başına ve
+  ilk kareden itibaren duruyor. Hem tarayıcı paneli hem başsız Chromium
+  (`referans/araclar/kartbas.sh`) buraya poz verdirebiliyor.
+
+  ⚠️ Panelin `computer{screenshot}` yolu DEĞİŞKEN — bu dosyanın başlığında bir
+  dönem "30sn'de zaman aşımına düşüyor" yazıyordu, sonra yeniden çalışır oldu.
+  Önce tek çağrıyla dene; düşerse başsız Chromium'a geç.
+
+      ?id=gh-1        hangi sayfa (varsayılan: gh-acilis)
+      ?en=560&boy=747 tuval ölçüsü — dar telefon durumunu sınamak için
+      ?tema=light     açık temada dene
+      ?gizle=metin    metin bloklarını gizler — ARKA PLANI ÖLÇMEK için:
+                      basılan kare metnin ARKASINDAKİ gerçek bileşik zemin
+                      olur (fotoğraf + perde), üstüne yazı düşmeden. Kontrast
+                      ancak böyle ölçülebiliyor; yazılı karede örneklenen
+                      piksel yazının kendisi olurdu.
+      ?sergi=1        `ms-galeri` için `galeriBaslat()`i çağırır (koridor,
+                      balonlar ve kart çalışır hâle gelir)
+      ?ogretici=1     üstüne `galeriDugmeleriniAyarla`yı da çağırır, yani
+                      "okur sergiye VARDI" durumunu taklit eder ve açılış
+                      balonları oynar
+
+      Başsız Chromium'la bakılacaksa balonların açık olduğu anlar:
+
+        --virtual-time-budget=3000   → birinci balon açık
+        --virtual-time-budget=7000   → ikinci balon açık
+        --virtual-time-budget=12000  → ikisi de bitmiş, koridor sakin
+
+      ⚠️ `?ogretici=1` GERÇEK TETİĞİ ATLIYOR, onu sınamıyor. Sayıda öğreticiyi
+      başlatan şey okuyucunun SAYFA DEĞİŞİMİ (`okuyucu.js` §kaydirmaOldu,
+      rAF'a bağlı); burada okuyucu yok, o yüzden kanca elle çağrılıyor. Yani
+      bu bayrak "balonlar doğru oynuyor mu"yu gösterir, "sergiye varınca
+      tetikleniyor mu"yu değil.
+
+      Gerçek yolu sınamak bir dönem imkânsızdı (panelin sekmesi
+      `visibilityState: "hidden"` kalıyor, rAF ateşlemiyordu). 2026-09-08'de
+      panel `visible` ve rAF çalışıyor, sayıda uçtan uca doğrulandı: `#pages`in
+      `scrollTop`unu galeriye kaydırınca iki balon sırayla oynadı (4.4sn arayla)
+      ve durdu. Panel yine "hidden"a düşerse tek yol bu bayrak + başsız
+      Chromium'dur.
+
+  ⚠️ SAYFAYI KOPYALAMIYOR, FETCH EDİYOR. Sayı bu dosyaya bakmıyor; silinse
+  aynen çalışır. Yalnız bakmak için var.
+  ════════════════════════════════════════════════════════════════════════════
+-->
+<html lang="tr" data-theme="dark" data-issue="2026-09" data-depth="full">
+  <head>
+    <meta charset="utf-8" />
+    <title>Tezgâh · sayfa</title>
+    <link rel="stylesheet" href="css/app.css" />
+    <style>
+      body {
+        margin: 0;
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        background: #14140f;
+      }
+      .kutu {
+        width: var(--canvas-w);
+        height: var(--canvas-h);
+        position: relative;
+        container-type: inline-size;
+      }
+      .kutu .page {
+        position: absolute;
+        inset: 0;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="kutu" id="yuva"></div>
+
+    <script type="module">
+      const soru = new URLSearchParams(location.search);
+      const id = soru.get('id') ?? 'gh-acilis';
+
+      if (soru.get('tema') === 'light') document.documentElement.dataset.theme = 'light';
+
+      /* Tuval ölçüsü `--canvas-w/h` üzerinden veriliyor, `.kutu`nun kendi
+         genişliği değil: cqi birimleri ve canvas.css'in kuralları o iki
+         değişkene bakıyor. */
+      const en = Number(soru.get('en') ?? 560);
+      const boy = Number(soru.get('boy') ?? Math.round((en * 4) / 3));
+      const yuva = document.getElementById('yuva');
+      yuva.style.setProperty('--canvas-w', en + 'px');
+      yuva.style.setProperty('--canvas-h', boy + 'px');
+
+      const ham = await (await fetch(`sayfalar/${id}/sayfa.html`, { cache: 'no-store' })).text();
+      const t = document.createElement('template');
+      t.innerHTML = ham;
+      yuva.append(t.content.firstElementChild);
+
+      /* `visibility` — `display: none` DEĞİL: blokları akıştan çıkarmak
+         perdenin altındaki düzeni değiştirmez ama `.page__inner`ın kendi
+         yüksekliğini değiştirir ve ölçülecek kutular kayardı. */
+      if (soru.get('gizle') === 'metin') {
+        for (const b of yuva.querySelectorAll('.page__inner')) b.style.visibility = 'hidden';
+      }
+
+      /* Giriş animasyonları `data-inview`e bağlı ve sayfalar onunla DOĞUYOR
+         (bkz. DURUM.md — o im görünürlük değil). Yine de bekliyoruz: görseller
+         inmeden basılan kare boş çıkar. */
+      await Promise.all(
+        [...yuva.querySelectorAll('img')].map((g) =>
+          g.complete ? null : new Promise((c) => g.addEventListener('load', c, { once: true }))
+        )
+      );
+
+      if (soru.has('sergi') || soru.has('ogretici')) {
+        const { galeriBaslat, galeriDugmeleriniAyarla } = await import('./js/galeri.js');
+        galeriBaslat();
+        /* Sergiye "varmak": gerçek sayıda bunu `okuyucu.js` her sayfa
+           değişiminde çağırıyor. Burada elle çağrılıyor çünkü tezgâhta
+           okuyucu yok — ve panelde rAF ateşlemediği için orada da olmuyor. */
+        if (soru.has('ogretici')) galeriDugmeleriniAyarla(yuva.firstElementChild);
+      }
+
+      document.documentElement.dataset.hazir = '1';
+    </script>
+  </body>
+</html>

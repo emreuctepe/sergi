@@ -226,6 +226,57 @@
 }
 
 /* --------------------------------------------------------------------------
+   WİKİ KARTI — mangaka bağlantılarının modal içeriği (bkz. js/wiki.js)
+   -------------------------------------------------------------------------- */
+.wiki-kart {
+  padding: var(--ui-sp-4);
+  display: grid;
+  gap: var(--ui-sp-3);
+}
+.wiki-kart__yukleniyor {
+  font-size: var(--ui-fs-sm);
+  color: var(--ink-faint);
+}
+.wiki-kart__img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  background: var(--paper-sunken);
+}
+.wiki-kart__ozet {
+  font-family: var(--font-text);
+  font-size: var(--ui-fs-base);
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+/* Kaynak künyesi: özet Wikipedia'dan, çıkış düğmesi DuckDuckGo'ya. İkisi ayrı
+   yerler olduğu için künye sessiz ama görünür duruyor — okur gideceği yerle
+   okuduğu şeyi karıştırmasın. */
+.wiki-kart__kaynak {
+  margin-top: calc(-1 * var(--ui-sp-1));
+  font-size: var(--ui-fs-xs);
+  color: var(--ink-faint);
+}
+.wiki-kart__kaynak a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.wiki-kart__kaynak a:hover {
+  color: var(--ink);
+}
+
+.wiki-kart__dis {
+  justify-self: start;
+  font-size: var(--ui-fs-sm);
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
    TOAST
    -------------------------------------------------------------------------- */
 .toast-host {
@@ -513,6 +564,64 @@
 .depth-card__meta span {
   font-size: var(--ui-fs-xs);
   color: var(--ink-faint);
+}
+
+/* --------------------------------------------------------------------------
+   GÖRÜNÜM (TEMA) — aynı modalın ikinci sorusu
+   Kartlardan bilerek DAHA KÜÇÜK ve daha sessiz: okuma derinliği sayının nasıl
+   okunacağını değiştiriyor, tema yalnız rengini. İkisi aynı ağırlıkta
+   çizilseydi modal iki eşit soru soruyormuş gibi görünürdü.
+
+   Üstteki çizgi de bu yüzden var: kartlarla arasına bir nefes koyuyor,
+   "burada başka bir şey soruluyor" diyor.
+   -------------------------------------------------------------------------- */
+.tema-sec {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-sp-3);
+  padding: var(--ui-sp-3) var(--ui-sp-4) var(--ui-sp-4);
+  border-top: 1px solid var(--line);
+}
+.tema-sec__etiket {
+  flex: 1;
+  font-size: var(--ui-fs-sm);
+  color: var(--ink-faint);
+}
+.tema-sec__sira {
+  display: flex;
+  gap: var(--ui-sp-2);
+}
+
+.tema-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-sp-2);
+  /* En küçük dokunma hedefi: yatayda geniş ama dikeyde ince bir düğme
+     parmakla ıskalanıyordu. */
+  min-height: var(--ui-tap);
+  padding: var(--ui-sp-2) var(--ui-sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-full);
+  background: var(--paper);
+  font-size: var(--ui-fs-sm);
+  color: var(--ink-soft);
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+.tema-btn:hover {
+  border-color: var(--accent);
+}
+.tema-btn[data-active="true"] {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 8%, transparent);
+  color: var(--ink);
+  font-weight: 600;
+}
+.tema-btn__simge {
+  font-size: var(--ui-fs-base);
+  line-height: 1;
 }
 
 /* --------------------------------------------------------------------------
@@ -1301,4 +1410,485 @@
   font-size: var(--fs-2xs);
   color: var(--ink-faint);
   letter-spacing: 0.04em;
+}
+
+/* --------------------------------------------------------------------------
+   SHORTS KAPISI — filigranın açtığı küçük kart
+   Filigran artık YouTube'a doğrudan gitmiyor; önce burada soruyor. `<a href>`
+   yerinde durduğu için sağ tık / orta tık / ctrl+tık hâlâ direkt yeni
+   sekmeye gidiyor (bkz. js/manga.js), yalnızca düz sol tık burada duruyor.
+   -------------------------------------------------------------------------- */
+.shorts-kart {
+  position: fixed;
+  right: max(var(--ui-sp-4), env(safe-area-inset-right, 0px) + var(--ui-sp-3));
+  bottom: max(var(--ui-sp-4), env(safe-area-inset-bottom, 0px) + var(--ui-sp-3));
+  z-index: var(--z-toast);
+  width: min(88vw, 300px);
+  padding: var(--ui-sp-4);
+  border-radius: var(--radius-lg);
+  background: var(--paper-raised);
+  color: var(--ink);
+  box-shadow: var(--shadow-3), var(--edge);
+  display: grid;
+  gap: var(--ui-sp-3);
+  animation: shorts-kart-in var(--dur-base) var(--ease-spring);
+}
+.shorts-kart[hidden] {
+  display: none;
+}
+@keyframes shorts-kart-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+}
+:root[data-motion="off"] .shorts-kart {
+  animation: none;
+}
+.shorts-kart__head {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-sp-2);
+}
+.shorts-kart__head b {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: var(--ui-fs-base);
+  font-weight: 700;
+  letter-spacing: var(--tracking-caps);
+}
+.shorts-kart__x {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  color: var(--ink-faint);
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+.shorts-kart__x:hover {
+  background: var(--paper-sunken);
+  color: var(--ink);
+}
+.shorts-kart__x .icon {
+  width: 16px;
+  height: 16px;
+}
+.shorts-kart__metin {
+  font-size: var(--ui-fs-sm);
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+/* Kırmızı, filigrandaki Shorts rozetiyle aynı ton (bkz. blocks.css
+   .manga-mark__badge) — kart o rozetin devamı gibi okunuyor. */
+.shorts-kart__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-sp-2);
+  padding: 12px var(--ui-sp-4);
+  border-radius: var(--radius-full);
+  background: #ff0033;
+  color: #fff;
+  font-size: var(--ui-fs-sm);
+  font-weight: 700;
+  transition: transform var(--dur-fast) var(--ease-spring);
+}
+.shorts-kart__cta:hover {
+  transform: translateY(-1px);
+}
+.shorts-kart__cta .icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* ============================================================================
+   TAM EKRAN MANGA
+   ----------------------------------------------------------------------------
+   Sorun: `mn-1` 9:16 bir kompozisyon ve 3:4 bir tuvalin içinde yaşıyor. Tuval
+   masaüstünde `min(100vw, 100svh*3/4, 560px)` ile 560px'te duruyor, sayfa da
+   onun içinde 374px'e düşüyor — balon yazısı 7.6px. Tarayıcı zoom'u da
+   kurtarmıyor: %135'ten sonra `100svh*3/4` terimi bağlayıcı oluyor ve tuval
+   fiziksel 750 pikselde DÜZLEŞİYOR (ölçüldü: %150'de de %300'de de 750).
+
+   Çözüm bir "transform: scale" DEĞİL. Ölçek dönüşümle verilseydi `srcset`
+   düzen boyutuna baktığı için tarayıcı 600w görselde kalır, büyüdükçe çizim
+   bulanıklaşırdı. Bunun yerine sahne, TUVALİN BÜYÜTÜLMÜŞ HÂLİ: `--canvas-h`
+   ve container birimleri burada yeniden tanımlanıyor, böylece blocks.css'teki
+   plan formülü tek satırı değişmeden daha büyük bir tabanla çalışıyor —
+   kompozisyon birebir korunuyor, görseller gerçekten büyük iniyor.
+   ========================================================================= */
+
+.mangazoom {
+  --cubuk-alani: calc(var(--ui-tap) + var(--ui-sp-5) + env(safe-area-inset-bottom, 0px));
+
+  width: 100vw;
+  max-width: 100vw;
+  height: 100svh;
+  max-height: 100svh;
+  padding: 0;
+  border: 0;
+  background: var(--paper-sunken);
+  color: var(--ink);
+  overflow: hidden;
+}
+.mangazoom::backdrop {
+  background: var(--scrim);
+}
+
+/* --- görüş alanı: gezinme (pan) buradaki KENDİ kaydırması ------------------
+   Kaydırmayı elde etmek için `transform: translate` yerine gerçek scroll:
+   dokunmatik sürükleme, trackpad, klavye okları ve kaydırma çubuğu böylece
+   tarayıcıdan bedava geliyor.
+
+   `safe center`: içerik kutudan büyükken düz `center` onu iki yana taşırır ve
+   sol/üst kenarına ASLA kaydırılamaz. `safe` bu durumda hizalamayı bırakıyor. */
+.mangazoom__viewport {
+  position: absolute;
+  /* Alt çubuk sayfanın ÜSTÜNE binmiyor, kendi şeridini alıyor: sığdırma bu
+     kutuya göre hesaplandığı için sayfa hiçbir ekran boyunda çubuğun altında
+     kalmıyor. Bedeli sığdırmada ~%8 küçük bir sayfa — okumanın asıl yeri
+     zaten yakınlaştırılmış hâli, ve kısmen örtülü bir kare o bedelden pahalı.
+     Sayfanın son karesi (tam genişlik, 4. kuşak) tam buraya denk geliyordu. */
+  inset: 0 0 var(--cubuk-alani) 0;
+  display: flex;
+  justify-content: safe center;
+  align-items: safe center;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.mangazoom__viewport[data-gezinir="true"] {
+  cursor: grab;
+}
+.mangazoom__viewport[data-gezinir="true"]:active {
+  cursor: grabbing;
+}
+/* Sürükleme sırasında metin seçimi kapanıyor — balonlar seçilebilir kalsın
+   diye (bkz. bilesen.css §5) yalnızca sürüklerken, kalıcı olarak değil. */
+.mangazoom__viewport[data-surukleniyor="true"] {
+  user-select: none;
+}
+
+/* Sahne sayfadan geniş: `plan` formülü sayfayı ortalayıp yanlarda sahnenin
+   ~%16'sı kadar boşluk bırakıyor. Çerçeve o boşluğu kesiyor — yoksa okur
+   sığdırma seviyesinde bile yana kayıp boş alana bakabilir, üstelik sayfa
+   ekranda ortalanmaz. Oranları manga.js ölçüp yazıyor (bkz. sigdirmayiOlc).
+
+   `clip`, `hidden` değil: `hidden` kaydırılabilir bir kutu yaratır ve içerideki
+   taşmayı görüş alanının kaydırma alanına ekler — kesmeye çalıştığımız şeyi
+   geri getirirdi. `overflow-clip-margin` ise balon gölgelerine pay bırakıyor. */
+.mangazoom__cerceve {
+  flex: none;
+  width: calc(var(--sahne-w, 560px) * var(--kutu-oran, 1));
+  overflow: clip;
+  overflow-clip-margin: 8px;
+}
+
+.mangazoom__stage {
+  width: var(--sahne-w, 560px);
+  margin-left: calc(var(--sahne-w, 560px) * var(--kirp-sol, 0) * -1);
+  --canvas-h: calc(var(--sahne-w, 560px) * 4 / 3);
+  container-type: inline-size;
+  container-name: canvas;
+}
+
+/* --- tuvale göre kalibre edilmiş tavanları kaldırma ------------------------
+   `clamp(6px, 1.35cqi, 12px)` 560px'lik tuvalde doğru bir üst sınırdı: daha
+   büyüğü elipsleri şişirip kareyi yutuyordu. Burada taban zaten büyük, tavan
+   ise tam ekranın bütün anlamını yutuyor — sahne ne kadar büyürse büyüsün
+   balon 12px'te kalırdı. Oranlar aynen korunuyor, yalnız sınırlar kalkıyor. */
+.mangazoom__stage .manga-bubble {
+  font-size: var(--fs-2xs);
+}
+.mangazoom__stage .manga[data-layout="plan"] .manga-bubble {
+  font-size: 1.35cqi;
+}
+.mangazoom__stage .manga-title {
+  font-size: 3.6cqi;
+}
+
+/* Çizgi kalınlıkları da kompozisyonun parçası. `px` bırakılsalardı sahne
+   büyüdükçe kareler kıl gibi çerçevelenir, çizgi roman dili bozulurdu.
+   Değerler tuvaldeki karşılıklarının oranı: 2px/560 ≈ 0.36cqi. */
+.mangazoom__stage .manga-panel,
+.mangazoom__stage .manga-title {
+  border-width: 0.36cqi;
+}
+.mangazoom__stage .manga-bubble {
+  border-width: 0.27cqi;
+  box-shadow: 0.36cqi 0.36cqi 0 color-mix(in oklab, var(--ink) 30%, transparent);
+}
+
+/* --- çubuk ----------------------------------------------------------------
+   Sayfa her zaman dikey (9:16), ekran çoğunlukla yatay — yani yükseklik kıt,
+   genişlik bol. Yatay ekranda çubuk bu yüzden SAĞDAKİ ölü alana geçiyor ve
+   `--cubuk-alani` sıfırlanıyor: sayfa bütün yüksekliği kullanıyor. Ekran kare
+   ya da dikeyse yanda yer yok, çubuk alta iniyor ve kendi şeridini alıyor.
+
+   Bu, sayının kendi kuralı: canvas.css §tuval "yatay boşluk da masaüstünde
+   menüye ev sahipliği yapar — arayüz yine tuvalin dışında yaşar, okuma alanı
+   bozulmaz" diyor. Burada da arayüz sayfanın dışında kalıyor. */
+.mangazoom__bar {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--ui-sp-3) + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--ui-sp-1);
+  padding: var(--ui-sp-1);
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--paper) 82%, transparent);
+  backdrop-filter: blur(14px) saturate(1.3);
+  box-shadow: var(--shadow-2), var(--edge);
+  font-family: var(--font-ui);
+}
+.mangazoom__btn {
+  display: grid;
+  place-items: center;
+  width: var(--ui-tap);
+  height: var(--ui-tap);
+  border-radius: var(--radius-full);
+  color: var(--ink);
+  opacity: 0.8;
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out);
+}
+.mangazoom__btn:hover {
+  opacity: 1;
+  background: color-mix(in oklab, var(--ink) 10%, transparent);
+}
+.mangazoom__btn[disabled] {
+  opacity: 0.25;
+  pointer-events: none;
+}
+.mangazoom__btn .icon {
+  width: 20px;
+  height: 20px;
+}
+/* Kapat, ölçek tuşlarından bir çizgiyle ayrılıyor: yanlışlıkla basılması
+   okumayı bitiren tek tuş o. */
+.mangazoom__ayrac {
+  width: 1px;
+  height: 22px;
+  margin-inline: var(--ui-sp-1);
+  background: color-mix(in oklab, var(--ink) 20%, transparent);
+}
+.mangazoom__yuzde {
+  min-width: 52px;
+  text-align: center;
+  font-size: var(--ui-fs-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+}
+
+@media (min-aspect-ratio: 1 / 1) {
+  .mangazoom {
+    --cubuk-alani: 0px;
+  }
+  .mangazoom__bar {
+    left: auto;
+    right: var(--ui-sp-4);
+    bottom: auto;
+    top: 50%;
+    transform: translateY(-50%);
+    flex-direction: column;
+  }
+  .mangazoom__ayrac {
+    width: 22px;
+    height: 1px;
+    margin-inline: 0;
+    margin-block: var(--ui-sp-1);
+  }
+  /* Dikey çubukta yüzde, tuşların altında dar bir satır: 52px'lik yatay
+     genişlik burada çubuğu gereksiz şişiriyordu. */
+  .mangazoom__yuzde {
+    min-width: 0;
+    font-size: var(--ui-fs-xs);
+    padding-block: var(--ui-sp-1);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   GİRİŞ — bandaki düğme ve sayfanın kendisi
+   -------------------------------------------------------------------------- */
+
+/* Kapı iki tane: banttaki düğme ve sayfanın kendisi. İmleç, sayfanın
+   tıklanabilir olduğunu söyleyen tek işaret — bu yüzden filigran
+   bağlantısında bilerek geri alınıyor, orası başka bir yere gidiyor. */
+.page[data-kind="manga"] .manga-page {
+  cursor: zoom-in;
+}
+.page[data-kind="manga"] .manga-mark {
+  cursor: pointer;
+}
+
+/* Düğme manga sayfasına varıldığında BİR KEZ nabız atıyor. Bir ipucu balonu
+   yerine bunu seçtik: kendini yazıyla anlatmak zorunda kalan düğmenin ikonu
+   yanlıştır, üstelik sayının zaten dört kartlık bir tanıtımı var ve ikinci
+   bir öğretici katman gürültü olurdu. */
+.band__btn--buyut[data-ipucu="true"] {
+  animation: buyut-nabiz 1.1s var(--ease-out) 2;
+}
+@keyframes buyut-nabiz {
+  0%, 100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 55%, transparent);
+  }
+  35% {
+    box-shadow: 0 0 0 7px color-mix(in oklab, var(--accent) 0%, transparent);
+  }
+}
+:root[data-motion="off"] .band__btn--buyut[data-ipucu="true"] {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .band__btn--buyut[data-ipucu="true"] {
+    animation: none;
+  }
+}
+
+/* ============================================================================
+   İÇİNDEKİLER
+   ----------------------------------------------------------------------------
+   Alt bandın solundaki düğmeden açılan, bölüm açılışlarına atlayan liste.
+   Ekranın ORTASINDA, arkası bulanık — mod seçiciyle (`.modal` + `.scrim`) aynı
+   dil, çünkü ikisi de aynı cinsten karar: "bu sayıyı nasıl/nereden okuyacağım".
+   İki ayrı yüzey dili öğrenmek okura düşmemeli.
+
+   Önce düğmenin üstüne oturan bir menüydü ve yeri js'ten `--x` / `--y` ile
+   ölçülüyordu. İki sebeple bırakıldı: dokuz satır o kutuya sığmıyordu, ve
+   telefonda liste ekranın alt kenarına yapışınca başparmağın altında kalıp
+   kendi hedeflerini örtüyordu. Ortada duran bir yüzeyin ölçecek yeri yok —
+   konum kodu da bu yüzden silindi, CSS burada tek başına yetiyor.
+
+   ⚠️ Ortalamayı tarayıcının KENDİ `<dialog>` kuralı yapıyor (`inset: 0` +
+   `margin: auto` + `height: fit-content`). Bu yüzden burada `top`/`left`/
+   `bottom` YAZILMIYOR: bir tanesini yazmak kutuyu fazla-kısıtlı hâle getirip
+   ortalamayı bozar — nitekim `bottom` yazılıyken tarayıcı onu atıp kutuyu
+   ekranın tepesine yapıştırıyordu.
+   ========================================================================= */
+
+.icindekiler {
+  margin: auto;
+  padding: 0;
+  width: min(100% - 2 * var(--ui-sp-4), 460px);
+  max-height: min(80svh, 620px);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--paper-raised);
+  color: var(--ink);
+  box-shadow: var(--shadow-3), var(--edge);
+  overflow: hidden;
+}
+/* ⚠️ `[open]`e bağlı. Koşulsuz bir `display` tarayıcının kapalı `<dialog>`a
+   verdiği `display: none`u ezer ve liste hep açık kalırdı. */
+.icindekiler[open] {
+  display: flex;
+  flex-direction: column;
+  animation: icindekiler-gir var(--dur-base) var(--ease-spring);
+}
+/* Perde `.scrim` ile aynı: sayı okunmaz olmasın diye kararma ölçülü, ama
+   bulanıklık arkadaki satırları çözülemez yapıyor — yoksa göz listeyi değil
+   arkasındaki yazıyı okumaya çalışıyor. */
+.icindekiler::backdrop {
+  background: var(--scrim);
+  backdrop-filter: blur(3px);
+}
+@keyframes icindekiler-gir {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+}
+:root[data-motion="off"] .icindekiler[open] {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .icindekiler[open] {
+    animation: none;
+  }
+}
+
+/* Başlık `.modal__head` ile aynı ölçüde: iki yüzey yan yana görülmeyecek ama
+   arka arkaya görülecek ve aynı boyda durmaları gerekiyor. `sticky` değil —
+   kaydıran şey liste, başlık zaten ızgaranın dışında sabit. */
+.icindekiler__bas {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-sp-3);
+  padding: var(--ui-sp-4) var(--ui-sp-4) var(--ui-sp-3);
+  border-bottom: 1px solid var(--line);
+}
+.icindekiler__baslik {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: var(--ui-fs-lg);
+  font-weight: 600;
+}
+
+.icindekiler__liste {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--ui-sp-2) 0 var(--ui-sp-3);
+}
+
+/* Satır: [numara] [bölüm adı] [sayfa sayısı].
+   Numara ve sayfa sayısı `tabular-nums`, çünkü alt alta dizilen sayıların
+   hizasız oynaması listeyi tırtıklı gösteriyor.
+
+   Yükseklik `--ui-tap`in altına düşmüyor: bu liste asıl telefonda işe yarıyor
+   ve orada her satır bir başparmak hedefi. */
+.icindekiler__satir {
+  display: grid;
+  grid-template-columns: 2.5ch 1fr auto;
+  align-items: baseline;
+  gap: var(--ui-sp-4);
+  width: 100%;
+  min-height: var(--ui-tap);
+  padding: var(--ui-sp-3) var(--ui-sp-4);
+  text-align: left;
+  color: inherit;
+  font-family: var(--font-ui);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.icindekiler__satir:hover {
+  background: var(--paper-sunken);
+}
+
+.icindekiler__no {
+  font-size: var(--ui-fs-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-faint);
+}
+.icindekiler__ad {
+  font-family: var(--font-display);
+  font-size: var(--ui-fs-lg);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.icindekiler__adet {
+  font-size: var(--ui-fs-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-faint);
+}
+
+/* Okunan bölüm. İşaret rengin yanında bir de ÇİZGİ taşıyor: vurguyu yalnız
+   renge bırakmak, rengi ayırt edemeyen okur için hiçbir şey söylememek olurdu. */
+.icindekiler__satir[aria-current="true"] {
+  background: color-mix(in oklab, var(--accent) 10%, transparent);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+.icindekiler__satir[aria-current="true"] .icindekiler__ad {
+  color: var(--accent);
+}
+.icindekiler__satir[aria-current="true"] .icindekiler__no {
+  color: color-mix(in oklab, var(--accent) 72%, var(--ink-faint));
 }

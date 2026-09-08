@@ -1,44 +1,6 @@
-# OS / editör
+# Bu depo derlemesiz: `vanilla/` doğrudan servis edilir, build adımı yok.
+__pycache__/
+*.pyc
 .DS_Store
 Thumbs.db
 *.swp
-.vscode/
-
-# Python (prototype/tools/devserver.py çalışınca oluşabilir)
-__pycache__/
-*.pyc
-
-# Ham görsel kaynakları — depoya girmez, yalnızca üretilmiş WebP'ler izlenir.
-# (2026-09 one-shot: 8.1 MB PNG -> assets/2026-09/kapali-kapilar/ 360 KB)
-prototype/assets/**/kargaMangaKapalıKapılar/
-
-# Font dağıtım arşivleri — aynı gerekçe. Zip 1,5 MB ve içinde aynı fontun
-# otf/ttf/woff/woff2 dördü birden var; depoya giren yalnızca kullanılan tek
-# dosya (static/fonts/badcomic.woff2) ve lisans metni.
-*_Font_*.zip
-
-# --- Node / SvelteKit ------------------------------------------------------
-node_modules
-
-# Derleme çıktıları
-/.svelte-kit
-/build
-.output
-.wrangler
-.vercel
-.netlify
-
-# Ortam değişkenleri (Supabase/Resend anahtarları buraya girer, ASLA commit'lenmez)
-.env
-.env.*
-!.env.example
-
-# Vite
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
-
-# Playwright
-test-results
-playwright-report
-/blob-report
-/playwright/.cache

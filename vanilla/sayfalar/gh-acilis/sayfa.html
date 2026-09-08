@@ -1,10 +1,30 @@
+<!--
+  gh-acilis — Kantō dosyasının foto bölümünün açılışı.
+
+  ⚠️ BU SAYFA ARTIK AYRI BİR BÖLÜM DEĞİL. Eskiden "Gece Hattı" adlı bağımsız
+  bir foto-öyküydü (gece treni, peron, yağmur); `data-section` de öyleydi ve
+  içindekilerde kendi satırı vardı. Şimdi `data-section="kanto-depremi"`:
+  içindekiler bölümleri ARDIŞIKLIĞA göre kümelediği için (js/icindekiler.js
+  §bolumleriCikar) bu üç sayfa k-* dizisinin arasına girince tek bir "Kantō
+  Depremi" satırında eriyorlar. Kendi satırını geri istersen tek yapılacak şey
+  bu üç dosyada `data-section`i değiştirmek — listede elle yazılmış hiçbir yer
+  yok.
+
+  ⚠️ `data-duzen="diptik"` — kadraj ikiye bölünüp alt alta konuyor. Sebebi ve
+  geometrisi `css/bilesen.css` §10'da. Kısası: kaynak 1920×960 (2:1), tuval
+  3:4; `cover` ile basılsaydı genişliğin yalnız %37'si görünürdü ve bu karede
+  anlatan şey tam olarak genişlik — enkazın ufka kadar gitmesi.
+
+  `--yari-oran` YARIM genişlik / TAM yükseklik: 1920/2 = 960, yükseklik 960.
+-->
 <section
   class="page page--overlay"
   data-page-id="gh-acilis"
   data-mod="all"
-  data-section="gece-hatti"
-  data-section-title="Gece Hattı"
+  data-section="kanto-depremi"
+  data-section-title="Kantō Depremi"
   data-kind="opener"
+  data-duzen="diptik"
   data-scene="mask-wipe"
   data-fit="contain"
   data-bleed="full"
@@ -13,24 +33,38 @@
   aria-roledescription="sayfa"
 >
   <div class="page__bg">
-    <picture
-      ><source
-        type="image/avif"
-        srcset="
-          assets/2026-09/tren-600.avif   600w,
-          assets/2026-09/tren-900.avif   900w,
-          assets/2026-09/tren-1200.avif 1200w
-        "
-        sizes="(max-width: 640px) 100vw, 600px" />
+    <!--
+      İki `<img>` AYNI dosyayı gösteriyor, kırpma noktası CSS'te: kutunun
+      oranı kaynağın yarısı olduğu için `cover` + `object-position` sol ve sağ
+      yarıyı veriyor. Diske ikinci bir dosya yazılmıyor.
+
+      Erişilebilirlik: tarif KAPSAYICIDA (`role="img"` + `aria-label`), iki
+      parçada değil — ekran okuyucu tek bir fotoğraf duymalı, "aynı sahnenin
+      solu ve sağı" değil.
+    -->
+    <div
+      class="diptik"
+      style="--yari-oran: 960 / 960"
+      role="img"
+      aria-label="Yangından sonra ufka kadar uzanan enkaz alanı; uzakta ayakta kalmış birkaç bina ve bir kule, önde yanmış ahşap yığınları."
+    >
       <img
-        class="page__bg-img"
-        src="assets/2026-09/tren.webp"
-        sizes="(max-width: 640px) 100vw, 600px"
+        class="diptik__yari"
+        data-yari="sol"
+        src="assets/2026-09/KantoDepremi/kanto-02.jpg"
         alt=""
         loading="lazy"
-        fetchpriority="auto"
         decoding="async"
-    /></picture>
+      />
+      <img
+        class="diptik__yari"
+        data-yari="sag"
+        src="assets/2026-09/KantoDepremi/kanto-02.jpg"
+        alt=""
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
   </div>
   <div class="page__inner">
     <p
@@ -42,7 +76,7 @@
       Foto-öykü
     </p>
     <h1 class="h1 blk blk--invert" style="--i: 1" data-block-id="gh-acilis:1" data-block-kind="h1">
-      Gece Hattı
+      Ufka Kadar
     </h1>
     <p
       class="lead blk blk--invert"
@@ -50,7 +84,8 @@
       data-block-id="gh-acilis:2"
       data-block-kind="lead"
     >
-      Son trenden inen yüz kırk kişi. Hepsi aynı yöne yürüyor ve kimse konuşmuyor.
+      Deprem 11.58'de, öğle yemeği ocaklarının yandığı saatte geldi. Ahşap şehir
+      tutuştu. Aşağıdaki üç kare yangın söndükten sonra çekildi.
     </p>
   </div>
 </section>

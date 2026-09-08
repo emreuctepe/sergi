@@ -229,18 +229,28 @@ picture {
 }
 
 /* ==========================================================================
-   5 · MANGA KARESİ                                 (MangaPanel.svelte'ten)
+   5 · ÇİZERİN GÖRSELLERİ                           (MangaPanel.svelte'ten)
    --------------------------------------------------------------------------
+   Kapsam KARGAMANGA'nın işi: manga bölümünün 7 karesi ile kapağı, söyleşi
+   bölümünün 8 çizimi ile kapağı. Sınır `assets/2026-09/` klasör yapısına
+   birebir oturuyor (alt klasörler çizerin, düz dosyalar Wikimedia) — gerekçe
+   ve tam döküm js/telif.js başında.
+
    Kural yalnız GÖRSELE iniyor: balonlar (`.manga-bubble`) HTML ve seçilebilir
    kalmalı. ⚠️ Bu bir koruma DEĞİL, caydırıcı — görselin adresi sayfa
    kaynağında düz duruyor. Engellenen tek şey kazara ve kolay kaldırma.
 
-   Sayfa arka planlarına bilerek UYGULANMIYOR: 11 arka plan Wikimedia
-   Commons'tan CC BY-SA ile geliyor ve o lisans (§2(a)(5)(B)) "etkin teknolojik
-   önlem" uygulamayı açıkça yasaklıyor — kilitlemek kendi künyemizle çelişirdi.
+   Wikimedia arka planlarına bilerek UYGULANMIYOR: künyedeki sekiz görselin
+   bir kısmı CC BY-SA ve o lisans (§2(a)(5)(B)) "etkin teknolojik önlem"
+   uygulamayı açıkça yasaklıyor — kilitlemek kendi künyemizle çelişirdi.
+   Seçicileri genişletirken bu sınır korunmalı.
    ======================================================================= */
 
-.manga-panel__art img {
+.page[data-section="kapali-kapilar"] img,
+.page[data-section="soylesi"] img,
+/* Tam ekranda manga sayfası `.page`in dışına taşınıyor (manga.js); ilk iki
+   satır orada eşleşmez ve görsellerin en büyük hâli tam da orada duruyor. */
+.mangazoom img {
   user-select: none;
   -webkit-user-drag: none;
   -webkit-touch-callout: none; /* iOS: uzun basınca çıkan kaydet menüsü */
@@ -309,7 +319,7 @@ picture {
    `data-mod` her sayfanın kendi özniteliğinde yazılı, ayrı bir liste yok.
    `~=` boşlukla ayrılmış listede tek kelime arıyor: `data-mod="mid full"`.
 
-   ⚠️ `min` modu `full`ün alt kümesi DEĞİL: `km-min` sayfası yalnız `min`de var
+   ⚠️ `min` modu `full`ün alt kümesi DEĞİL: `k-min` sayfası yalnız `min`de var
    (sayının kendisi öyle yazılmış — o sayfa uzun anlatının üç cümlelik özeti).
    Bu yüzden üç kural da ayrı ayrı yazılıyor, "full'ü göster gerisini gizle"
    gibi bir kısayol o sayfayı kaybederdi.
@@ -325,4 +335,423 @@ picture {
 
 :root[data-depth='full'] .page:not([data-mod~='full']):not([data-mod~='all']) {
   display: none;
+}
+
+/* ==========================================================================
+   8 · PERDE DENETİMİ — `data-scrim`                    (Kantō sahneleri için)
+   --------------------------------------------------------------------------
+   `blocks.css` arka plan katmanına iki perdeden birini KOŞULSUZ sürüyor:
+
+     · `.page--overlay .page__bg::after`            → alttan yukarı SİYAH
+     · `.page:not(.page--overlay) .page__bg::after` → ortadan dışa KÂĞIT
+
+   İkisi de fotoğraf için doğru, Kantō sahneleri için değil. Sebep `palet.ts`in
+   başında yazılı: bu sahneler DESEN değil IŞIK, ve renkleri temadan gelmiyor —
+   kendi gecelerini yanlarında taşıyorlar. Kâğıt yıkaması bir gece sahnesinin
+   değer yapısını çökertir; siyah perde de GÜNDÜZ olan `TokyoBugun`u karartır
+   ve o sahnenin bütün anlamı (AlevHortumu'nun ters değer yapısı) kaybolur.
+
+   Üç kip, üçü de sayfanın kendi özniteliğinde yazılı:
+
+     data-scrim="none"   perde yok. Sahne olduğu gibi görünür; metin ya
+                         sahnenin dışında ya da yok.
+     data-scrim="light"  AÇIK perde — gündüz sahnesinin üstündeki KOYU metin
+                         için. `blk--invert` KULLANILMAZ; bunun yerine mürekkep
+                         aşağıda TEMADAN BAĞIMSIZ olarak sabitleniyor.
+     (yazılmamış)        blocks.css'in davranışı; fotoğraf sayfaları böyle.
+
+   ⚠️ Bu dosya katmansız (bkz. app.css sonu), o yüzden `blocks.css`in kuralını
+   eziyor. Bir `@layer`a taşınırsa üç sahne birden bozulur ve tek belirtisi
+   "sayfa biraz soluk duruyor" olur.
+   ======================================================================= */
+
+.page[data-scrim='none'] .page__bg::after {
+  content: none;
+}
+
+/* ⚠️ DURAKLAR 2026-09-08'DE YENİDEN AYARLANDI — sahne SVG'den fotoğrafa
+   dönünce eskisi yetmez oldu. Eski hâl (92% / 62%@30% / şeffaf@62%) elle
+   çizilmiş bir sahneye göre ayarlanmıştı: orada metnin arkası TASARIM GEREĞİ
+   neredeyse beyazdı, yani perdenin işi kolaydı. Fotoğrafta metnin arkası
+   (kadrajın %45–%90'ı) yoğun şehir: ölçülen en koyu pencere rgb(87 103 117).
+   Eski perde kicker hizasında yalnız 0.14 opaklığa ulaşıyordu ve ölçüm
+   **2.11** verdi — AA eşiği 4.5, yani başlık üstü okunmuyordu.
+
+   Perde YUKARI UZATILDI, KOYULAŞTIRILMADI. Yön önemli: bu sayfa `k-3`ün ters
+   değer yapısı olduğu için (bkz. sayfanın kendi başlığı) çözüm sayfayı
+   karartmak DEĞİL, aydınlatmak. Uzatılmış perde fotoğrafın alt yarısını
+   soldurur — bedeli bu — ama eskisi de tam olarak öyle bir sahneydi.
+
+   `k-son` bu kipin TEK kullanıcısı (ölçüldü), o yüzden kural yerinde
+   değiştirildi; ikinci bir sayfa `data-scrim="light"` alırsa duraklar onun
+   metin hizasına göre yeniden ölçülmeli. */
+.page[data-scrim='light'] .page__bg::after {
+  background: linear-gradient(
+    to top,
+    color-mix(in oklab, #f2f5f6 94%, transparent) 0%,
+    color-mix(in oklab, #f2f5f6 88%, transparent) 32%,
+    color-mix(in oklab, #f2f5f6 60%, transparent) 55%,
+    color-mix(in oklab, #f2f5f6 22%, transparent) 70%,
+    transparent 84%
+  );
+}
+
+/* ⚠️ PERDE TEMADAN BAĞIMSIZ; MÜREKKEP DE ÖYLE OLMALI.
+   Yukarıdaki perde sabit `#f2f5f6` — sahne kendi gündüzünü yanında taşıdığı
+   için tema değişince KOYULAŞMIYOR. Metnin rengi ise `--ink`ten geliyordu ve o
+   tema ile dönüyor: karanlık temada `--ink` `#ece3d5` oluyor, yani neredeyse
+   beyaz perdenin üstünde neredeyse beyaz yazı. Ölçülen kontrast 1.16:1 —
+   başlık da gövde de görünmüyordu.
+
+   Değerler açık temanınkinin KOPYASI DEĞİL. Metin düz perdenin üstünde değil,
+   perdenin yukarı doğru açıldığı yerde SAHNENİN üstünde duruyor. Açık temanın
+   `--accent`i (#b8432c) ve `--ink-faint`i (#8a7d71) o zeminde 2.36 ve 2.71
+   veriyordu — yani bu sayfada AÇIK temada da sınıfta kalıyorlardı.
+
+   Ölçülen sonuç (2026-09-08, sahne fotoğrafa dönüp perde yeniden ayarlandıktan
+   SONRA), her bloğun kutusundaki en koyu 8×8 pencereye karşı:
+
+     blok      en kötü   ortalama   eşik
+     kicker      5.86      8.10      4.5
+     h2         10.11     12.50      3     (büyük metin)
+     para       10.76     13.88      4.5
+     caption     7.70      8.17      4.5
+
+   ⚠️ BU SAYILAR TAHMİN DEĞİL, ÖLÇÜM — ve tekrar üretilebilir:
+     1) `tezgah-sayfa.html?id=k-son&en=560&boy=747&gizle=metin` başsız basılır
+        (`gizle=metin` yazıyı düşürmeden zemini verir),
+     2) `referans/araclar/kontrast.py` kareden okur.
+   Fotoğraf ya da perde değişirse ölçüm YENİLENMELİ; bu tablo o an yalan olur.
+
+   ⚠️ ARKA PLANA DOKUNULMADI. `k-son`un bütün anlamı gündüz olmasında; perdeyi
+   koyulaştırmak ya da sahneyi karartmak `k-3` ile arasındaki ters değer
+   yapısını (bkz. sayfanın kendi başlığı) silerdi. Kontrast yalnız mürekkep
+   tarafından kazanılıyor.
+
+   `--ink-soft` bugün bu sayfada kullanılmıyor; yine de sabitleniyor, yoksa
+   buraya eklenecek ilk `.lead`/`.byline` bloğu aynı hatayı sessizce geri
+   getirirdi. */
+.page[data-scrim='light'] {
+  --ink: #1b1613;
+  --ink-soft: #3a312a;
+  --ink-faint: #4b4038;
+  --accent: #5e2216;
+
+  /* ⚠️ `color` YENİDEN KURULUYOR, yalnız değişkeni yazmak YETMİYOR.
+     `.h2` ve `.para` kendi rengini vermiyor, MİRAS alıyor — ve miras
+     `body`den geliyor (base.css §25). Oradaki `color: var(--ink)` KÖKTEKİ
+     `--ink`e çözülüyor, yani yukarıdaki satır ona hiç uğramıyor: değişken
+     sayfada değişse de gövdede hesaplanmış renk karanlık temada `#ece3d5`
+     kalıyordu. Buradaki satır rengi sayfanın KENDİ mürekkebinden yeniden
+     hesaplatıyor; `.kicker` (`--accent`) ve `.caption` (`--ink-faint`)
+     rengi kendileri verdiği için zaten yukarıdaki satırlarla düzeliyor. */
+  color: var(--ink);
+}
+
+/* `.figure` bloğu bugüne kadar yalnız `<img>` taşıyordu; Kantō sahneleri satır
+   içi `<svg>` olarak giriyor ve aynı ölçüyü alması gerek. Kural §4'e değil
+   buraya yazıldı: orası "Figure.svelte'ten" gelen mirasın kopyası, bu ise
+   klonda eklenen yeni bir durum. */
+.figure svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius-md);
+}
+
+/* Kantō sahneleri 3:4 DİKEY, oysa `.figure`ın bugüne kadarki bütün kaynakları
+   yatay fotoğraflardı (400×~190). Tam genişlikte bir dikey sahne metin
+   sayfasını tek başına yutuyor: tuval eni kadar geniş, bir buçuk katı yüksek.
+   Daraltılıyor ve ortalanıyor — kırpmak seçenek değil, kompozisyonun anlattığı
+   şey (kalabalığın ortasındaki tek açık koridor) tam da kenarlarda. */
+.figure--dik {
+  max-width: 62%;
+  margin-inline: auto;
+}
+
+/* ==========================================================================
+   9 · KAYNAKÇA — çizgi roman bölmeleri
+   --------------------------------------------------------------------------
+   Sekiz kaynak, sekiz bölme, tek sayfa. Bölmeler dikdörtgen DEĞİL: kenarları
+   eğik çokgenler ve aralarındaki boşluk sayfanın kendi gecesi — yani gerçek
+   bir çizgi roman oluğu.
+
+   ⚠️ YERLEŞİM SABİT, "rastgele görünen" ama her açılışta AYNI. Gerekçesi
+   `js/sahneler.js`in başındaki kuralın aynısı: dergi sayfası bir
+   kompozisyondur, her ziyarette yeniden zar atılan bir şey değil. Ayrıca
+   sabit olduğu için çakışmadığı ve taşmadığı GARANTİ edilebiliyor; atılan bir
+   zarda bunun kontrolü yok.
+
+   ⚠️ HER BÖLME KENDİ KUTUSUNA SAHİP, `inset: 0` + kırpma DEĞİL. İkincisi daha
+   kısa yazılırdı ama içerik kutunun ortasına değil SAYFANIN ortasına
+   hizalanırdı: sekiz bölmenin sekiz etiketi de sayfanın göbeğinde üst üste
+   binerdi. Kutu ayrı olunca `clip-path` yüzdeleri de kendi kutusuna göre
+   okunuyor ve hizalama kendiliğinden doğru geliyor.
+
+   Bölmenin dört ölçüsü (`--x --y --g --y-boy`) ve kırpması (`--kes`) sayfanın
+   kendi `style` özniteliğinde: yerleşim bir KOMPOZİSYON, CSS sınıfı değil.
+   ======================================================================= */
+
+.kaynak-plan {
+  position: relative;
+  width: 100%;
+
+  /* Bölmelerin `--y-boy`u YÜZDE, ve yüzdenin çözülebilmesi için kabın kendi
+     yüksekliğinin BELİRLİ olması şart — belirsizse sekiz bölme birden sıfır
+     yükseklikte çizilir. Belirliliği aşağıdaki `flex: 1 1 0` veriyor; oran
+     yalnızca o düzen bir gün kaldırılırsa diye duran taban.
+
+     ⚠️ SABİT ORAN TEK BAŞINA YETMİYOR, ölçüldü: 4/5 oranıyla plan 567px
+     oluyordu ve başlıklarla birlikte sayfayı 53px TAŞIRIYORDU. Oranı küçültmek
+     çözüm değil — başlık dar ekranda iki satıra sarınca aynı taşma geri gelir,
+     üstelik yalnız bazı genişliklerde. Artan alanı almak taşmayı imkânsız
+     kılıyor. */
+  aspect-ratio: 4 / 5;
+
+  /* `cqi` bu noktadan sonra TUVALİN değil PLANIN enine bakıyor. Bölme içi
+     ölçülerin istediği de bu — bir bölmenin yazısı sayfaya değil kendi
+     çerçevesine göre ölçeklenmeli. */
+  container-type: inline-size;
+}
+
+/* Sayfanın kendisi dikey esnek bir kutu (`canvas.css` §sayfa) ve yüksekliği
+   `contain` kipinde BELİRLİ. `page__inner`ı da esnek yapınca plan artan alanı
+   alıyor: başlık kaç satır sararsa sarsın plan geri kalanına oturuyor.
+   `min-height: 0` şart — onsuz esnek kutu çocuğunu küçültmeyi reddeder ve
+   taşma geri gelir. */
+.page[data-page-id='k-kaynak'] .page__inner {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.page[data-page-id='k-kaynak'] .kaynak-plan {
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.kaynak {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--g);
+  height: var(--y-boy);
+  clip-path: polygon(var(--kes));
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.6cqi;
+  padding: 2.4cqi 2.8cqi;
+
+  text-decoration: none;
+  overflow: hidden;
+
+  /* Kutunun kendisi geçiş yapmıyor, İÇİ yapıyor: `clip-path`li bir kutuyu
+     büyütmek çokgeni de büyütür ve oluk kapanır. */
+  transition: filter var(--dur-fast) var(--ease-out);
+}
+
+.kaynak:hover,
+.kaynak:focus-visible {
+  filter: brightness(1.12);
+}
+
+/* Odak halkası bir KONTUR ve `clip-path` konturu kırpar: halka bölmenin
+   dışında kalırdı, yani hiç görünmezdi. İçeri alınmış bir gölge onun yerini
+   tutuyor ve çokgenin kendi kenarını izliyor. */
+.kaynak:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 0.8cqi currentColor;
+}
+
+.kaynak__im {
+  width: 8cqi;
+  height: 8cqi;
+  flex: none;
+}
+
+.kaynak__yer {
+  font-family: var(--font-ui);
+  font-size: 2.5cqi;
+  font-weight: 700;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.kaynak__ad {
+  font-family: var(--font-ui);
+  font-size: 3.1cqi;
+  line-height: 1.22;
+  text-wrap: balance;
+}
+
+/* --------------------------------------------------------------------------
+   ÜÇ AİLE
+   İşaretler kendi çizimimiz, kimsenin logosu değil: say­fanın künyesi telif
+   konusunda açık ve bir marka işaretini kopyalamak onunla çelişirdi. Renk ve
+   biçim tanıtmaya yetiyor — oynatma üçgeni, serif M, mühürlü belge.
+   -------------------------------------------------------------------------- */
+
+.kaynak[data-tur='youtube'] {
+  background: #7d1b16;
+  color: #f6e0ac;
+}
+.kaynak[data-tur='youtube'] .kaynak__im {
+  color: #d64430;
+}
+
+/* Medium'un kendi görünümü kâğıt üstünde serif: bölme de öyle. Kâğıt tonu
+   `palet.ts`teki `KIZIL.kagit` — sayfanın geri kalanına yabancı düşmesin. */
+.kaynak[data-tur='medium'] {
+  background: #f4efe6;
+  color: #171210;
+}
+.kaynak[data-tur='medium'] .kaynak__ad {
+  font-family: var(--font-text);
+}
+
+.kaynak[data-tur='resmi'] {
+  background: #1e3348;
+  color: #dfe7ea;
+}
+.kaynak[data-tur='resmi'] .kaynak__im {
+  color: #8fb0c4;
+}
+
+/* Dar tuvalde (telefon) sekiz bölmenin etiketi okunmuyor: ad gizleniyor, yer
+   adı ve işaret kalıyor. Bölme hâlâ tıklanabilir ve `aria-label` tam metni
+   taşıyor, yani kaybolan şey yalnız GÖRÜNEN ad. */
+@container (max-width: 380px) {
+  .kaynak__ad {
+    display: none;
+  }
+  .kaynak__yer {
+    font-size: 3cqi;
+  }
+}
+
+/* ==========================================================================
+   10 · DİPTİK — geniş arşiv fotoğrafını ikiye bölüp dikey yığma
+   --------------------------------------------------------------------------
+   Tuval 3:4 (0.75); 1923 fotoğrafları 1.40–2.00 arasında YATAY. `cover` ile
+   tam kanamalı basılsalardı görünen genişlik sırasıyla %53, %52 ve **%37**
+   olurdu — ve bu üç karede bilgiyi taşıyan şey tam olarak GENİŞLİK: enkazın
+   ufka kadar gitmesi, yıkık binayla ayakta kalan tramvayın aynı kadrajda
+   durması. Ortadan kırpmak fotoğrafı süse çevirir.
+
+   Çözüm: kareyi SOL ve SAĞ yarısına ayırıp alt alta koymak. Böylece kadrajın
+   tamamı görünüyor ve yığın dikeyleşiyor — 2:1'lik panorama 0.5 oranına
+   düşüyor, yani artık tuvalden DAR, kırpılacak bir şey kalmıyor.
+
+   ⚠️ DOSYA KESİLMİYOR, İKİ KOPYA AYNI JPEG. Numara `object-fit: cover` +
+   `object-position`: kutunun oranı kaynağın YARISI olduğu için `cover`
+   görüntüyü yüksekliğe oturtuyor ve genişliğin tam yarısı taşıyor; `left`
+   sol yarıyı, `right` sağ yarıyı gösteriyor. Bu makinede rasterleştirici
+   yok (ne ImageMagick ne PIL), ama olsaydı da yol bu olurdu: tek dosya
+   önbellekte tek giriş ve kırpma noktası CSS'te kalıyor.
+
+   Yarının oranını SAYFA bildiriyor (`--yari-oran: 960 / 960`), çünkü sayı
+   başına üç değer var ve hepsi kaynağın piksel ölçüsünden geliyor. Formül
+   tek satır: yarım genişlik / tam yükseklik.
+
+   ⚠️ `.diptik` `.page__bg`in ÇOCUĞU değil TORUNU tutuyor — `<img>`ler bir
+   ara katmanda. Bu bilerek: `canvas.css:167`deki `.page__bg > img` kuralı
+   (%100×%100 + cover) tam kanamalı arka plan için doğru ama diptik için
+   yıkıcı, ikisi de aynı anda uygulanamaz. §1'deki `<picture>` çözümüyle
+   aynı hile, aynı sebep.
+   ======================================================================= */
+
+/* Yığın tuvalden dar kaldığı için yanlarda zemin görünüyor ve o zemin SABİT
+   KOYU — temayı izlemiyor. Gerekçe `k-son`unkiyle aynı (bkz. BENIOKU.md
+   "Kantō sahneleri neden temayı izlemiyor"): bunlar siyah-beyaz baskı ve
+   baskının kendi değer aralığı ancak koyu bir zeminde okunuyor. Açık temada
+   `--paper` (#f5f1e8) fotoğrafın kendi beyazından parlak olur, kadraj da
+   kâğıdın üstünde yüzen bir leke hâline gelirdi. */
+.page[data-duzen='diptik'] .page__bg {
+  background: #0c0a09;
+}
+
+/* Perde diptikte GÜÇLENDİRİLİYOR. `blocks.css` §15/§26'daki iki gradyan
+   fotoğrafın altının koyu olduğu varsayımıyla ayarlanmış — sayının öbür tam
+   kanamalı sayfalarında öyle. Burada değil: kadraj ikiye bölününce ALT yarının
+   dibi kaynağın ORTA şeridi oluyor ve bu üç karede orası en parlak yer
+   (moloz, beton, gökyüzü aksı). Basılıp bakıldı: `blocks.css` değerleriyle
+   "Ufka Kadar" başlığı parlak molozun üstünde eriyordu.
+
+   Güç yalnız METNİN YAŞADIĞI şeritte: künye alttan ~%25'te, açılış başlığı
+   ~%45'te bitiyor, o yüzden iki ayrı durak. Üstteki yarıya hiç dokunulmuyor —
+   kadrajın yarısı perdesiz kalıyor. */
+.page[data-duzen='diptik'] .page__bg::after {
+  background: linear-gradient(
+    to top,
+    color-mix(in oklab, #000 92%, transparent) 0%,
+    color-mix(in oklab, #000 82%, transparent) 22%,
+    color-mix(in oklab, #000 40%, transparent) 40%,
+    transparent 60%
+  );
+}
+.page[data-duzen='diptik'][data-kind='opener'] .page__bg::after {
+  background: linear-gradient(
+    to top,
+    color-mix(in oklab, #000 92%, transparent) 0%,
+    color-mix(in oklab, #000 84%, transparent) 30%,
+    color-mix(in oklab, #000 52%, transparent) 48%,
+    color-mix(in oklab, #000 18%, transparent) 66%,
+    transparent 80%
+  );
+}
+
+.diptik {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  /* ⚠️ `minmax(0, …)` ŞART — çıplak `1fr` yazılamaz. `1fr` aslında
+     `minmax(auto, 1fr)` demek ve o `auto` taban, satırın içindeki görselin
+     MIN-CONTENT boyundan (yani kaynağın kendi 1920px'inden) küçülmesini
+     engelliyor. Ölçüldü: çıplak `1fr` ile satırlar 1920px'e şişiyor,
+     `height: 100%` şişmiş satıra oturuyor ve yığın 540×720 tuvalde 3840px
+     boyuna ulaşıyor. Taban sıfırlanınca satır ızgaradan gelen payı alıyor. */
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  /* Oluk "bu tek kare ikiye kesildi" diyecek kadar geniş, "bunlar iki ayrı
+     fotoğraf" diyecek kadar dar. Sayfanın kendi zemini görünüyor. */
+  gap: var(--diptik-oluk, 1.6cqi);
+  justify-items: center;
+  align-content: center;
+  /* Taşma güvenlik ağı — aşağıdaki `max-width: none`un karşılığı. Tuval
+     beklenmedik biçimde uzarsa (canvas.css §34: dar telefonda `--canvas-h`
+     4/3'ü AŞABİLİYOR) satır yükselir ve yarı tuvalden geniş düşebilir.
+     Yarılar ortalandığı için kırpma iki dış kenardan simetrik oluyor:
+     kadrajın ortası her hâlükârda duruyor. */
+  overflow: hidden;
+}
+
+.diptik__yari {
+  height: 100%;
+  width: auto;
+  aspect-ratio: var(--yari-oran);
+  object-fit: cover;
+
+  /* ⚠️ `max-width: none` ŞART, SÜS DEĞİL — ve bunu bir kez yanlış yaptım.
+     base.css:86 bütün görsellere `max-width: 100%` veriyor. `aspect-ratio`
+     ile birlikte o kural yönü TERSİNE çeviriyor: genişlik %100'e kırpılıyor,
+     sonra yükseklik orandan YENİDEN hesaplanıyor ve `height: 100%` sessizce
+     eziliyor. Ölçüldü: 540×720 tuvalde her yarı 540×769,5 çıkıyordu — tek bir
+     yarı bile tuvalin tamamından uzun, ikisi üst üste 1539px, ve `.page`in
+     `overflow: hidden`ı farkı sessizce kesiyordu. Yani kırpmayı gidermek için
+     eklenen düzen, daha beteriyle geri getiriyordu.
+
+     Doğru zincir: satır yüksekliği ızgaradan gelir (1fr) → `height: 100%`
+     onu alır → genişlik `aspect-ratio`dan türer. Genişliğin bir tavanı
+     OLMAMALI, yoksa zincir baştan kurulur. */
+  max-width: none;
+}
+
+.diptik__yari[data-yari='sol'] {
+  object-position: left center;
+}
+.diptik__yari[data-yari='sag'] {
+  object-position: right center;
 }

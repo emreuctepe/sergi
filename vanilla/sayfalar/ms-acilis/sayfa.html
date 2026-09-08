@@ -1,0 +1,123 @@
+<!--
+  ms-acilis — "Akıllı Kız" sergisinin girişi.
+
+  Tek noktalı perspektifle bir galeri fuayesi: yanlarda geri kaçan iki duvar,
+  ortada aydınlık bir kapı, yerde kapıdan taşan ışık. Sonraki sayfa (ms-galeri)
+  bu kapıdan içerisi.
+
+  ⚠️ RENKLER TEMAYI İZLEMİYOR — Kantō sahneleriyle aynı gerekçe (bkz. BENIOKU
+  "Kantō sahneleri neden temayı izlemiyor"). Bu bir DESEN değil IŞIK sahnesi:
+  anlamı, karanlık bir fuayenin sonundaki tek aydınlık açıklık olmasında.
+  `--paper` açık temada #f5f1e8'e dönseydi kapı zemine gömülür, değer yapısı
+  çökerdi.
+
+  Işık kaynağı KAPININ ARDINDA. Yan duvarlar bu yüzden kapıya doğru
+  açılıyor ama basamak basamak — sürekli bir degrade `visual_design.md` §3'ü
+  bozardı.
+-->
+<section
+  class="page page--overlay"
+  data-page-id="ms-acilis"
+  data-mod="all"
+  data-section="akilli-kiz"
+  data-section-title="Akıllı Kız"
+  data-kind="opener"
+  data-scene="parallax"
+  data-fit="contain"
+  data-bleed="full"
+  data-inview="true"
+  role="group"
+  aria-roledescription="sayfa"
+>
+  <div class="page__bg">
+    <svg
+      class="art"
+      viewBox="0 0 300 400"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <defs>
+        <radialGradient id="ms-vig-giris" cx="0.5" cy="0.44" r="0.8">
+          <stop offset="0.4" stop-color="#0a0908" stop-opacity="0"></stop>
+          <stop offset="1" stop-color="#0a0908" stop-opacity="0.72"></stop>
+        </radialGradient>
+        <filter
+          id="ms-grain-giris"
+          x="0"
+          y="0"
+          width="100%"
+          height="100%"
+          filterUnits="objectBoundingBox"
+          color-interpolation-filters="sRGB"
+        >
+          <feTurbulence type="fractalNoise" baseFrequency="1.5" numOctaves="1" seed="10"></feTurbulence>
+          <feColorMatrix
+            type="matrix"
+            values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.34 0.34 0.32 0 -0.12"
+          ></feColorMatrix>
+        </filter>
+      </defs>
+
+      <rect width="300" height="400" fill="#0d0b0a"></rect>
+
+      <!-- ① tavan: kapıya doğru daralan koyu düzlem -->
+      <path d="M0 0 H300 V44 L196 104 H104 L0 44 Z" fill="#0a0908"></path>
+
+      <!-- ② yan duvarlar. Sağ duvar kapıdan sızan ışığı alıyor, sol duvar
+           almıyor: tek anahtar ışık, iki farklı düz değer. -->
+      <path d="M0 44 L104 104 V286 L0 356 Z" fill="#171310"></path>
+      <path d="M300 44 L196 104 V286 L300 356 Z" fill="#221b16"></path>
+
+      <!-- ③ yan duvarlarda asılı işler: perspektifte paralelkenar, konturssuz -->
+      <g fill="#0f0c0a">
+        <path d="M30 92 L74 116 V186 L30 174 Z"></path>
+        <path d="M84 124 L100 132 V190 L84 190 Z"></path>
+      </g>
+      <g fill="#2c231c">
+        <path d="M270 92 L226 116 V186 L270 174 Z"></path>
+        <path d="M216 124 L200 132 V190 L216 190 Z"></path>
+      </g>
+
+      <!-- ④ kapı: üç basamaklı ışık. İç içe üç düz dikdörtgen, degrade değil. -->
+      <rect x="104" y="104" width="92" height="182" fill="#6d4a1f"></rect>
+      <rect x="112" y="112" width="76" height="174" fill="#b9832f"></rect>
+      <rect x="124" y="124" width="52" height="162" fill="#efd79c"></rect>
+
+      <!-- ⑤ zemin ve kapıdan taşan ışık gölü. Kenarı testere: yumuşak bir elips
+           sahneyi 3B render'a çevirirdi (visual_design.md §5). -->
+      <rect y="286" width="300" height="114" fill="#100d0b"></rect>
+      <path
+        d="M124 286 H176 L208 330 L246 400 H44 L92 330 Z"
+        fill="#54401f"
+      ></path>
+      <path d="M132 286 H168 L188 332 L214 400 H80 L110 332 Z" fill="#8a6a2e"></path>
+
+      <!-- ⑥ ön düzlem: solda kırpılmış bir sütun kenarı, derinliği kuran şey -->
+      <g fill="#080706">
+        <path d="M0 0 H26 V400 H0 Z"></path>
+        <path d="M300 0 H274 V400 H300 Z"></path>
+      </g>
+
+      <!-- kaplama: vinyet + gren. Sahnenin SON çocuğu olmak zorunda. -->
+      <rect width="300" height="400" fill="url(#ms-vig-giris)"></rect>
+      <rect width="300" height="400" filter="url(#ms-grain-giris)" opacity="0.09"></rect>
+    </svg>
+  </div>
+
+  <div class="page__inner">
+    <p class="kicker blk blk--invert" style="--i: 0" data-block-id="ms-acilis:0" data-block-kind="kicker">
+      Çizer: Ece Özgür · Sergi
+    </p>
+    <h1 class="h1 h1--big blk blk--invert" style="--i: 1" data-block-id="ms-acilis:1" data-block-kind="h1">
+      Akıllı Kız
+    </h1>
+    <p class="lead blk blk--invert" style="--i: 2" data-block-id="ms-acilis:2" data-block-kind="lead">
+  Bu sergi deneyiminde bölüm öğrencilerinden Ece Özgür'ün çizimleriyle masal anlatımını serbestçe okuyabilirsiniz.
+    </p>
+    <div class="byline blk blk--invert" style="--i: 3" data-block-id="ms-acilis:3" data-block-kind="byline">
+      <span class="byline__author">かしこいむすめ</span>
+      <span class="byline__role">Japon halk masalı</span>
+    </div>
+  </div>
+</section>

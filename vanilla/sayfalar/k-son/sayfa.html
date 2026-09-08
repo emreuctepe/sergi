@@ -1,0 +1,80 @@
+<!--
+  k-son — yazının son paragrafının karşılığı ve dosyanın kapanışı.
+
+  ⚠️ BU KADRAJ `k-3`ÜN (alev hortumu) KASITLI TERSİ ve sayfanın bütün işi bu:
+  orada kadrajın çoğu neredeyse siyahtı, burada neredeyse beyaz. İkisi sayının
+  iki ucunda durunca yüz yılın farkını altyazı değil DEĞER anlatıyor. Sahne
+  eskiden elle üretilmiş bir SVG'ydi (`TokyoBugun.svelte`); 2026-09-08'de
+  kullanıcı isteğiyle fotoğrafla değiştirildi, gerekçe `page__bg` içinde.
+
+  ⚠️ Bu yüzden `data-scrim="light"` ŞART ve metin `blk--invert` KULLANMIYOR:
+  `blocks.css` tam kanamalı sayfalara alttan yukarı SİYAH perde sürüyor,
+  fotoğraflar için doğru ama BU fotoğraf için değil — karartmak sayfanın tek
+  argümanını siler. Ayrıntı ve ölçülmüş kontrast: `css/bilesen.css` §8.
+-->
+<section
+  class="page page--overlay"
+  data-page-id="k-son"
+  data-mod="all"
+  data-section="kanto-depremi"
+  data-section-title="Kantō Depremi"
+  data-kind="signature"
+  data-scene="signature"
+  data-scrim="light"
+  data-fit="contain"
+  data-bleed="full"
+  data-inview="true"
+  role="group"
+  aria-roledescription="sayfa"
+>
+  <div class="page__bg">
+    <!--
+      Sahne ARTIK ÜRETİLMİŞ SVG DEĞİL, fotoğraf (kullanıcı isteği, 2026-09-08).
+      Yerini aldığı şey `src/lib/art/kanto/TokyoBugun.svelte`nin vanilla
+      karşılığıydı: dört değer düzlemi, sismik çaprazlar, önde alçak ahşap
+      çatı sırası. Silinen o SVG'nin argümanı hâlâ geçerli ve fotoğraf onu
+      DAHA İYİ taşıyor: kadrajın ortasında 1958'de dikilmiş bir kule, dibinde
+      Zōjō-ji'nin ahşap çatısı, arkasında camlı kuleler. "%93,4" ile "kalan
+      %6,6" aynı karede, çizilmiş değil çekilmiş olarak duruyor.
+
+      ⚠️ 960×1280 = TAM 3:4, yani tuvalin oranı. `cover` hiçbir şey kırpmıyor;
+      başka bir görselle değiştirilirse bu bir daha doğru olmayabilir.
+
+      ⚠️ `data-scrim="light"` DURUYOR ve şart. Gerekçe sayfanın başındakiyle
+      aynı, üstelik fotoğrafta daha da güçlü: `blocks.css` tam kanamalı
+      sayfalara alttan yukarı SİYAH perde sürüyor, bu ise parlak bir GÜNDÜZ
+      karesi. Siyah perde onu karartıp `k-3` (alev hortumu) ile arasındaki ters
+      değer yapısını silerdi. Kontrast mürekkep tarafından kazanılıyor —
+      ölçülmüş değerler `css/bilesen.css` §8'de.
+
+      `srcset` yok: türev üreteci bu makinede yok (bkz. BENIOKU.md).
+    -->
+    <img
+      class="page__bg-img"
+      src="assets/2026-09/KantoDepremi/960px-Tokyo_Tower_2023-2880247269.jpg"
+      alt=""
+      width="960"
+      height="1280"
+      loading="lazy"
+      decoding="async"
+    />
+  </div>
+
+  <div class="page__inner">
+    <p class="kicker blk" style="--i: 0" data-block-id="k-son:0" data-block-kind="kicker">
+      Yüz yıl sonra
+    </p>
+    <h2 class="h2 blk" style="--i: 1" data-block-id="k-son:1" data-block-kind="h2">
+      Tokyo şu an ne durumda?
+    </h2>
+    <p class="para blk" style="--i: 2" data-block-id="k-son:2" data-block-kind="p">
+      Aynı büyüklükte bir depremin olması durumunda ortalama 6000 insanın hayatını
+      kaybedebileceği tahmin ediliyor. Bu hâlâ büyük bir sayı olsa da yüz bin kişinin
+      kaybedilmesine oranla ne denli gelişim kaydedildiği ortada.
+    </p>
+    <p class="caption blk" style="--i: 3" data-block-id="k-son:3" data-block-kind="caption">
+      2025 yılı itibarıyla Tokyo'daki konutların yaklaşık %93,4'ünün yürürlükteki deprem
+      standartlarını karşıladığı belirtiliyor.
+    </p>
+  </div>
+</section>

@@ -1,0 +1,854 @@
+/* ============================================================================
+   GALERİ — "Akıllı Kız" sergisi (ms-galeri)
+   ----------------------------------------------------------------------------
+   Sayının başka hiçbir yerinde bu yapı yok ve sebebi basit: bir sergi GEZİLİR.
+   Öteki sayfalar okunmak için duruyor, bu sayfa dolaşılmak için.
+
+   Katman kurgusu (arkadan öne):
+
+     .galeri              = section.page — durumu ve paleti taşıyan kök
+       .galeri__kamera    = .page__bg — 3:4 PENCERE, taşanı kırpıyor
+         .galeri__serit     tek parça galeri duvarı, kameradan {--serit-en} geniş
+         .galeri__kaplama   vinyet + gren; objektifin özelliği, duvarın değil
+       .galeri__bolge ×2  görünmez dokunma bölgeleri (%30 / %30)
+       .galeri__hedef     görünmez düğme, ORTADAKİ eserin üstünde
+       .galeri__levha     = .page__inner — alttan binen sayaç/metin levhası
+       .galeri__odak      açılan eser (perde + eserin kendisi + etiketi)
+
+   ⚠️ SAYFANIN KENDİSİNDEN GELEN DEĞERLER (`uret.py` style özniteliğine yazıyor):
+       --serit-en   şeridin kamera cinsinden genişliği   (452.5%)
+       --adim-oran  bir durak, şeridin kaçta kaçı        (0.0866)
+       --eser-*     ortadaki eserin kadrajdaki kutusu; durak değişince js
+                    aynı değerleri künye verisinden okuyup yeniden yazıyor
+       --eser-oran  eser dosyalarının en/boy oranı (bu sayıda 828/554)
+       --eser-yer   yer tutucunun yeşili — şeritte de aynı hex kullanılıyor
+   Burada sabitlenselerdi durak sayısını, ADIM'ı ya da eser oranını değiştirmek
+   iki dosyayı birden düzenlemek olurdu ve biri er geç unutulurdu. `js/galeri.js`
+   sürükleme ölçeğini de bunlardan TÜRETİYOR, fazladan sayı yok.
+
+   ⚠️ --gal-* değişkenleri ana düzlemlerin değerleri. Yayında SABİT: tema
+   izlemiyorlar, gerekçe `ms-acilis`in başında (DESEN değil IŞIK sahnesi).
+   ========================================================================= */
+
+.galeri {
+  --sure: 900ms; /* duraktan durağa kayma */
+  --egri: cubic-bezier(0.32, 0.02, 0.18, 1); /* çabuk kalk, yumuşak otur */
+
+  /* ⚠️ Sürükleme dinleyicileri artık BURADA (bkz. js/galeri.js §SÜRÜKLEME),
+     o yüzden sözleşme de burada olmak zorunda: dikey kaydırma tarayıcının,
+     yatay hareket bizim. Yalnız kamerada dursaydı levhanın ve hedefin
+     üstünden başlayan jestler tarayıcıya kalırdı. */
+  touch-action: pan-y;
+
+  /* ⚠️ `uret.py` §DEĞERLER ile aynı olmak ZORUNDA — aynı hex iki dosyada
+     yazılı. Ayrı düşerlerse sayfa jeneratörün yedeğini değil buradakini
+     kullanır ve fark ancak gözle yakalanır.
+
+     Hepsi referans görselden ölçüldü (9×9 medyan yamalar). Duvar sanılandan
+     koyu ve sıcak, zemin de sıcak; sahnedeki tek soğuk yüzey --gal-dip. */
+  --gal-tavan: #464540;
+  --gal-ray: #1a1d1c;
+  --gal-duvar: #c0b7aa;
+  --gal-dip: #575c5d;
+  --gal-zemin: #75736e;
+  --gal-zemin-isik: #817c75;
+  --gal-koni: #fdf8ec;
+}
+
+/* --------------------------------------------------------------------------
+   1 · KAMERA VE ŞERİT
+   --------------------------------------------------------------------------
+   Bir durak ilerlemek şeridi kendi genişliğinin --adim-oran kadarı kaydırmak
+   demek. Yüzde, elemanın KENDİ genişliğine göre çözülüyor; şerit kameradan
+   4.525 kat geniş olduğu için %8.66'sı tam bir ADIM (235 birim) ediyor.
+
+   --durak tam sayı olmak zorunda DEĞİL: sürüklerken js ona kesirli değer
+   yazıyor ve şerit parmağı takip ediyor.
+   ------------------------------------------------------------------------ */
+
+.galeri__kamera {
+  overflow: clip; /* `hidden` olsaydı kaydırma kabına dönerdi */
+  background: var(--gal-zemin);
+
+  /* ⚠️ BU SATIR SAYFANIN ÇALIŞMASININ ŞARTI. Tarayıcıya "dikey kaydırma
+     senin, yatay benim" diyor. Olmadan iki şeyden biri oluyor: ya dergi
+     yatay sürüklerken dikey zıplıyor, ya da tarayıcı jesti kendi alıp
+     pointermove olaylarını hiç göndermiyor. preventDefault ile taklit
+     edilebilir ama o yol dikey kaydırmayı da yavaşlatıyor. */
+  touch-action: pan-y;
+
+  /* Farede sürüklerken sahnenin içindeki hiçbir şey seçilmesin. */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* İki genel kural buraya uymuyor ve ikisi de açıkça geri alınıyor:
+   canvas.css `.page__bg > svg`yi %100×%100'e sabitliyor, base.css ise bütün
+   svg'lere `max-width: 100%` veriyor. İkincisi olmadan şerit sessizce tek
+   kamera genişliğine kırpılıyor ve kaydırma HİÇBİR ŞEY YAPMIYOR gibi
+   görünüyor — belirtisi sebebinden çok uzak olduğu için not edildi. */
+.galeri__kamera > .galeri__serit {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--serit-en);
+  max-width: none;
+  height: 100%;
+  transform: translateX(calc(var(--durak, 0) * var(--adim-oran) * -100%));
+  transition: transform var(--sure) var(--egri);
+  will-change: transform;
+}
+
+/* Parmak şeridi taşırken geçiş olmamalı: her kare bir öncekine 900ms'de
+   varmaya çalışırdı ve sürükleme lastik gibi gerilirdi. */
+.galeri[data-suruklerken='true'] .galeri__serit {
+  transition: none;
+}
+
+.galeri__kamera > .galeri__kaplama {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   2 · DOKUNMA BÖLGELERİ
+   --------------------------------------------------------------------------
+   Instagram/Shorts deyimi: düğme görünmüyor, kadrajın kenarına dokunmak
+   yetiyor. Ortadaki %40 bilerek boş — orası eserin kendisi.
+
+   Görünmez ama DÜĞME: klavyeyle sekiliyor, ekran okuyucuda adı var. Görünmez
+   olmalarının bedeli erişilebilirlik olmamalı.
+   ------------------------------------------------------------------------ */
+
+.galeri__bolge {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  width: 30%;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  touch-action: pan-y; /* kamerayla aynı sözleşme */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.galeri__bolge--geri {
+  left: 0;
+}
+.galeri__bolge--ileri {
+  right: 0;
+}
+
+.galeri__bolge:disabled {
+  cursor: default;
+}
+
+/* İşaret normalde YOK. Farede kenara gelince beliriyor: masaüstünde
+   dokunacak kenar diye bir şey yok, orada bir şeyin tıklanabilir olduğunu
+   söyleyen tek şey imleç. Dokunmatikte hiç belirmiyor — levhadaki ipucu
+   satırı orada bu işi görüyor. */
+.galeri__isaret {
+  display: grid;
+  place-items: center;
+  width: max(44px, 9cqi);
+  height: max(44px, 9cqi);
+  border: 1px solid color-mix(in oklab, var(--gal-koni) 30%, transparent);
+  border-radius: 50%;
+  background: color-mix(in oklab, #12100e 42%, transparent);
+  color: #f4efe3;
+  opacity: 0;
+  transition: opacity 180ms var(--ease-out, ease);
+}
+
+@media (hover: hover) {
+  .galeri__bolge:hover:not(:disabled) .galeri__isaret {
+    opacity: 1;
+  }
+}
+
+/* Klavyeyle gezerken işaret GÖRÜNMEK ZORUNDA: odağın nerede olduğu
+   görünmeyen bir düğmede başka türlü anlaşılmıyor. */
+.galeri__bolge:focus-visible .galeri__isaret {
+  opacity: 1;
+  outline: 2px solid var(--gal-koni);
+  outline-offset: 3px;
+}
+
+.galeri__isaret .icon {
+  width: 58%;
+  height: 58%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* --------------------------------------------------------------------------
+   3 · HEDEF — ortadaki eserin görünmez düğmesi
+   --------------------------------------------------------------------------
+   Kutusu sayfadan geliyor (`--eser-*`), yani şeridi çizen fonksiyonun ta
+   kendisinden: düğme çerçeveyle birim birim aynı yerde duruyor.
+
+   ⚠️ BÖLGELERDEN YÜKSEK (z-index 4 > 2) ve bilerek. Çerçeve kadrajın %34'ü,
+   ortalanınca iki ucundan dokunma bölgelerine ikişer yüzde giriyor; o payda
+   okurun niyeti "ilerle" değil "şuna bak" oluyor.
+
+   İşareti YOK. Farede tek işaret `zoom-in` imleci (manga sayfasıyla aynı
+   deyim) ve perdenin yarıya inmesi; büyüteç yalnız klavye odağında beliriyor,
+   çünkü görünmez bir düğmede odağın nerede olduğu başka türlü anlaşılmıyor.
+   ------------------------------------------------------------------------ */
+
+.galeri__hedef {
+  position: absolute;
+  z-index: 4;
+  left: var(--eser-sol);
+  top: var(--eser-ust);
+  width: var(--eser-en);
+  height: var(--eser-boy);
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: zoom-in;
+  touch-action: pan-y; /* kamerayla aynı sözleşme */
+  -webkit-tap-highlight-color: transparent;
+
+  /* Durak değişince düğme de kayıyor. Şeritle AYNI eğri ve AYNI süre:
+     ayrışsalardı düğme çerçeveden önce ya da sonra varır, arada kalan
+     karelerde eserin yanındaki duvara tıklanırdı. */
+  transition:
+    left var(--sure) var(--egri),
+    top var(--sure) var(--egri),
+    width var(--sure) var(--egri),
+    height var(--sure) var(--egri);
+}
+
+.galeri[data-suruklerken='true'] .galeri__hedef {
+  transition: none;
+  pointer-events: none; /* parmak şeridi taşırken tıklama değil sürükleme var */
+}
+
+.galeri__buyutec {
+  display: grid;
+  place-items: center;
+  width: max(44px, 9cqi);
+  height: max(44px, 9cqi);
+  border-radius: 50%;
+  background: color-mix(in oklab, #12100e 42%, transparent);
+  color: #f4efe3;
+  opacity: 0;
+}
+
+.galeri__hedef:focus-visible {
+  outline: 2px solid var(--gal-koni);
+  outline-offset: 2px;
+}
+
+.galeri__hedef:focus-visible .galeri__buyutec {
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   3c · KONUŞMA BALONLARI
+   --------------------------------------------------------------------------
+   Katman şeridin İKİZİ: aynı genişlik, aynı dönüşüm, aynı geçiş. Üç değer de
+   sayfadan geliyor (`--serit-en`, `--durak`, `--adim-oran`), yani burada
+   ikinci bir kopya yok — biri değişince ikisi birden değişiyor.
+
+   ⚠️ ÜÇ SATIR ŞERİTLE AYNI OLMAK ZORUNDA (width / transform / transition).
+   Ayrı düşerlerse balon figürün başından kayar ve bu ancak kaydırırken
+   görülür — duran kadrajda her şey yerli yerinde görünür.
+
+   Ölçüler `cqi`: kapsayıcı `.canvas` (canvas.css §TUVAL), yani 100cqi = bir
+   kadraj. Yüzde kullanılamazdı, çünkü katman kameradan 4.5 kat geniş ve
+   yüzdeler ONA çözülürdü.
+   ------------------------------------------------------------------------ */
+
+.galeri__balonlar {
+  position: absolute;
+  z-index: 5; /* hedeften (4) yüksek — gerekçe `uret.py` §KONUŞMA KATMANI */
+  top: 0;
+  left: 0;
+  width: var(--serit-en);
+  height: 100%;
+  transform: translateX(calc(var(--durak, 0) * var(--adim-oran) * -100%));
+  transition: transform var(--sure) var(--egri);
+  pointer-events: none; /* katman geçirgen; yalnız düğmeler yakalıyor */
+}
+
+.galeri[data-suruklerken='true'] .galeri__balonlar {
+  transition: none;
+}
+
+/* Çapa FİGÜRÜN KUTUSU: sprite nereye, ne kadar büyük çizildiyse oraya ve o
+   kadar. Dördü de `nesne()`nin hesabından türüyor (`uret.py` §balonlar), yani
+   figür kımıldarsa kutu da kımıldıyor. */
+.galeri__balon {
+  position: absolute;
+  left: var(--balon-sol);
+  top: var(--balon-ust);
+  width: var(--balon-en);
+  height: var(--balon-boy);
+
+  /* Noktanın ölçüleri TEK YERDE: hem noktanın kendisi hem düğmenin yukarı
+     uzaması bunlardan türüyor. Ayrı yazılsalardı biri değişince nokta yine
+     düğmenin dışına düşerdi — aşağıdaki hata tam olarak buydu. */
+  --nokta-cap: 2.4cqi;
+  --nokta-bosluk: 1cqi;
+  --nokta-alan: calc(var(--nokta-cap) + var(--nokta-bosluk) * 2);
+}
+
+/* ⚠️ DOKUNMA HEDEFİ FİGÜRÜN TAMAMI. Önce başın üstündeki nokta düğmeydi;
+   2.4cqi, dar ekranda ~8px — mobilde dokunulamaz. Şimdi en dar sprite
+   (`cantali`, 103 birim) bile parmak boyunun kat kat üstünde. */
+/* ⚠️ DÜĞME FİGÜRÜN TAMAMI DEĞİL, ESER HATTININ ALTINDA KALAN KISMI.
+   `--balon-kes` sayfadan geliyor ve künye levhasının dibinden hesaplanıyor
+   (`uret.py` §balonlar). Sebep: `.galeri__hedef` eserin çerçevesini VE
+   levhasını kaplıyor, balon katmanı ondan yüksekte duruyor (5 > 4), yani
+   levhaya dokunmak eseri değil ziyaretçiyi konuşturuyordu.
+
+   Çakışma z-index takasıyla çözülmedi — o zaman da figürün gövdesi eserin
+   altında kalırdı. İki hedef artık HİÇ örtüşmüyor: üstü eserin, altı
+   ziyaretçinin. */
+.galeri__balon-dugme {
+  pointer-events: auto;
+  position: absolute;
+  top: var(--balon-kes, 0%);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  touch-action: pan-y; /* kamerayla aynı sözleşme */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.galeri__balon-dugme:focus-visible {
+  outline: 2px solid var(--gal-koni);
+  outline-offset: 2px;
+  border-radius: 1.4cqi;
+}
+
+/* İŞARET, DÜĞME DEĞİL (`pointer-events: none`). Tek işi figürün konuşabildiğini
+   söylemek: dokunmatikte imleç yok, yani başka hiçbir ipucu kalmıyor. Kasten
+   küçük — koridor sakin bir sahne, yedi parlak rozet sergiyi bastırırdı. */
+.galeri__balon-nokta {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  translate: -50% var(--nokta-bosluk);
+  pointer-events: none;
+  width: var(--nokta-cap);
+  height: var(--nokta-cap);
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--gal-koni) 80%, transparent);
+  box-shadow: 0 0 0 0.9cqi color-mix(in oklab, #12100e 46%, transparent);
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .galeri__balon-dugme:hover ~ .galeri__balon-nokta {
+    transform: scale(1.35);
+  }
+}
+
+/* Balon açıkken işaret çekiliyor: yerini kutu alıyor, ikisi üst üste binerdi. */
+.galeri__balon[data-acik='true'] .galeri__balon-nokta {
+  opacity: 0;
+}
+
+/* Balonun kendisi. Rengi SAHNEDEN, temadan değil: karanlık bir odada
+   konuşuluyor ve açık temada beyaz bir kutu koridorda delik açardı — kartın
+   etiketiyle aynı gerekçe (§6). */
+/* Kutu figürün BAŞININ ÜSTÜNDE, çapanın dışına taşarak. Genişliği figürünkine
+   bağlı değil — dar bir sprite'ın üstünde de okunur bir satır uzunluğu lazım. */
+.galeri__balon-kutu {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  pointer-events: auto;
+
+  /* -50% kutuyu figürün ortasına hizalıyor; `--balon-kaydir` uçtaki
+     figürlerde kadraja iten emniyet payı (js ölçüp yazıyor, §BALONLAR).
+     Normalde 0: tıklanan figür zaten kadrajın ortasına getiriliyor. */
+  translate: calc(-50% + var(--balon-kaydir, 0px)) -1.6cqi;
+
+  width: max-content;
+  max-width: 34cqi;
+  padding: 2.2cqi 2.6cqi;
+  border-radius: 2.4cqi;
+  background: color-mix(in oklab, #12100e 82%, transparent);
+  backdrop-filter: blur(6px);
+  color: var(--gal-koni);
+  font-family: var(--font-ui);
+  font-size: max(11px, 2.7cqi);
+  line-height: 1.42;
+  text-wrap: pretty;
+  overflow: hidden; /* süre şeridi köşelerden taşmasın */
+  animation: balonGir 220ms var(--ease-out) both;
+}
+
+@keyframes balonGir {
+  from {
+    opacity: 0;
+    transform: translateY(1.4cqi) scale(0.94);
+  }
+}
+
+.galeri__balon-metin {
+  position: relative;
+  z-index: 1; /* süre şeridinin üstünde kalsın */
+  margin: 0;
+}
+
+/* KALAN SÜRE. Sağdan sola çekilen bir yıkama: balon kapanmadan önce ne kadar
+   kaldığını gösteriyor. `transform-origin: left` + scaleX(1→0) demek, sağ
+   kenarın sola doğru yürümesi demek.
+
+   ⚠️ Süre js'ten geliyor (`--bekleme`), metnin uzunluğuna göre. Sabit bir
+   süre uzun sözde yetmez, kısa sözde bekletirdi. */
+.galeri__balon-sure {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  transform-origin: left center;
+  background: color-mix(in oklab, var(--gal-koni) 13%, transparent);
+  animation: balonSuresi var(--bekleme, 4s) linear forwards;
+}
+
+@keyframes balonSuresi {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* Kart açıkken balonlar susuyor — levhayla aynı gerekçe: perde odayı
+   söndürünce koridorda konuşan kimse kalmamalı. */
+.galeri.page:has(.galeri__odak:not([hidden])) .galeri__balonlar {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+/* Parmak şeridi taşırken balona dokunmak değil sürüklemek var. */
+.galeri[data-suruklerken='true'] .galeri__balon-dugme {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .galeri__balon-kutu {
+    animation: none;
+  }
+
+  /* ⚠️ Şerit KALDIRILMIYOR, yalnız hareketi kesiliyor: kalan süreyi gösteren
+     tek işaret o. Silinseydi balon habersiz kapanırdı. */
+  .galeri__balon-sure {
+    animation: none;
+    transform: scaleX(1);
+    opacity: 0.5;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4 · KEŞİF ÖRTÜSÜ — "henüz bakılmadı"
+   --------------------------------------------------------------------------
+   İki düz yüzey, ikisi de şeritte çizili (`uret.py` §ORTU_OPAK): koyu bir
+   perde + camın üstündeki iki yansıma kaması. Buradaki iş yalnız SÖNDÜRMEK.
+
+   ⚠️ ODANIN IŞIĞINA DOKUNULMUYOR. Konileri de kısmak denenebilirdi ama
+   sahnenin bütün ışık değerleri referanstan ölçüldü; ilk açılışta okurun
+   gördüğü hâl o ölçümden sapmasın diye kısılan tek şey eserin kendisi.
+
+   Süre --sure değil --dur-slow: keşif kadraj kaymasından hızlı olmalı, yoksa
+   kart kapandıktan sonra perde hâlâ inerken görünüyor.
+   ------------------------------------------------------------------------ */
+
+.galeri__perde,
+.galeri__cam {
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+
+.galeri__tablo[data-gorulen='true'] .galeri__perde,
+.galeri__tablo[data-gorulen='true'] .galeri__cam {
+  opacity: 0;
+}
+
+/* Fareyle üstüne gelmek perdeyi yarıya indiriyor: "buranın altında bir şey
+   var" demenin dokunmatikte karşılığı olmayan tek yolu bu.
+
+   ⚠️ `:not([data-gorulen])` ŞART. Bu seçici üsttekinden daha özgül (:has()
+   kendi içindeki en özgül parçayı sayıyor), yani açılmış bir eserin sıfırlanmış
+   perdesini geri 0.3'e ÇEKERDİ: okur baktığı tablonun üstüne gelince tablo
+   yeniden kararırdı. Ölçüt de doğrusu bu: perde yalnız henüz açılmamış eserde
+   var, o yüzden kalkacak bir perde de yalnız orada.
+
+   ⚠️ İKİ AYRI TETİK VAR VE İKİSİ DE GEREKLİ — biri fazlalık değil.
+
+   ORTADAKİ eser `.galeri__hedef`in ALTINDA kalıyor (z-index 4, §3), yani
+   imleç ona hiç değmiyor; `<g>` `:hover` almıyor, düğme alıyor. Onun için
+   `:has()` gerekiyor. YANDAKİ eserlerin üstünde ise hiçbir şey yok — dokunma
+   bölgeleri (§2) sayfada yorum içinde, perde de artık `pointer-events: none`
+   (§5) — dolayısıyla `<g>`nin kendisi `:hover` alıyor ve doğrudan seçiliyor.
+
+   Yanlardaki tetik eksikken belirti şuydu: kenardaki eser TIKLANIYOR (js'teki
+   yetkilendirilmiş dinleyici onu açıyor) ama üstüne gelince hiçbir şey olmuyor.
+   Yani okura "burası ölü" diyen bir kadraj, tam da az önce canlandırılmış
+   yerde. Ölçüldü: gerçek imleç zinciri `g.galeri__tablo`ya kadar İNİYORDU,
+   eksik olan tek şey ona cevap veren kuraldı.
+
+   `[data-durakta]` YOK üstelik bilerek: yandaki esere tıklamak `git(i); ac(i)`
+   çalıştırıyor, yani oraya gidip açıyor. Perdenin kalkması o yüzden dürüst —
+   gösterdiği şey gerçekten yapılabilir. */
+.galeri:has(.galeri__hedef:hover) .galeri__tablo[data-durakta='true']:not([data-gorulen='true']) .galeri__perde,
+.galeri:has(.galeri__hedef:focus-visible) .galeri__tablo[data-durakta='true']:not([data-gorulen='true']) .galeri__perde,
+.galeri__tablo:hover:not([data-gorulen='true']) .galeri__perde {
+  opacity: 0.3;
+}
+
+/* --------------------------------------------------------------------------
+   5 · PERDE VE LEVHA
+   --------------------------------------------------------------------------
+   blocks.css'in genel tam-kanama perdesi kadrajın %68'ine kadar tırmanıyor;
+   burada eserleri ve zemindeki ışık göllerini karartırdı. Bu perde %24'te
+   bitiyor: yalnız levhanın metnini taşıyacak kadar.
+   ------------------------------------------------------------------------ */
+
+.galeri .page__bg::after {
+  background: linear-gradient(
+    to top,
+    color-mix(in oklab, #12100e 88%, transparent) 0%,
+    color-mix(in oklab, #12100e 74%, transparent) 14%,
+    color-mix(in oklab, #12100e 40%, transparent) 20%,
+    transparent 24%
+  );
+
+  /* ⚠️ `pointer-events: none` — BU SATIR OLMADAN KENARDAKİ ESERLER TIKLANMIYOR
+     ve belirtisi sebebinden çok uzak düşüyor. Perde yalnız `background`ı
+     eziyor; `position: absolute` ve `inset: 0`ı `blocks.css`ten MİRAS ALIYOR,
+     yani görünmez bir yaprak olarak kameranın TAMAMINI kaplıyor ve şeridin
+     üstünde duruyor (::after kendi çocuklarından sonra boyanıyor).
+
+     Sonuç: kadrajdaki eserlerin hiçbirine dokunulamıyordu. Ortadaki
+     çalışıyordu ama başka bir sebeple — `.galeri__hedef` z-index 4 ile
+     kameranın DIŞINDA, perdenin erişemediği bir katmanda. Ölçüldü:
+     `elementsFromPoint` yığınının tepesinde perde vardı, eserin bütün
+     parçaları (`galeri__cam`, `galeri__perde`, `image`, `rect`) onun altında.
+
+     Bir alttaki levha kuralı aynı hatayı aynı gerekçeyle çözüyor; perde
+     gözden kaçmış. */
+  pointer-events: none;
+}
+
+/* Eserin kendisi artık dokunulabilir (yukarıdaki satır sayesinde) ve imleç
+   bunu söylemeli — `.galeri__hedef`in `zoom-in`iyle aynı deyim, çünkü okur
+   için ikisi de aynı şey: "bu esere yakından bak". */
+.galeri__tablo {
+  cursor: zoom-in;
+}
+
+/* ⚠️ `pointer-events: none` — levha dokunma bölgelerinin ÜSTÜNDE duruyor ve
+   içinde tıklanacak hiçbir şey yok. Olmasaydı kadrajın alt şeridine dokunmak
+   sergiyi ilerletmez, sessizce hiçbir şey yapmazdı. */
+.galeri.page[data-bleed='full'] .page__inner.galeri__levha {
+  position: relative;
+  z-index: 3;
+  padding: 3.2cqi 5.4cqi calc(1.4cqi + var(--safe-bottom));
+  pointer-events: none;
+}
+
+/* ⚠️ `flex-end`, `space-between` DEĞİL. Satırda görünen tek şey kaldı (sayaç
+   artık .sr-only, akıştan çıkmış); space-between tek öğeyi sola yapıştırıyor ve
+   ipucu, okuyucunun kendi sol alt köşesindeki bölüm adının üstüne biniyordu. */
+.galeri__alt {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  font-size: var(--fs-2xs);
+  color: color-mix(in oklab, #f7f2ea 54%, transparent);
+}
+
+/* `.galeri__sayac`ın GÖRSEL kuralı yok: span duruyor ama .sr-only ile gizli
+   (gerekçe `uret.py` §ALT LEVHA). Harf aralığı ve tabular-nums buradan
+   silindi — kırpılmış bir kutuda ikisi de bir şey yapmıyordu. Sayaç geri
+   görünür yapılacaksa ikisi de geri gelmeli, yoksa sayı her durakta zıplar. */
+
+/* ⚠️ KART AÇIKKEN LEVHA SÖNÜYOR. Perde onu tamamen örtmüyor (%4 sızıyor) ve
+   arkada kalan ipucu satırı, kart açıkken "tabloya dokun" diyerek zaten
+   yapılmış bir işi tarif ediyordu.
+
+   Kuralın ilk gerekçesi bu değildi: görünür "01 / 10" sayacı kartın kendi
+   künye numarasıyla çakışıyordu (aynı sayı ekranda iki kez, biri hayalet).
+   Sayaç 2026-09-07'de .sr-only'ye alındı, yani o çakışma artık yok — kural
+   ipucu satırı için duruyor. Sayaç geri görünür yapılırsa eski gerekçe de
+   geri gelir; kuralı o gün kaldırmayın.
+
+   ⚠️ SEÇİCİ BİLEREK UZUN. Levha aynı zamanda bir `.blk` ve blocks.css'in sahne
+   kuralı (`.page[data-inview='true'][data-scene='fade-up'] .blk`) ona opacity: 1
+   yazıyor. Kısa hâli o kuralla AYNI özgüllükte kalıyor ve yalnız galeri.css
+   sonra @import edildiği için kazanıyordu — app.css'in başlığının tam olarak
+   güvenmeyin dediği şey (ikisi de layer(blocks) içinde). */
+.galeri.page:has(.galeri__odak:not([hidden])) .page__inner.galeri__levha {
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+/* --------------------------------------------------------------------------
+   6 · ODAK — açılan eser
+   --------------------------------------------------------------------------
+   Ekranda iki şey var: ESER ve altındaki ETİKET. Pervaz yok, levha yok, kutu
+   yok — ve üçünün yokluğu da aynı tek kurala dayanıyor.
+
+   ⚠️ ÇERÇEVE ODANIN PARÇASI, ESERİN DEĞİL. Koridorda pervaz gerekiyor çünkü
+   orada tablo bir DUVARA asılı; burada duvar yok, perde odayı söndürüyor.
+   İlk sürüm koridordaki pervazı dört kat büyütüp kartın etrafına koyuyordu
+   (oranı `--eser-pervaz` diye sayfadan geliyordu) ve sonuç eserden çok
+   mobilyaya bakmak oluyordu: ekranın en kalın, en kontrastlı nesnesi
+   pervazın kendisiydi.
+
+   ⚠️ ETİKET DE AYDINLIK BİR LEVHA DEĞİL. Sahnenin kuralı "karanlık koridorda
+   tek aydınlık yüzey"; o yüzey eserin kendisi. Altına ikinci bir beyaz
+   dikdörtgen koymak onunla yarışıyordu — üstelik sergi metni uzun, yani o
+   dikdörtgen ekranın yarısı kadar oluyordu. Yazı doğrudan perdenin üstünde.
+
+   ⚠️ ETİKETİN RENGİ --gal-koni. Yeni bir "kart mürekkebi" tanımlanmadı:
+   odayı aydınlatan ışık neyse etiketi aydınlatan da o, ve tezgâhta koni
+   değişince etiket onunla birlikte değişiyor.
+
+   ⚠️ TUVALİN İÇİNDE KALIYOR (.galeri'ye göre inset: 0), tam ekran bir modal
+   değil. Sergi tuvalin içinde geziliyor; kart da orada açılınca dergi objesi
+   bozulmuyor ve manga okuyucusunun tam ekran perdesiyle sıraya girmiyor.
+
+   ⚠️ KAYAN ŞEY KARTIN KENDİSİ, perde değil. Uzun metin perdeyi de kaydırsaydı
+   ya boya kayan kutunun içinde kalıp aşağıda boyasız bir şerit bırakırdı, ya
+   da kapat düğmesi metinle birlikte ekrandan çıkardı. Perde duruyor, kart
+   içinde kayıyor, düğme perdeye çakılı.
+   ------------------------------------------------------------------------ */
+
+.galeri__odak {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6cqi 6cqi calc(6cqi + var(--safe-bottom));
+
+  /* ⚠️ %96 ÖLÇÜLDÜ, seçilmedi. Perdenin arkasındaki duvar #c0b7aa, yani
+     sahnenin EN AÇIK yüzeyi; %93'te sızan %7'si sergi metninin arkasında
+     hâlâ okunuyordu (alttaki sayaç levhası dâhil). Tamamen siyah da değil:
+     sıfır saydamlıkta sergi tuvalden çıkıp tarayıcının kendi karanlığına
+     düşüyor ve okur nerede olduğunu kaybediyor. */
+  background: color-mix(in oklab, #0b0a09 96%, transparent);
+  animation: gal-perde-ac var(--dur-base) var(--ease-out);
+}
+
+.galeri__odak[hidden] {
+  display: none;
+}
+
+/* Boyasız tıklama alanı: karta değil boşluğa dokunmak kapatıyor. */
+.galeri__odak-perde {
+  position: absolute;
+  inset: 0;
+}
+
+/* ⚠️ ALT KENARDAKİ SOLMA, SÜS DEĞİL: metnin devam ettiğini söyleyen tek şey.
+   Kutunun dibinde satır düz kesildiğinde okuduğu şey "aşağısı var" değil
+   "bozuk" oluyordu — çubuğu da gizlediğimiz için (aşağıya bak) başka işaret
+   kalmıyor. Maske kutunun GÖRÜNEN alanına vuruyor, kayan içeriğe değil, yani
+   solma hep dipte duruyor; metnin sonundaki boşluk da (§künye alt payı) son
+   satırın solmanın içinde bitmesini engelliyor. */
+.galeri__kart {
+  position: relative;
+  width: 100%;
+  max-height: 100%;
+  margin: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none; /* metnin kenarında çubuk = ikinci bir dikey çizgi */
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 9cqi), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 9cqi), transparent);
+  animation: gal-kart-ac var(--dur-base) var(--ease-out);
+}
+
+.galeri__kart::-webkit-scrollbar {
+  display: none;
+}
+
+.galeri__kart:focus-visible {
+  outline: none; /* kart açılınca odağı ALIYOR; halka "hata" gibi okunuyor */
+}
+
+/* ⚠️ HALE, GÖLGE DEĞİL. Koyu bir eserin kenarı 93% siyahın üstünde kayboluyor
+   ve altına gölge koymak onu daha da karartıyordu. Buradaki ışık sahnenin
+   kendi ışığı: spot eserin üstüne düşünce duvara taşan hâli. Rengi de o
+   yüzden --gal-koni. */
+.galeri__kart-gorsel,
+.galeri__kart-yer {
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--eser-oran);
+  object-fit: cover;
+  box-shadow: 0 0 14cqi -2cqi color-mix(in oklab, var(--gal-koni) 13%, transparent);
+}
+
+.galeri__kart-yer {
+  background: var(--eser-yer);
+}
+
+/* Etiket eserin ALTINDA ve onunla aynı genişlikte: sergi salonunda levha
+   eserin hizasından taşmaz. Ölçü de oradan geliyor, kart genişliğinden. */
+.galeri__kunye {
+  color: var(--gal-koni);
+  /* Alttaki 10cqi maskenin payı: son satır solmanın içinde bitmesin. */
+  padding: 5cqi 0 10cqi;
+  text-align: left;
+}
+
+.galeri__kunye-no {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklab, currentColor 42%, transparent);
+}
+
+.galeri__kunye-ad {
+  margin: 2cqi 0 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  line-height: 1.08;
+  font-weight: 400; /* koyu değil BÜYÜK: ağırlık değil ölçü hiyerarşi kuruyor */
+  color: color-mix(in oklab, currentColor 94%, transparent);
+}
+
+.galeri__kunye-alt {
+  margin: 1.8cqi 0 0;
+  font-family: var(--font-ui);
+  font-size: var(--fs-xs);
+  line-height: 1.4;
+  color: color-mix(in oklab, currentColor 50%, transparent);
+}
+
+/* ⚠️ İNCE BİR ÇİZGİ VAR ve tek süs bu. Etiketin künye satırı ile sergi metni
+   arasında bir yerde durak gerekiyor; boşlukla açılsaydı metin başlıksız
+   ikinci bir paragraf gibi okunurdu. Çizgi kısa ve sönük: ayırıyor, bölmüyor. */
+.galeri__kunye-metin {
+  margin: 4cqi 0 0;
+  padding-top: 4cqi;
+  border-top: 1px solid color-mix(in oklab, currentColor 16%, transparent);
+  font-family: var(--font-text);
+  font-size: var(--fs-sm);
+  line-height: 1.72;
+  color: color-mix(in oklab, currentColor 76%, transparent);
+}
+
+/* ⚠️ PERDEYE ÇAKILI, karta değil: metin kayarken düğme yerinde duruyor.
+   Halkası yok — 93% karanlıkta bir X'i okutmak için çember gerekmiyor; tek
+   iş eserin açık bir köşesine denk gelirse kaybolmaması, onu da altındaki
+   sönük leke hallediyor. */
+.galeri__kapat {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  display: grid;
+  place-items: center;
+  width: max(44px, 9cqi);
+  height: max(44px, 9cqi);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in oklab, #0b0a09 30%, transparent);
+  color: color-mix(in oklab, var(--gal-koni) 72%, transparent);
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .galeri__kapat:hover {
+    color: var(--gal-koni);
+  }
+}
+
+.galeri__kapat:focus-visible {
+  outline: 2px solid var(--gal-koni);
+  outline-offset: 3px;
+}
+
+.galeri__buyutec .icon,
+.galeri__kapat .icon {
+  width: 58%;
+  height: 58%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@keyframes gal-perde-ac {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes gal-kart-ac {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   7 · AZ HAREKET
+   --------------------------------------------------------------------------
+   Kayma düşüyor, kamera duraktan durağa ANINDA atlıyor. Geriye eksik bir
+   sürüm değil, tablodan tabloya gezilen sabit bir koridor kalıyor. js de
+   aynı sorguyu okuyup kilidi atlıyor (`js/galeri.js`) — CSS'i beklemek 900ms
+   boş kilit demek olurdu.
+
+   Kart da anında açılıyor: büyüyerek gelen bir kutu, az hareket isteyen okur
+   için tam olarak istemediği şey.
+   ------------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .galeri__kamera > .galeri__serit,
+  .galeri__hedef {
+    transition: none;
+  }
+
+  .galeri__odak,
+  .galeri__kart {
+    animation: none;
+  }
+}
+
+:root[data-motion='off'] .galeri__kamera > .galeri__serit,
+:root[data-motion='off'] .galeri__hedef {
+  transition: none;
+}
+
+:root[data-motion='off'] .galeri__odak,
+:root[data-motion='off'] .galeri__kart {
+  animation: none;
+}

@@ -1,0 +1,179 @@
+<!--
+  k-4 — "Yaklaşık on metre yüksekliğinde olduğu söylenilen Tsunami
+  dalgalarında yüzlerce insanın öldüğü söylenmektedir."
+
+  `src/lib/art/kanto/Tsunami.svelte`nin vanilla karşılığı.
+
+  ⚠️ SAHNENİN ANLATTIĞI ŞEY ÖLÇEK, DALGA DEĞİL. "On metre" bir sayı olarak
+  okunduğunda hiçbir şey ifade etmiyor; kadrajın altındaki çatı sırası onu
+  ifade ediyor. Bu yüzden kasaba en ÖN düzlemde ve en koyu tonda: dalgaya
+  bakan göz onu ikinci anda fark ediyor, ve fark ettiği an ölçeği anlıyor.
+
+  Çatıların oranı gerçekçi DEĞİL (en yüksek mahya 15 birim, dalga 366) ve
+  olması da gerekmiyor: sahne bir kesit değil, bir izlenim. Gerçek oran
+  kadrajda "büyük bir dalga" verirdi; istenen "üstüne kapanan bir duvar".
+
+  Soğuk aile (`palet.ts` → `SU`), tek sıcak vurgu: soldaki yanan kıyı. İki
+  felaket aynı kadrajda ama aynı düzlemde değil — yangın ARKADA, deniz önde.
+  Deprem yangını çıkardı, deniz sonra geldi.
+
+  ⚠️ DALGANIN YÜZÜNDEKİ DİLİMLER YALNIZ DİKEY KAYDIRILDI. İlk sürüm kenarı hem
+  sağa hem aşağı kaydırıyordu ve kaydırılan kenar hem tepede hem dipte
+  kendisiyle buluşup kapalı bir KEMER üretiyordu; kasaba da o kemerin arkasında
+  kayboluyordu, yani sahnenin anlattığı şey görünmüyordu. Dikey kaydırma kenarı
+  asla kendisiyle kesiştiremez — kemer imkânsız.
+-->
+<section
+  class="page page--overlay"
+  data-page-id="k-4"
+  data-mod="full"
+  data-section="kanto-depremi"
+  data-section-title="Kantō Depremi"
+  data-kind="figure"
+  data-scene="mask-wipe"
+  data-fit="contain"
+  data-bleed="full"
+  data-inview="true"
+  role="group"
+  aria-roledescription="sayfa"
+>
+  <div class="page__bg">
+    <svg
+      class="art"
+      viewBox="0 0 300 400"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <defs>
+        <radialGradient id="kanto-vig-tsunami" cx="0.5" cy="0.46" r="0.78">
+          <stop offset="0.45" stop-color="#0a0d10" stop-opacity="0"></stop>
+          <stop offset="1" stop-color="#0a0d10" stop-opacity="0.5"></stop>
+        </radialGradient>
+        <filter
+          id="kanto-grain-tsunami"
+          x="0"
+          y="0"
+          width="100%"
+          height="100%"
+          filterUnits="objectBoundingBox"
+          color-interpolation-filters="sRGB"
+        >
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="1.5"
+            numOctaves="1"
+            seed="1923"
+          ></feTurbulence>
+          <feColorMatrix
+            type="matrix"
+            values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.34 0.34 0.32 0 -0.12"
+          ></feColorMatrix>
+        </filter>
+      </defs>
+
+      <rect width="300" height="400" fill="#0a0d10"></rect>
+
+      <!-- ① gökyüzü: iki düz bant. Dalganın solunda kalan üçgende görünüyor. -->
+      <path d="M0 118 L52 128 L112 112 L176 126 L300 114 V400 H0 Z" fill="#16202a"></path>
+
+      <!-- ② ufuktaki yanan kıyı: kadrajın izinli TEK sıcak rengi -->
+      <rect x="0" y="196" width="180" height="20" fill="#8f3a1e"></rect>
+      <path
+        d="M0 216 V206 H12 V198 H28 V210 H44 V200 H62 V212 H80 V202 H100 V214 H118 V216 Z"
+        fill="#0a0d10"
+      ></path>
+      <rect x="0" y="216" width="180" height="184" fill="#16202a"></rect>
+
+      <!--
+        ③ dalga: kütle, sonra yüzünde üç yatay dilim (üstte açık, altta koyu).
+
+        ⚠️ KÜTLE `gece` DEĞİL `derin`. İlk denemede en koyu tondaydı ve önündeki
+        kasaba da `gece` olduğu için TAMAMEN kayboluyordu. Kütle bir basamak
+        açılınca kadrajın en koyu tonu ait olduğu yere, en öndeki çatılara gitti.
+      -->
+      <path
+        d="M300,34L256,50L216,74L188,66L150,112L118,150L96,142L68,202L44,258L30,322L18,400L300,400Z"
+        fill="#16202a"
+      ></path>
+      <path
+        d="M300,34L256,50L216,74L188,66L150,112L118,150L96,142L68,202L44,258L30,322L18,400L18,550L30,472L44,408L68,352L96,292L118,300L150,262L188,216L216,224L256,200L300,184Z"
+        fill="#243440"
+      ></path>
+      <path
+        d="M300,34L256,50L216,74L188,66L150,112L118,150L96,142L68,202L44,258L30,322L18,400L18,470L30,392L44,328L68,272L96,212L118,220L150,182L188,136L216,144L256,120L300,104Z"
+        fill="#375062"
+      ></path>
+      <path
+        d="M300,34L256,50L216,74L188,66L150,112L118,150L96,142L68,202L44,258L30,322L18,400L18,426L30,348L44,284L68,228L96,168L118,176L150,138L188,92L216,100L256,76L300,60Z"
+        fill="#4e6f83"
+      ></path>
+
+      <!-- ④ köpük: tepe boyunca üçgenler. Kenarları düz, tepeleri sivri. -->
+      <g fill="#93b0bd">
+        <path d="M256 50 L264 26 L278 46 Z"></path>
+        <path d="M216 74 L222 48 L238 68 Z"></path>
+        <path d="M188 66 L192 42 L206 62 Z"></path>
+        <path d="M150 112 L152 84 L170 98 Z"></path>
+        <path d="M118 150 L116 124 L136 132 Z"></path>
+        <path d="M96 142 L92 118 L112 128 Z"></path>
+        <path d="M68 202 L62 178 L84 184 Z"></path>
+      </g>
+      <g fill="#d6e4e9">
+        <path d="M259 40 L264 26 L270 42 Z"></path>
+        <path d="M219 62 L222 48 L230 64 Z"></path>
+        <path d="M190 55 L192 42 L199 57 Z"></path>
+        <path d="M151 99 L152 84 L161 96 Z"></path>
+        <path d="M117 137 L116 124 L126 130 Z"></path>
+        <path d="M94 131 L92 118 L103 125 Z"></path>
+        <!-- serpinti: tepenin ÜSTÜNDE ama YAKININDA kopmuş kareler. Gökyüzüne
+             dağıtılsalardı yıldız gibi okunurlardı. -->
+        <rect x="272" y="20" width="3" height="3"></rect>
+        <rect x="240" y="30" width="4" height="4"></rect>
+        <rect x="206" y="48" width="3" height="3"></rect>
+        <rect x="176" y="40" width="3" height="3"></rect>
+        <rect x="146" y="76" width="4" height="4"></rect>
+        <rect x="112" y="106" width="3" height="3"></rect>
+        <rect x="88" y="108" width="3" height="3"></rect>
+        <rect x="62" y="164" width="3" height="3"></rect>
+      </g>
+
+      <!--
+        ⑤ kıyı ve kasaba. Kadrajın EN KOYU tonu çatılarda — kontur çizmek
+        seçenek olmadığı için iki koyu kütlenin ayrışması ancak değerle olur, ve
+        arkalarındaki açık kıyı şeridi o değeri veriyor. Kıyı şeridi aynı
+        zamanda dalganın NEDEN dalga olduğunu söylüyor: su bir yüzeyin üstünden
+        gelir, o yüzey görünmezse gelen şey de su gibi durmuyor.
+      -->
+      <rect x="0" y="344" width="300" height="56" fill="#243440"></rect>
+      <g fill="#0a0d10">
+        <path d="M0 372 L0 357 L15 353 L30 357 L30 372 Z"></path>
+        <path d="M32 372 L32 363 L44 359 L56 363 L56 372 Z"></path>
+        <path d="M58 372 L58 355 L75 351 L92 355 L92 372 Z"></path>
+        <path d="M94 372 L94 362 L105 358 L116 362 L116 372 Z"></path>
+        <path d="M118 372 L118 358 L133 354 L148 358 L148 372 Z"></path>
+        <path d="M150 372 L150 364 L163 360 L176 364 L176 372 Z"></path>
+        <path d="M178 372 L178 356 L196 352 L214 356 L214 372 Z"></path>
+        <path d="M216 372 L216 363 L227 359 L238 363 L238 372 Z"></path>
+        <path d="M240 372 L240 357 L256 353 L272 357 L272 372 Z"></path>
+        <path d="M274 372 L274 362 L288 358 L302 362 L302 372 Z"></path>
+        <rect x="0" y="372" width="300" height="28"></rect>
+      </g>
+
+      <rect width="300" height="400" fill="url(#kanto-vig-tsunami)"></rect>
+      <rect width="300" height="400" filter="url(#kanto-grain-tsunami)" opacity="0.08"></rect>
+    </svg>
+  </div>
+
+  <div class="page__inner">
+    <p
+      class="caption blk blk--invert"
+      style="--i: 0"
+      data-block-id="k-4:0"
+      data-block-kind="caption"
+    >
+      Kıyı kentlerinde yaşanan birçok deprem gibi Tsunamiler başlamıştı. Yaklaşık on metre
+      yüksekliğinde olduğu söylenilen Tsunami dalgalarında yüzlerce insanın öldüğü söylenmektedir.
+    </p>
+  </div>
+</section>

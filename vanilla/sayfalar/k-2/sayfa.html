@@ -1,0 +1,202 @@
+<!--
+  k-2 — Yokohama İç Limanı, Dongola'nın güvertesi.
+
+  `src/lib/art/kanto/Gemici.svelte`nin vanilla karşılığı, TEK BİR SAPMAYLA.
+
+  ⚠️ KONUŞMA BALONU ANLATICI KUTUSUNA ÇEVRİLDİ. Svelte bileşeninde kuyruklu,
+  köşeleri kırık bir balon vardı ve içindeki söz Griffin'e aitmiş gibi
+  görünüyordu. Bileşenin kendi notu da bunu uyarıyor: o söz Griffin'in KAYITLI
+  SÖZÜ DEĞİL, yazının anlatıcı cümlesi. Griffin gerçek bir kişi ve elimizde
+  onun ağzından çıkmış bir cümle yok.
+
+  Çizgi roman dilinde ayrım zaten var: kuyruklu ve yuvarlak olan KONUŞUR,
+  kuyruksuz ve dikdörtgen olan ANLATIR. Kutu ikincisine çevrildi — kuyruk
+  silindi, köşeler düzeltildi. Böylece içindeki cümle (yazının kendi cümlesi)
+  kimseye atfedilmiş olmuyor.
+
+  Bileşendeki balon genişliği metinden HESAPLANIYORDU (SVG metni ölçemediği
+  için karakter sayısından kestirim). Burada gerek yok: metin sabit, ölçü de
+  elle konmuş. Satırları sen bölüyorsun — SVG `<text>` sarmıyor.
+
+  ⚠️ `aria-hidden` YOK, `role="img"` var: diğer sahneler süs olduğu için ekran
+  okuyucudan gizleniyor, bu kutunun içinde METİN var.
+-->
+<section
+  class="page page--overlay"
+  data-page-id="k-2"
+  data-mod="mid full"
+  data-section="kanto-depremi"
+  data-section-title="Kantō Depremi"
+  data-kind="figure"
+  data-scene="mask-wipe"
+  data-fit="contain"
+  data-bleed="full"
+  data-inview="true"
+  role="group"
+  aria-roledescription="sayfa"
+>
+  <div class="page__bg">
+    <svg
+      class="art"
+      viewBox="0 0 300 400"
+      preserveAspectRatio="xMidYMid slice"
+      role="img"
+      aria-label="Yanan Yokohama’yı gemi küpeştesinden izleyen bir deniz subayı. Üstteki anlatıcı kutusunda: Yarım saat içinde tüm şehir, Dante'nin Cehennemi'nden fırlamış bir manzarayı andırıyordu."
+    >
+      <defs>
+        <radialGradient id="kanto-vig-gemici" cx="0.5" cy="0.46" r="0.78">
+          <stop offset="0.45" stop-color="#0a0807" stop-opacity="0"></stop>
+          <stop offset="1" stop-color="#0a0807" stop-opacity="0.42"></stop>
+        </radialGradient>
+        <filter
+          id="kanto-grain-gemici"
+          x="0"
+          y="0"
+          width="100%"
+          height="100%"
+          filterUnits="objectBoundingBox"
+          color-interpolation-filters="sRGB"
+        >
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="1.5"
+            numOctaves="1"
+            seed="1923"
+          ></feTurbulence>
+          <feColorMatrix
+            type="matrix"
+            values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.34 0.34 0.32 0 -0.12"
+          ></feColorMatrix>
+        </filter>
+        <!-- Panelin içi ayrı bir dünya: dışına taşan hiçbir şey yok. -->
+        <clipPath id="gemici-panel">
+          <rect x="16" y="28" width="268" height="320"></rect>
+        </clipPath>
+      </defs>
+
+      <rect width="300" height="400" fill="#0a0807"></rect>
+
+      <g clip-path="url(#gemici-panel)">
+        <!-- gökyüzü: üç düz bant, ufka doğru AÇILIYOR (ışık aşağıda) -->
+        <rect x="16" y="28" width="268" height="68" fill="#171210"></rect>
+        <path d="M16 96 L84 88 L152 100 L216 86 L284 94 V140 H16 Z" fill="#241b17"></path>
+        <path d="M16 140 L74 132 L138 144 L206 130 L284 138 V168 H16 Z" fill="#33251e"></path>
+
+        <!-- ufuktaki yangın bandı: yüzlerce ayrı yangının tek bant hâline gelmesi -->
+        <path
+          d="M16 152 L62 158 L108 146 L156 156 L204 144 L252 154 L284 148 V168 H16 Z"
+          fill="#5e2a1c"
+        ></path>
+
+        <!-- karşı kıyı: alçak ahşap şehir, hepsi neredeyse siyah -->
+        <path
+          d="M16 168 V160 H36 V152 H54 V163 H74 V150 H96 V161 H120 V154 H142 V147 H164
+             V160 H186 V151 H208 V162 H230 V153 H250 V159 H268 V150 H284 V168 Z"
+          fill="#0a0807"
+        ></path>
+
+        <!-- yangın sütunları: dar üçgenler, kıyının üstünde. Üç tane, hepsi ayrı. -->
+        <g fill="#8f3a1e">
+          <path d="M148 152 L154 112 L162 152 Z"></path>
+          <path d="M232 156 L238 132 L243 156 Z"></path>
+          <path d="M196 150 L201 126 L207 150 Z"></path>
+        </g>
+        <g fill="#e2882c">
+          <path d="M151 150 L154 112 L158 150 Z"></path>
+          <path d="M234 154 L238 132 L241 154 Z"></path>
+        </g>
+
+        <!-- deniz: üç bant. En üsttekinde yangının yansıması var. -->
+        <path d="M16 168 H284 V194 H16 Z" fill="#5e2a1c" opacity="0.7"></path>
+        <path d="M16 194 H284 V244 H16 Z" fill="#241b17"></path>
+        <path d="M16 244 H284 V348 H16 Z" fill="#171210"></path>
+
+        <!-- suyun üstündeki kırık yansıma: dikdörtgenler, dalga değil -->
+        <g fill="#8f3a1e" opacity="0.45">
+          <rect x="146" y="176" width="22" height="3"></rect>
+          <rect x="150" y="186" width="14" height="3"></rect>
+          <rect x="142" y="200" width="28" height="2"></rect>
+          <rect x="152" y="214" width="12" height="2"></rect>
+          <rect x="228" y="180" width="16" height="3"></rect>
+          <rect x="232" y="196" width="10" height="2"></rect>
+        </g>
+
+        <!-- geminin küpeştesi: bir üst tırabzan, bir alt kayıt, iki dikme -->
+        <g fill="#0a0807">
+          <rect x="16" y="252" width="268" height="6"></rect>
+          <rect x="16" y="300" width="268" height="4"></rect>
+          <rect x="200" y="252" width="6" height="60"></rect>
+          <rect x="262" y="252" width="6" height="60"></rect>
+        </g>
+
+        <!--
+          GRIFFIN. Gövde kadrajı alttan kırpıyor; baş üçte bir noktasında,
+          bakışı ateşe dönük. YÜZDE GÖZ YOK: manzarayı anlatan şey adamın
+          ifadesi değil, ufuk.
+
+          ⚠️ CEKET `gece` DEĞİL `kok`: ikisi de en koyu tonda olsaydı adam
+          kadrajın içinde kaybolurdu. Kontur (kural 1) olmadığı için silüet
+          ancak komşu yüzeyin değerinden ayrışabiliyor.
+        -->
+        <path d="M6 348 L16 258 L46 228 L92 216 L138 232 L160 268 L166 348 Z" fill="#171210"></path>
+        <path d="M92 216 L138 232 L160 268 L166 348 L128 348 L124 258 Z" fill="#241b17"></path>
+        <path d="M66 216 L92 224 L120 212 L128 230 L92 242 L58 230 Z" fill="#33251e"></path>
+
+        <!-- kafatası: sekiz düz kenar, hiçbiri eğri değil -->
+        <path
+          d="M70 216 L64 186 L70 162 L88 152 L108 156 L118 172 L120 196 L112 214 L88 222 Z"
+          fill="#241b17"
+        ></path>
+        <!-- ateşe dönük kenar: sahnedeki TEK anahtar ışığın yüze düşen yüzeyi.
+             Üç basamak, ve en parlağı kıl payı — ışık yüzün kenarından girer. -->
+        <path
+          d="M108 156 L118 172 L120 196 L112 214 L105 209 L107 178 L101 160 Z"
+          fill="#5e2a1c"
+        ></path>
+        <path d="M110 168 L118 177 L119 198 L112 208 L109 196 Z" fill="#8f3a1e"></path>
+        <path d="M114 181 L119 189 L118 198 L114 194 Z" fill="#e2882c"></path>
+        <path d="M78 186 L86 182 L88 194 L79 197 Z" fill="#33251e"></path>
+
+        <!-- kasket: kubbe, bant, siperlik. Üç parça, üçü de düz. -->
+        <path d="M60 162 L66 140 L92 131 L116 140 L122 158 L118 164 L63 166 Z" fill="#0a0807"></path>
+        <path d="M62 160 L120 157 L121 168 L63 171 Z" fill="#171210"></path>
+        <path d="M112 166 L134 170 L136 177 L112 174 Z" fill="#0a0807"></path>
+      </g>
+
+      <!--
+        ANLATICI KUTUSU. Kuyruksuz ve dik köşeli: konuşmuyor, anlatıyor.
+        Panelin oluğunu üstten KIRIYOR — çizgi roman geleneğinde anlatıcı
+        kutusu panelin köşesine oturur ve kadrajın dışına taşabilir.
+      -->
+      <rect x="132" y="34" width="154" height="86" fill="#f6e0ac"></rect>
+      <text x="142" y="52" font-family="var(--font-manga)" font-size="9.5" fill="#0a0807">
+        <tspan x="142">Yarım saat içinde</tspan>
+        <tspan x="142" dy="13.5">tüm şehir, Dante'nin</tspan>
+        <tspan x="142" dy="13.5">Cehennemi'nden</tspan>
+        <tspan x="142" dy="13.5">fırlamış bir manzarayı</tspan>
+        <tspan x="142" dy="13.5">andırıyordu.</tspan>
+      </text>
+
+      <rect width="300" height="400" fill="url(#kanto-vig-gemici)"></rect>
+      <rect
+        width="300"
+        height="400"
+        filter="url(#kanto-grain-gemici)"
+        opacity="0.075"
+      ></rect>
+    </svg>
+  </div>
+
+  <div class="page__inner">
+    <p
+      class="caption blk blk--invert"
+      style="--i: 0"
+      data-block-id="k-2:0"
+      data-block-kind="caption"
+    >
+      Deprem sırasında Yokohama İç Limanı'nda demirli bulunan Dongola gemisindeki Kraliyet Donanma
+      Yedek Kuvvetleri'nden Komutan R. H. Griffin, deprem meydana gelirken dehşet içinde izliyordu.
+      Griffin, pek çok farklı noktada yangınların nasıl başladığına bizzat tanık oldu.
+    </p>
+  </div>
+</section>

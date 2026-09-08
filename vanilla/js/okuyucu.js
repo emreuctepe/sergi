@@ -21,6 +21,14 @@
      9 · Başlatma
    ========================================================================= */
 
+import { bulmacaBaslat } from './bulmaca.js';
+import { galeriBaslat, galeriDugmeleriniAyarla } from './galeri.js';
+import { icindekilerBaslat } from './icindekiler.js';
+import { kantoHareketiniBaslat } from './kanto.js';
+import { mangaBaslat, mangaDugmesiniAyarla } from './manga.js';
+import { telifBaslat } from './telif.js';
+import { wikiKapisiniBaslat } from './wiki.js';
+
 /* ==========================================================================
    1 · ÖĞELER VE SABİTLER
    ======================================================================= */
@@ -35,8 +43,12 @@ const ilerlemeKutusu = document.querySelector('.progress');
 const ilerlemeDolgusu = document.querySelector('.progress__fill');
 const cip = document.querySelector('.depth-chip');
 const cipEtiketi = document.querySelector('.depth-chip__label');
-const geriDugmesi = document.querySelector('.band--bottom .band__btn:first-child');
-const ileriDugmesi = document.querySelector('.band--bottom .band__btn:last-child');
+
+/* ⚠️ `id` ile, konumla DEĞİL. Burada önce `.band__btn:first-child` /
+   `:last-child` yazıyordu; banda üçüncü bir düğme (tam ekran) eklenince
+   "sonraki sayfa" sessizce o düğmeye bağlandı. Konum bir kimlik değil. */
+const geriDugmesi = document.getElementById('btn-geri');
+const ileriDugmesi = document.getElementById('btn-ileri');
 
 /** Modların kimliği ve okura görünen adı. Sıra çipin döngü sırası. */
 export const MODLAR = [
@@ -124,7 +136,7 @@ function etiketle() {
    Sayfalar DOM'dan çıkmıyor, yalnızca gizleniyor: süzme kuralları
    `css/bilesen.css` §7'de, `:root[data-depth]` + her sayfanın `data-mod`u.
 
-   ⚠️ `min` modu `full`ün alt kümesi DEĞİL — `km-min` sayfası yalnız `min`de
+   ⚠️ `min` modu `full`ün alt kümesi DEĞİL — `k-min` sayfası yalnız `min`de
    var. Bu yüzden "hepsini bas, fazlasını gizle" gibi bir kısayol yok.
    ======================================================================= */
 
@@ -141,7 +153,7 @@ function tumSayfalar() {
 /**
  * Modu değiştirir ve okuru bıraktığı yerde tutmaya çalışır.
  *
- * Okurun durduğu sayfa yeni modda gizlenmiş olabilir (`km-4` yalnız `full`de
+ * Okurun durduğu sayfa yeni modda gizlenmiş olabilir (`k-4` yalnız `full`de
  * var). O zaman EN YAKIN görünür sayfaya gidiliyor, sayı başa sarmıyor: mod
  * değiştirmenin bedeli "baştan başlamak" olmamalı.
  */
@@ -262,12 +274,31 @@ function guncelle() {
      yazı açık renge dönüyor. Manga dışarıda: onun kendi sayfa numarası var. */
   folio.dataset.overlay = String(sayfa.dataset.bleed === 'full' && tur !== 'manga');
 
+  /* ⚠️ "Tam kanama" KOYU demek değil. Yukarıdaki satır folio'yu açık renge
+     çeviriyor ama `k-son` GÜNDÜZ bir sahne (`data-scrim="light"`) ve alt kenarı
+     neredeyse beyaz perde — açık folio orada görünmüyordu.
+
+     Sayfanın kendi `data-scrim`i folio'ya yansıtılıyor, çünkü folio `#pages`in
+     DIŞINDA duruyor (index.html'de `#canvas`ın doğrudan çocuğu) ve hiçbir CSS
+     seçicisi oradan "şu an okunan sayfanın perdesi" bilgisine ulaşamıyor.
+     Rengin kendisi canvas.css §folio'da. */
+  folio.dataset.scrim = sayfa.dataset.scrim ?? '';
+
   const yuzde = ilerlemeYuzdesi();
   ilerlemeDolgusu.style.width = `${yuzde.toFixed(1)}%`;
   ilerlemeKutusu.setAttribute('aria-valuenow', String(Math.round(yuzde)));
 
   geriDugmesi.disabled = sira === 0;
   ileriDugmesi.disabled = sira === olcumler.length - 1;
+
+  /* Tam ekran düğmesi yalnız manga sayfasında var — 3:4 tuvalde 9:16 duran
+     tek sayfa o (bkz. js/manga.js). */
+  mangaDugmesiniAyarla(sayfa);
+
+  /* Sergi okları da yalnız kendi sayfasında: ▲▼ sayıyı gezdiriyor, ◀◀▶▶
+     koridoru. İkisi aynı yuvayı paylaşıyor ve hiç çakışmıyorlar (biri manga,
+     öbürü galeri sayfasında). */
+  galeriDugmeleriniAyarla(sayfa);
 }
 
 function ilerlemeYuzdesi() {
@@ -310,9 +341,34 @@ export function geri() {
   sayfayaGit(Math.max(sira - 1, 0));
 }
 
+/**
+ * Bir sayfaya götüren TEK yol — içindekiler, ileri/geri, Home/End hepsi burada.
+ *
+ * ⚠️ ÖNBELLEKTEKİ `top`A KAYDIRMIYOR, hedefi yeniden ölçüyor. `olcumler`
+ * bayat olabiliyor ve bayat bir `top` okuru hedefin BİR ÖNCESİNE düşürüyordu:
+ * sayfalar `min-height: 100%` ile en az bir kadraj, ama `fit="scroll"` olan
+ * 15 sayfanın boyu içeriğe bağlı. Söyleşi sayfalarının çizimleri ızgara
+ * gözünde, yani AKIŞTA, ve `width`/`height` taşımıyorlar — yüklenmeden önce
+ * yükseklikleri sıfır. Ölçüm sırası bunu kaçınılmaz yapıyordu:
+ *
+ *     acilis.js §460  baslat() → olc()            görseller HENÜZ inmemiş
+ *     acilis.js §470  await yuklemeEkrani()       görselleri BURADA bekliyor
+ *
+ * Yani ilk ölçüm, yükleme ekranının beklediği şeyin öncesinde alınıyordu.
+ * Kaydırma olduğunda tazeleniyordu (§419) ama HİÇ kaydırmamış okur —
+ * sayı açıldı, içindekiler açıldı, tıklandı — o tazelemeye hiç uğramıyordu.
+ *
+ * Hedef sıra numarası DEĞİL eleman olarak sabitleniyor: `olc()` görünür sayfa
+ * kümesini yeniden kuruyor ve arada mod değiştiyse aynı numara başka sayfaya
+ * denk gelirdi.
+ */
 function sayfayaGit(sira) {
-  if (!olcumler[sira]) return;
-  kaydir(olcumler[sira].top);
+  const hedef = olcumler[sira]?.el;
+  if (!hedef) return;
+
+  olc();
+  const taze = olcumler.find((o) => o.el === hedef);
+  kaydir(taze ? taze.top : hedef.offsetTop);
 }
 
 /**
@@ -323,6 +379,19 @@ function sayfayaGit(sira) {
  * ve `.pages` orada zaten `smooth`. Değeri burada yazmak, hareketi azaltma
  * tercihi olan okur için de doğru davranmayı mümkün kılıyor.
  */
+/* Programatik kaydırma sürerken snap'i tutan zamanlayıcı. Modül düzeyinde:
+   sıçrama bitmeden ikinci bir sıçrama gelirse ilkinin geri açma işi
+   iptal edilmeli, yoksa snap yolun ortasında geri gelir. */
+let snapSaati = 0;
+
+/** Snap'i geri açar. İki yoldan da çağrılabilir olmalı: `scrollend` ya da süre. */
+function snapiGeriAc() {
+  clearTimeout(snapSaati);
+  snapSaati = 0;
+  kap.removeEventListener('scrollend', snapiGeriAc);
+  kap.style.removeProperty('scroll-snap-type');
+}
+
 function kaydir(top) {
   const azHareket =
     document.documentElement.dataset.motion === 'off' ||
@@ -331,7 +400,37 @@ function kaydir(top) {
   hedefTop = top;
   hedefBitis = Date.now() + (azHareket ? 50 : 500);
 
-  kap.scrollTo({ top, behavior: azHareket ? 'instant' : 'smooth' });
+  if (azHareket) {
+    /* Anlık kaydırmada snap'in kavga edeceği bir animasyon yok. */
+    snapiGeriAc();
+    kap.scrollTo({ top, behavior: 'instant' });
+    guncelle();
+    return;
+  }
+
+  /* ⚠️ SNAP SIÇRAMA BOYUNCA KAPALI, varışta geri açılıyor.
+     `.page` `scroll-snap-stop: always` taşıyor (canvas.css §123) ve bu
+     "kap bir snap noktasının ÜZERİNDEN GEÇEMEZ, karşılaştığı ilk noktaya
+     oturur" demek. Kullanıcı gesture'ı için doğru davranış — sayfa sayfa
+     gezilsin diye zaten öyle konmuş — ama içindekilerden yapılan sıçrama
+     22.000px ve onlarca snap noktası aşıyor. Snap açıkken kaydırma yolda
+     bir yerde kesiliyordu.
+
+     NEDEN RASTGELE GÖRÜNÜYORDU: `fit="scroll"` olan 15 sayfa `normal`
+     taşıyor (§143), gerisi `always`. Sıçrama karışık bir diziden geçtiği
+     için nerede takıldığı NEREDEN başladığına bağlıydı; en uzun sıçramalar
+     da sayının başındayken oluyor, yani ilk yüklemede.
+
+     `scrollend` her yerde yok (Safari 18.2 öncesi); süre yedeği şart.
+     1800ms, Chrome'un uzun smooth kaydırma süresinin (~800ms) iki katından
+     fazla — erken açılırsa snap yolun ortasında geri döner. */
+  clearTimeout(snapSaati);
+  kap.removeEventListener('scrollend', snapiGeriAc);
+  kap.style.scrollSnapType = 'none';
+  kap.addEventListener('scrollend', snapiGeriAc, { once: true });
+  snapSaati = setTimeout(snapiGeriAc, 1800);
+
+  kap.scrollTo({ top, behavior: 'smooth' });
   guncelle();
 }
 
@@ -424,6 +523,17 @@ function tuslar(olay) {
   const hedef = olay.target;
   if (hedef.closest?.('input, textarea, select') || hedef.isContentEditable) return;
 
+  /* ⚠️ Boşluk tuşu odaktaki bir DÜĞMENİN üzerindeyken sayfayı değil o düğmeyi
+     çalıştırmalı. Aşağıdaki `preventDefault` düğmenin kendi etkinleşmesini de
+     iptal ediyordu: bulmacadaki şıklar klavyeyle seçilemiyor, boşluk onların
+     yerine sayfayı atlıyordu. Aynı kaza banttaki içindekiler düğmesinde de
+     vardı — odaktayken boşluk listeyi açmıyordu.
+
+     Koşul TUŞA bakıyor, hedefe değil: oklar bir düğmenin üzerindeyken de
+     sayfayı gezdirmeye devam etmeli, yoksa fareyle "ileri"ye basan okur
+     ok tuşlarını kaybederdi. */
+  if (olay.key === ' ' && hedef.closest?.('button, [role="button"], a[href]')) return;
+
   switch (olay.key) {
     case 'ArrowDown':
     case 'PageDown':
@@ -460,12 +570,55 @@ export function baslat({ modDegistir }) {
   ileriDugmesi.addEventListener('click', ileri);
   geriDugmesi.addEventListener('click', geri);
   cip.addEventListener('click', modDegistir);
+  mangaBaslat(kap);
+  telifBaslat();
+  wikiKapisiniBaslat();
+  kantoHareketiniBaslat();
+  galeriBaslat();
+  bulmacaBaslat();
 
-  const yenidenOlc = () => {
-    letterboxOlc();
-    olc();
-    guncelle();
-  };
+  /* İçindekiler okuyucuyu içe aktarmıyor, ihtiyacı olan üç şeyi buradan
+     alıyor — karşılıklı import iki modülü de kırılgan yapardı.
+
+     ⚠️ Sayfa listesi `gorunurSayfalar()` ile DEĞİL, `olcumler` üzerinden
+     veriliyor. Listedeki satır bir SIRA NUMARASI taşıyor ve o numara birazdan
+     `sayfayaGit`e gidiyor; `sayfayaGit` de `olcumler`e bakıyor. İki ayrı
+     kaynaktan sayılsaydı ölçümün bayat olduğu bir anda (görsel indi, mod
+     değişti) satır komşu bölüme atlardı. */
+  icindekilerBaslat({
+    /* Liste kurulmadan ÖNCE yeniden ölçülüyor. Ölçüm normalde kaydırmada
+       tazeleniyor ama açılış akışından yeni çıkmış, henüz hiç kaydırmamış bir
+       okurda bayat olabiliyor: tanıtım perdesi kalkarken sayfaların bir kısmı
+       daha yüksekliksizdi ve `olcumler` kısa kalmıştı (folio da o anda
+       "01 / 05" diyordu). O hâlde liste sayının yarısını yutardı. */
+    sayfalariVer: () => {
+      olc();
+      return olcumler.map((o) => o.el);
+    },
+    okunanSirayiVer: okunanSira,
+    git: sayfayaGit
+  });
+
   window.addEventListener('resize', yenidenOlc);
   window.visualViewport?.addEventListener('resize', yenidenOlc);
+}
+
+/**
+ * Ölçümü tazeler. `resize`in kendi işi ama DIŞARIYA da açık, çünkü düzenin
+ * oturduğu ikinci bir an var: yükleme ekranı kapanırken (`acilis.js` §470).
+ *
+ * O ekran `document.fonts.ready`i ve bütün görselleri bekliyor — yani
+ * beklediği her şey, `baslat()`in ilk ölçümünü geçersiz kılan şeyin ta
+ * kendisi. Buradan bir kez daha ölçülmezse `olcumler` ilk kaydırmaya kadar
+ * bayat kalıyor ve o aralıkta yapılan her gezinme hedefi ıskalıyor.
+ *
+ * `sonYukseklik` de tazeleniyor: `kaydirmaOldu` (§419) yüksekliği bununla
+ * karşılaştırıp yeniden ölçüp ölçmeyeceğine karar veriyor, bayat kalırsa ilk
+ * kaydırmada gereksiz bir ölçüm daha yapardı.
+ */
+export function yenidenOlc() {
+  letterboxOlc();
+  olc();
+  sonYukseklik = kap.scrollHeight;
+  guncelle();
 }
