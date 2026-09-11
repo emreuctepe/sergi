@@ -208,9 +208,29 @@ ESER_YOLU = "assets/2026-09/akilli-kiz"
 # çizimlerde o sahnelerin hiçbiri yok; masal keseden çekilen taşta bitiyor.
 # Yani o on metin "eskimiş" değildi, var olmayan on eseri anlatıyordu.
 #
-# Aşağıdaki metinler masalın kendi anlatısını izliyor ve her biri ÇERÇEVEDE
-# GÖRÜNEN bir şeye dayanıyor (çakıl zemini, kırmızı tram, 白い balonu, gökkuşağı).
-# Sıra birebir: `NN.webp` masalın NN. durağı.
+# ════════════════════════════════════════════════════════════════════════════
+# ⚠️ AŞAĞIDAKİ METİNLER BİREBİR ALINTI — SERGİ YORUMU DEĞİL
+# ────────────────────────────────────────────────────────────────────────────
+# Kaynak: çizimlerle birlikte teslim edilen `akıllıKız.txt`, masalın Türkçe
+# anlatımı. Dosyada on numaralı bölüm var ve sıra BİREBİR: `NN.webp` metnin
+# NN. bölümü.
+#
+# Bir ara buraya masalı anlatan DEĞİL yorumlayan metinler yazılmıştı ("çizer
+# ölçeği öne koyuyor", "kalpler kadrajın yalnız bir yanında"). Kullanıcı
+# kararı: künye masalın kendisini taşıyacak, benim okumamı değil. Yani
+# aşağıdaki dizeler ÜRETİLMEDİ, KOPYALANDI.
+#
+# ⚠️ DEĞİŞTİRİLMEDİLER — yazım dahil. 01'deki "bir tüccari" kaynakta öyle
+# yazıyor. Düzeltmek "olduğu gibi" olmaktan çıkarırdı; düzeltilecekse önce
+# `akıllıKız.txt`te düzeltilmeli, sonra buraya taşınmalı.
+#
+# ⚠️ 08/09/10'DA SATIR BAŞI VAR ve anlamlı: replikler kaynakta ayrı satırlarda.
+# `\n`ler burada duruyor, ekrana çıkmalarını `css/galeri.css`teki
+# `.galeri__kunye-metin { white-space: pre-line }` sağlıyor. O kural
+# kaldırılırsa diyalog tek paragrafa yapışır.
+#
+# `ad` alanları alıntı DEĞİL, levha başlığı: kaynakta bölüm adı yok ve levhanın
+# bir başlığa ihtiyacı var (boşsa "Eser 01" yazıyor).
 #
 # ⚠️ `alt` SATIRI DOĞRULANMADI. `CIZER` aşağıda ve `ms-acilis` sergiyi Ece
 # Özgür'ün çizimleriyle diye tanıtıyor; gelen dosyaların gerçekten ona ait
@@ -221,112 +241,104 @@ ESERLER = [
         "dosya": "01.webp",
         "ad": "İşler Yolunda",
         "metin":
-            "Kalabalık bir kasaba, bir tüccar, eşi ve tek kızları. Üçü de "
-            "gülüyor, terazi babanın elinde ve masalın söylediği tek şey "
-            "işlerin iyi gittiği. Ama seride bir daha hiç bu kadar masum "
-            "görünmeyecek bir şey çoktan kadrajda: bastıkları zemin siyah ve "
-            "beyaz çakılla kaplı. Masalın kızı on durak sonra kurtaran şey o "
-            "taşlar olacak ve bu karede kimse onlara bakmıyor.",
+            "Eskiden hareketli bir kasabada bir tüccari, eşi ve tek kızıyla beraber "
+            "çalışkanlıkla yaşarmış, işleri de iyi gidiyormuş."
     },
     {
         "dosya": "02.webp",
         "ad": "İlaç Kore'den Geliyor",
         "metin":
-            "Anne yatakta, ağzında derece; hastalık gün geçtikçe ağırlaşıyor. "
-            "Doktorlar iyileşme umudu vermiyor, tek çare diye Kore'den "
-            "getirilen bir ilacı gösteriyorlar. Çizim üç kişiyi üç ayrı "
-            "uzaklığa koymuş: anne en geride, kız yastığın hemen yanında, "
-            "baba ise kadrajın önünde ve yüzü dağılmış tek yüz o. Haberi ilk "
-            "alan, bize en yakın duran.",
+            "Ama on küsur yıl sonra kadın hastalanmış ve durumu gün geçtikçe "
+            "kötüleşmiş. Doktorlar iyileşme umudu vermemiş, tek çare olarak Kore'den "
+            "(Joseon) getirilen bir ilacı işaret etmişler."
     },
     {
         "dosya": "03.webp",
         "ad": "Para Yanıyor",
         "metin":
-            "Tüccar ilacı almayı bırakmıyor; birikimi tükenince borca "
-            "giriyor. Üç panel, üç ayrı dil: beyaz hız çizgileri içinde "
-            "verilen haber, kırmızı tramın üstünde sandıktan aleve giden ok, "
-            "ve sağda, kadrajın boyunca uzanan tek parça sevinç — やった〜. "
-            "Alanın en büyüğü iyi haberi alana ayrılmış, kötü haberi "
-            "alanlara değil.",
+            "Adam, karısına olan sevgisinden hiç durmadan bu pahalı ilacı almış; "
+            "birikimleri bitince borç almaya başlamış."
     },
     {
         "dosya": "04.webp",
         "ad": "Geriye Borç Kaldı",
         "metin":
-            "İlaç işe yaramadı, kadın öldü ve tüccara dağ gibi bir borç "
-            "kaldı. Adam yerde, hiçbir şey yapamaz hâlde. Serinin rengi "
-            "olmayan tek karesi bu — on çizimin dokuzunda gökyüzü, tram ya da "
-            "bir kalp var, burada yalnız grinin basamakları. Yasın çizime "
-            "yaptığı şey, çizerin paletini elinden almak.",
+            "Ne yazık ki ilaç işe yaramamış ve kadın vefat etmiş. Tüccara kalan tek şey "
+            "dağ gibi bir borçmuş. Adam yasa boğulup hiçbir şey yapamaz haldeyken, tek "
+            "kızı babasını çok merak etmeye başlamış."
     },
     {
         "dosya": "05.webp",
         "ad": "Alacağımı Tahsile Geldim",
         "metin":
-            "Tefeci kapıda: ödeyemezseniz dava açarım, ama ben o kadar "
-            "kalpsiz değilim — kızınızı verin, borcu sileyim. Kadraj "
-            "bütünüyle onun; yüzü çerçeveyi dolduruyor ve hız çizgileri "
-            "arkasından dışarı taşıyor. Baba ile kız ise soldaki iki küçük "
-            "balonun içine sığmış. Teklifi yapan büyüyor, teklifi alanlar "
-            "küçülüyor.",
+            "Derken tefeci gelmiş: \"Alacağımı tahsile geldim. Ödeyemezseniz dava açarım "
+            "— ama ben o kadar kalpsiz biri değilim. Kızınızı bana verin, borcunuzu "
+            "sileyim.\" demiş, hiç tereddüt etmeden."
     },
     {
         "dosya": "06.webp",
         "ad": "İkinci Teklif",
         "metin":
-            "Tefeci kıza uzun zamandır ilgi duyuyormuş; aradaki büyük yaş "
-            "farkına rağmen bir kez istemiş ve reddedilmiş. Bu ikinci "
-            "teklife ne baba ne kız seviniyor. Çizim bunu tek bir "
-            "asimetriyle söylüyor: kalpler kadrajın yalnız bir yanında. Öbür "
-            "yanda kızın üstüne inen dikey tarama var — aynı sahne, iki ayrı "
-            "hava.",
+            "Aslında tefeci uzun zamandır kıza ilgi duyuyormuş, aralarındaki büyük yaş "
+            "farkına rağmen bir kez evlenme teklif etmiş ama reddedilmiş. Ne baba ne de "
+            "kız bu ikinci teklife sevinmiş, ama ödeyecek para olmadığından tüccar "
+            "kendi çaresizliğine üzülmüş; yapabildiği tek şey ödeme süresini biraz "
+            "uzatmasını rica etmekmiş."
     },
     {
         "dosya": "07.webp",
         "ad": "Bahis",
         "metin":
-            "Teklif: keseye biri ak biri kara iki taş koyacağım. Kara "
-            "çekersen benimle evlenirsin ve borç silinir, ak çekersen ikisi "
-            "de silinir — kabul etmezsen baban hapse girer. Tefeci "
-            "ゲラゲラ diye gülerek, kesesi elinde yürüyor; iki yanında "
-            "kabaran şey ilk karenin zemini, yani birazdan kullanacağı "
-            "taşların ta kendisi. Üstünde yürüdüğü şeyi silah yapacak.",
+            "Birkaç gün sonra tefeci yine gelmiş ve kıza şöyle demiş: \"İlginç bir bahse "
+            "ne dersin? Babanın şu an borcu ödeyecek parası yok, ama bu bahis onu "
+            "kurtarabilir. Şu boş kesenin içine iki taş koyacağım — biri beyaz, biri "
+            "siyah. Elini kesenin içine sokup bir taş çekeceksin. Siyah çıkarsa benimle "
+            "evleneceksin ve babanın borcu silinecek. Beyaz çıkarsa hem evlilik hem "
+            "borç iptal olacak. Ne olursa olsun baban için avantajlı. Bu bahsi kabul "
+            "etmezsen baban hapse girer, bilesin.\""
     },
     {
         "dosya": "08.webp",
         "ad": "Taş Elimden Düştü",
         "metin":
-            "Başka çaresi kalmayan kız bahsi kabul ediyor, elini keseye "
-            "sokuyor ve taşı — dikkatsizce — düşürüyor. Taş yuvarlanıp "
-            "bahçedeki öbür taşların arasına karışıyor. Kadrajda iki şey "
-            "aynı anda oluyor: kız gülümsüyor, sağ kenarda bir şimşek "
-            "çakıyor. Ne olduğunu bilen tek kişi ile daha yeni anlamaya "
-            "başlayan kişi aynı karede.",
+            "Kızın başka çaresi kalmamış, istemeye istemeye bahsi kabul etmiş. Tüccarın "
+            "bahçesinde bol miktarda beyaz ve siyah küçük taş varmış; tefeci bunlardan "
+            "iki tane toplayıp kesenin içine koymuş."
+            "\n"
+            "\"Hadi, bir tane çek.\" demiş tefeci."
+            "\n"
+            "Kız kararlılıkla elini kesenin içine sokmuş ama dikkatsizce taşı elinden "
+            "düşürmüş. Taş yuvarlanıp diğer taşların arasına karışmış."
     },
     {
         "dosya": "09.webp",
         "ad": "Kesedeki Taşın Rengi",
         "metin":
-            "«Ne kadar sakarım, rengine bakmaya bile fırsat bulamadım» deyip "
-            "yerden beyaz bir taş alıyor: kesede kalan taşa bakarsanız "
-            "benimkinin rengi belli olur. Tefeci keseye iki kara taş "
-            "koyduğunu biliyor ve bunu söyleyemiyor. Panel tam ortadan "
-            "ayrılmış: solda cevabı veren düşünce balonu — 白い — sağda "
-            "cevabı bilen ama ağzını açamayan yüz, tek bir «?!» ile. Çizim "
-            "ikisini bilerek aynı kareye koymuyor.",
+            "\"Aman, aman! Özür dilerim. Ne kadar sakarım! Taşın rengine bakmaya bile "
+            "fırsat bulamadım.\" demiş kız, eğilip beyaz bir taş almış."
+            "\n"
+            "\"İşte bu.\" demiş — oysa yerdeki taşların hepsi birbirine benziyormuş, "
+            "hangisinin düşen taş olduğu belli değilmiş."
+            "\n"
+            "Tefeci öfkeyle kıpkırmızı kesilip bağırmış: \"Öyle olamaz! Siyahtı!\""
+            "\n"
+            "Kız da sesini yükseltmiş: \"O kadar emin olduğunuza göre, kesenin içine "
+            "bakarsak hangi renk taşın kaldığı belli olur. Benim çektiğim onun tam "
+            "tersi renk olmalı.\""
+            "\n"
+            "Aslında tefeci, kızın çektiği taşın siyah olduğunu biliyormuş — çünkü "
+            "keseye kasten iki siyah taş koymuşmuş. Ama bunu itiraf edemeyeceğinden, "
+            "istemeyerek kesede kalan taşın siyah, kızın çektiğinin de beyaz olduğunu "
+            "kabul etmek zorunda kalmış."
     },
     {
         "dosya": "10.webp",
         "ad": "Borç Silindi",
         "metin":
-            "«Bu kız gerçekten becerikliymiş.» Tefeci sözünde duruyor: "
-            "evlilikten vazgeçiyor, borcu da siliyor. Masal burada bitiyor ve "
-            "kaybedenin ne hissettiğini söylemiyor. Çizim söylüyor — "
-            "gökkuşağının altında ikisi birden gülüyor ve aradaki büyük "
-            "勝ち kimin olduğunu belirtmiyor. Kurnazlıkla kazanılmış bir "
-            "davayı kimsenin küçük düşmediği bir sahneyle kapatmak, "
-            "çizerin masala eklediği tek cümle.",
+            "\"Bu kız gerçekten becerikliymiş.\" (diye düşünmüş tefeci.)"
+            "\n"
+            "Söz verdiği için tefeci kızla evlenmekten vazgeçmiş ve tüccarın borcunu da "
+            "silmiş."
     },
 ]
 
@@ -670,10 +682,16 @@ KONUSMALAR = [
      "— …Tamam. Haklısın."],
 
     # ⑤ cantali @1592 — duraklar 5-6, "İkinci Teklif" ve "Bahis".
-    # Künyeyi okuyana ödül (bkz. ESERLER §06).
+    # Künyeyi okuyana ödül: ikinci söz §ESERLER 06'daki CÜMLEYE dayanıyor
+    # ("bir kez evlenme teklif etmiş ama reddedilmiş").
+    #
+    # ⚠️ ESKİ HÂLİ "Künyede yazıyormuş zaten" DİYORDU ve künyeler masalın
+    # birebir metnine dönünce o cümle yalan oldu — levhada artık sergi yorumu
+    # değil masalın kendisi var. Balonlar künyeden alıntı yapacaksa levhada
+    # GERÇEKTEN yazan bir şeyi göstermeli.
     ["Kalpler hep aynı tarafta. Kızın durduğu yanda bir tane bile yok.",
-     "Künyede yazıyormuş zaten. Ben keşfettim sanmıştım.",
-     "Belki de bütün mesele bu: aynı karedeler ama aynı sahnede değiller."],
+     "Levhayı okudum: adam onu çoktan bir kez istemiş, kız reddetmiş.",
+     "Yani buradaki tek yeni şey kalpler değil. Cevabın hâlâ aynı olması."],
 
     # ⑥ paltolu @1827 — duraklar 6-7, "Bahis" ve "Taş Elimden Düştü"
     ["Buradaki zemin, figürün üzerinde yürüdüğü malzemeyle kurduğu araçsal "

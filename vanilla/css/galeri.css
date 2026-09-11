@@ -760,6 +760,18 @@
   font-size: var(--fs-sm);
   line-height: 1.72;
   color: color-mix(in oklab, currentColor 76%, transparent);
+
+  /* ⚠️ SATIR BAŞLARI KORUNUYOR ve bu metnin KAYNAĞINDAN geliyor. Künyeler
+     masalın kendi metni ve son üç durakta diyalog var — replikler kaynakta
+     ayrı satırlarda duruyor. `normal` olsaydı `textContent` onları tek bir
+     paragrafa yapıştırır, "Hadi, bir tane çek." demiş tefeci. cümlesi bir
+     önceki cümlenin kuyruğuna eklenirdi.
+
+     `pre-line`, `pre` DEĞİL: girinti ve yinelenen boşluklar yine eziliyor,
+     yalnız `\n` ayakta kalıyor. Metin `js/galeri.js` §alanYaz'dan
+     `textContent` ile giriyor, yani işaretleme eklenmiyor — satırı kuran şey
+     tek başına bu kural. */
+  white-space: pre-line;
 }
 
 /* ⚠️ PERDEYE ÇAKILI, karta değil: metin kayarken düğme yerinde duruyor.
