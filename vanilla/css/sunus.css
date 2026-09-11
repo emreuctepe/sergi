@@ -1,0 +1,567 @@
+/* ============================================================================
+   SUNUŞ — karıştırılan yazının sayfası (`ed-sunus`)
+   ----------------------------------------------------------------------------
+   Koreografisi `js/sunus.js`te, hikâye kabuğu `css/hikaye.css`te. BURADA YALNIZ
+   DİLİMİN İÇİ VAR: çubuklara, dokunma bölgelerine, dilimin görünüp kaybolmasına
+   ait tek bir kural yok ve olmamalı — o kabuk başka sayfalarda da kullanılacak,
+   bu tipografi yalnız burada.
+
+   ⚠️ BİR DÖNEM `blocks.css` §SUNUŞ'TAYDI. Kendi dosyasına çıkarılmasının sebebi
+   büyüklük değil KOMŞULUK: `blocks.css` sayının HER sayfasında işleyen blokları
+   taşıyor (`.para`, `.pull`, `.cover__*`), buradaki kuralların tamamı ise tek
+   bir sayfaya ait. `hikaye.css` ve `galeri.css` aynı gerekçeyle ayrı duruyor ve
+   üçü de `app.css`te `layer(blocks)`a giriyor — yani kaskad açısından hiçbir
+   şey değişmedi, yalnız dosya sınırı içerik sınırına oturdu.
+
+   ⚠️ `.kr` SAYFANIN KENDİSİ DEĞİL, İÇİNDEKİ KUTU. `hikaye()` kutuya `.hik`
+   ekliyor ve `.hik` `position: absolute` — `.page`in üstüne yazılsaydı sayfa
+   snap akışından düşer, bütün sayı tek ekrana yığılırdı. Aşağıdaki konum
+   kuralı `.hik`inkiyle aynı değeri veriyor ama ondan ÖNCE: JS inmeden de kutu
+   sayfayı dolduruyor.
+
+   ────────────────────────────────────────────────────────────────────────────
+   İÇİNDEKİLER
+   ────────────────────────────────────────────────────────────────────────────
+     §ZEMİN    üç renk ve bir dönüş — bölümleri ayıran düz yüzey
+     §PERDE    zeminin üstündeki SVG sahne ve katmanlarının süzülmesi
+     §TARLA    1. ve 2. perde: karıştırılan kelimelerin ızgarası
+     §YAZI     3–5. perdeler: süpürme, daktilo, netleşme
+     §TEZGÂH   yalnız `tezgah-karistir.html`in açtığı ölçüm kancaları
+   ========================================================================= */
+
+.kr {
+  position: absolute;
+  inset: 0;
+
+  /* Zemin geçişi bir `--dur-*` değil çünkü hiçbirine eşit değil (750ms,
+     bkz. §ZEMİN). Yerel belirteç olması ŞART: `tokens.css`
+     §ERİŞİLEBİLİRLİK'teki 1ms indirimi ham bir `750ms`e ulaşamıyor ve
+     hareket azaltma bu geçişi hiç kapatamazdı. */
+  --kr-zemin-sure: 750ms;
+
+  /* Dilimin kendi açılış ölçeği (demo A1: slayt 0.75→1, 1500ms). Bu da
+     hiçbir `--dur-*`a eşit değil; aynı gerekçeyle yerel. */
+  --kr-giris-sure: 1500ms;
+
+  background: var(--kr-zemin, var(--paper));
+  transition: background var(--kr-zemin-sure) var(--ease-in-out);
+  overflow: hidden;
+}
+
+/* ----------------------------------------------------------------------------
+   §ZEMİN — ÜÇ RENK VE BİR DÖNÜŞ, demodaki yayın planının aynısı
+   ----------------------------------------------------------------------------
+   Demo ölçüldü (`tl.seek()` ile kare kare): zemin turuncu → kırmızı → SİYAH →
+   turuncu. Üç renk, ve sonuncusu AÇILIŞ RENGİNE DÖNÜŞ. Siyah perdenin tamamını
+   (başlık, sözler, künye) taşıyor; renk değiştirmek "yeni dilim" demek değil,
+   "yeni bölüm" demek.
+
+   ⚠️ ALTI DİLİM VAR AMA HÂLÂ ÜÇ RENK — ve bu bir eksiklik değil, yukarıdaki
+   cümlenin sonucu. Sonradan eklenen üç perde (`sehir`, `icerik`, `cagri`)
+   sözlerle AYNI BÖLÜMÜN devamı: dergi kendini anlatmayı sürdürüyor. Her birine
+   ayrı bir renk verilseydi zemin dilim sayacına dönüşürdü ve taşıdığı tek
+   bilgi ("neredeyiz") kaybolurdu. Onları birbirinden ayıran şey renk değil
+   PERDE (bkz. §PERDE).
+
+   Bir yan kazanç ölçülebilir cinsten: `--accent` üstünde `--ink` kontrastı
+   2.4:1 ve bu ancak BİR-İKİ SANİYELİK, iri puntolu bir kelime için savunulur.
+   Yeni dilimler okunacak cümleler taşıyor; onları koyu zeminde tutmak bir
+   tercih değil, okunabilirlik şartı.
+
+   ⚠️ DÖNÜŞ BAŞA SARMA İÇİN VAR, süs değil — sayfa `dongu: true` ile çalışıyor
+   (bkz. `js/sunus.js` §SAYI). Künye 750ms dağılırken zemin de 750ms boyunca 1'e
+   dönüyor, yani hikâye başa sardığında zemin ÇOKTAN 1; geriye tek geçiş
+   kalıyor: 1→2. Dönüş kaldırılırsa başa sarışta 3→1→2 iki geçiş üst üste biner
+   ve ortada bir kâğıt parlaması görünür.
+   -------------------------------------------------------------------------- */
+.kr[data-zemin="1"] { --kr-zemin: var(--paper); }
+.kr[data-zemin="2"] { --kr-zemin: var(--accent); }
+.kr[data-zemin="3"] { --kr-zemin: var(--paper-sunken); }
+
+/* ============================================================================
+   §PERDE — zeminin üstündeki sahne
+   ----------------------------------------------------------------------------
+   SVG'leri buraya indiren `js/perde.js`, hangisinin açılacağına karar veren
+   `js/sunus.js`. Burada yalnız "nasıl görünüyor" var.
+
+   ⚠️ ZEMİNİN YERİNE GEÇMİYOR, ÜSTÜNE BİNİYOR. `.kr`ın `background`ı olduğu
+   yerde duruyor ve perde onun üzerinde saydam bir katman. İki kazancı var:
+   dosyalar gelmezse (ağ hatası) sayfa düz renkli hâline düşüyor, ve zeminin
+   bölüm değiştiren rengi perdenin ALTINDAN okunmaya devam ediyor.
+
+   ⚠️ OPAKLIK ÖLÇÜLEREK SEÇİLDİ, göz kararıyla değil. Ölçüt: perdenin EN AÇIK
+   katmanı zeminle bindiğinde bile yazının kontrastı okunabilir kalmalı.
+   `tezgah-karistir.html`deki KONTRAST panosu bunu her perde için hesaplıyor —
+   her `fill` rengi zeminle `α` oranında karıştırılıp `--ink` ile WCAG kontrastı
+   çıkarılıyor. Panelin yazdığı sayı bu dosyadaki değerin gerekçesi.
+
+   Rasterleştirici olmadan da ölçülebilmesi bilerek: bindirme analitik bir
+   işlem (`sonuç = zemin·(1-α) + katman·α`), ekran görüntüsü gerekmiyor
+   (bkz. `js/karistir.js` §ÇEKİRDEK'teki aynı kaygı).
+   ========================================================================= */
+
+.kr {
+  /* ⚠️ BU SAYI ÖLÇÜLDÜ. Belirleyen katman her perdede aynı: `#e8d9b0` — ayın,
+     fenerin ve halkanın içindeki krem leke. Koyu temada `--ink` ile kontrastı
+     (kötümser hesapla, bkz. tezgâhtaki KONTRAST panosu):
+
+        α     paper    sunken
+       0.30    6.5:1    7.1:1
+       0.38    5.1:1    5.5:1   ← seçilen
+       0.42    4.5:1    4.8:1   ← eşiğin tam üstü, payı yok
+       0.50    3.6:1    3.8:1   ← AA'nın altında
+
+     0.42 eşiği (4.5:1) TAM tutturuyor, yani payı yok: çizimler yer tutucu ve
+     Ece Özgür'ün asıl çizimleri bir gün daha açık bir renk getirirse o değer
+     sessizce eşiğin altına düşerdi. 0.38 hem sahneyi görünür tutuyor hem
+     ~%13 pay bırakıyor.
+
+     ⚠️ DAHA YUKARI ÇIKMAK İÇİN ÇİZİMİ DEĞİŞTİRMEK GEREKİR, bu sayıyı değil.
+     `09.svg`nin (yagmur) tavanı 0.70 — çünkü içinde krem leke yok. Sınırı
+     koyan şey opaklık değil, en açık katman. */
+  --kr-perde-opak: 0.38;
+
+  /* Perde geçişi zeminden YAVAŞ. Renk bir anahtar (bölüm değişti), sahne bir
+     mekân; mekân renk kadar hızlı değişirse kesme gibi okunuyor. */
+  --kr-perde-sure: 1100ms;
+
+  /* Katmanların süzülme genliği. SVG'nin KENDİ birimi (viewBox 828×554),
+     piksel değil: tuval büyüyünce kayma da orantılı büyüyor. */
+  --kr-kayma: 1.5px;
+}
+
+.kr__perdeler {
+  position: absolute;
+  inset: 0;
+  z-index: 0; /* dilimler 1, bölgeler 2, çubuklar 3 — hepsinin altında */
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.kr__sahne {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+
+  opacity: 0;
+  transition: opacity var(--kr-perde-sure) var(--ease-in-out);
+}
+
+/* ⚠️ SEÇİMİ JS YAPIYOR, `data-perde` EŞLEŞMESİ DEĞİL. Perdenin adı bir içerik
+   kararı (`ay`, `fener`, `yagmur`…) ve CSS'e adların listesi yazılsaydı yeni
+   bir sahne eklemek iki dosyayı birden düzenlemek olurdu. `.hik__dilim`in
+   `data-on`u da aynı sebeple böyle (bkz. `css/hikaye.css` §2). */
+.kr__sahne[data-on="true"] {
+  opacity: var(--kr-perde-opak);
+
+  /* Çok yavaş bir kadraj kayması. `slice` zaten kırpıyor; bu ölçek kırpma
+     payının içinde geziniyor, yani kenardan boşluk açılmıyor. */
+  animation: kr-nefes 26s var(--ease-in-out) infinite alternate;
+}
+
+@keyframes kr-nefes {
+  from { transform: scale(1.02); }
+  to { transform: scale(1.1); }
+}
+
+/* ----------------------------------------------------------------------------
+   KATMANLAR — asıl iş burada
+   ----------------------------------------------------------------------------
+   Her katman iki animasyon taşıyor ve İKİSİ AYRI ÖZELLİĞE dokunuyor:
+
+     kr-katman-gir   `opacity`    — sırayla beliriyor (kademe `--i`den)
+     kr-suzul        `transform`  — sonsuza kadar süzülüyor
+
+   ⚠️ AYRI ÖZELLİK OLMASI ŞART. Aynı elemana iki animasyon aynı özelliği
+   yazsaydı listede sonra gelen ötekini sessizce yutardı; kademe ya da süzülme,
+   ikisinden biri hiç görünmezdi.
+
+   ⚠️ GECİKME NEGATİF. `kr-suzul` hepsinde aynı anda başlasaydı on katman tek
+   bir kütle gibi salınırdı — parallax duygusunu veren şey FAZ FARKI. Negatif
+   gecikme animasyonu "zaten bir süredir koşuyormuş" gibi başlatıyor, yani ilk
+   karede bile katmanlar dağınık.
+
+   Genlik `--i` ile büyüyor: önde çizilen katman arkadakinden daha çok
+   kayıyor. Gerçek parallaxın yönü bu ve SVG'de katman sırası zaten derinlik
+   sırası — önce çizilen arkada kalıyor.
+   -------------------------------------------------------------------------- */
+.kr__sahne[data-on="true"] > * {
+  --kr-kay: calc((var(--i, 0) + 1) * var(--kr-kayma));
+
+  animation:
+    kr-katman-gir 900ms var(--ease-out) both calc(var(--i, 0) * 90ms),
+    kr-suzul calc(11s + var(--i, 0) * 1.3s) var(--ease-in-out) infinite
+      calc(var(--i, 0) * -1.7s);
+}
+
+@keyframes kr-katman-gir {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes kr-suzul {
+  0%,
+  100% {
+    transform: translate3d(calc(var(--kr-kay) * -1), calc(var(--kr-kay) * -0.55), 0);
+  }
+  50% {
+    transform: translate3d(var(--kr-kay), calc(var(--kr-kay) * 0.55), 0);
+  }
+}
+
+/* ⚠️ DURAKLATMA HİKÂYENİN DURAKLATMASINA BAĞLI. `hikaye()` kutuya `.hik`
+   ekliyor ve kutu `.kr`ın kendisi — yani aşağıdaki seçici hikâyenin
+   `data-durakta`sını doğrudan okuyor. Okur parmağını basılı tutup perdeyi
+   dondurduğunda arkadaki sahne süzülmeye devam etseydi "duraklattım" duygusu
+   yalan olurdu. Bedava: `animation-play-state`, `transition` olsaydı
+   hesaplanmış dönüşümü okuyup geri yazmak gerekirdi (aynı gerekçe
+   `css/hikaye.css` §1'deki dolgu çubuğunda da yazılı). */
+.kr[data-durakta="true"] .kr__sahne,
+.kr[data-durakta="true"] .kr__sahne > * {
+  animation-play-state: paused;
+}
+
+/* ============================================================================
+   §TARLA — 1. ve 2. perdenin ızgarası
+   ========================================================================= */
+
+/* Dilimin İÇ DÜZENİ. Kutusu (`position`, `inset`, saydamlık geçişi)
+   `.hik__dilim`den geliyor — burada yalnız ortalama var.
+
+   Ölçek: demo dilimin TAMAMINI 0.75'ten açıyor (A1). Karışan yazının altında
+   duran bu yavaş büyüme, yazı yerine otururken kadrajın hâlâ hareket ediyor
+   olmasını sağlıyor. */
+.kr__slayt {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transform: scale(var(--kr-slayt-olcek, 1));
+  transition: transform var(--kr-giris-sure) var(--ease-out);
+}
+
+.kr__satir {
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+
+/* ⚠️ TEK PUNTO VAR, ÖLÇEK ÜÇ İŞİ BİRDEN GÖRÜYOR — demodaki en kolay gözden
+   kaçan karar bu. Demoda `.slide p` istisnasız 2rem; merkezdeki kelimeyi
+   büyüten şey punto değil `scale`. Espri buna dayanıyor: merkezdeki kelime
+   tarladaki 22 kopyadan BİRİ, ölçeği 1'e indiğinde aralarında kayboluyor ve
+   ancak büyüyünce başlığa dönüşüyor.
+
+   Bir dönem burada `.kr--merkez { font-size: var(--fs-lg) }` yazıyordu. Merkez
+   tarlanın 1.8 katı doğuyordu, yani hiç "kopyalardan biri" olmuyordu ve
+   dönüşüm gösterisi konusunu kaybediyordu. */
+.kr__satir p,
+.kr__son {
+  font-family: var(--kr-yazi, var(--font-display));
+  font-size: var(--fs-sm);
+  line-height: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
+  color: var(--ink-soft);
+  transition:
+    transform var(--dur-scene) var(--ease-out),
+    color var(--dur-scene) var(--ease-out);
+}
+
+.kr__satir p { margin: 0.6ch; }
+
+/* Merkezdeki satır: demodaki `p.center`. Yalnız RENGİYLE ve ÖLÇEĞİYLE
+   ayrılıyor, puntosuyla değil (bkz. yukarısı). */
+.kr__satir p.kr--merkez,
+.kr__son {
+  color: var(--ink);
+  transform: scale(var(--kr-olcek, 1));
+}
+
+/* Tarladaki kopyaların ve sözlerin kendi ölçeği — demoda A4'ün
+   `scale: {from: .75}`i ve A12'nin `scale: [.8, 1]`i. Gecikmesi
+   `merkezdenDisa`nın dalgasından geliyor, yani her kopya KENDİ sırası gelince
+   büyüyor. */
+.kr__satir p:not(.kr--merkez) {
+  transform: scale(var(--kr-p-olcek, 1));
+}
+
+/* ============================================================================
+   §YAZI — 3, 4 ve 5. perdeler: karıştırmayan üç animasyon
+   ----------------------------------------------------------------------------
+   Motorları `js/yazi.js`te. ⚠️ HAREKETİN KENDİSİ BURADA, JS'te değil — orada
+   yalnız metnin birimlere bölünmesi ve sıranın (`--i`) yazılması var. Ayrım
+   `js/karistir.js`in başındaki kuralın aynısı: saydamlık, bulanıklık, ölçek ve
+   maske CSS'in zaten bildiği şeyler.
+
+   ⚠️ ÜÇÜ DE NEDEN GEREKLİ: aynı karıştırma dili altı dilim boyunca
+   sürdürülseydi üçüncüsünden sonra "efekt" olurdu. Ayrıca uzun cümleler için
+   karıştırma YANLIŞ araç — okur yazıyı ancak bittikten sonra okumaya
+   başlıyor, oysa süpürme ve daktilo okunurken açılıyor.
+   ========================================================================= */
+
+.yz__b {
+  /* Maskenin ve ölçeğin işleyebilmesi için kutu gerek; satır kırılması
+     aradaki gerçek boşluklardan oluyor (bkz. `js/yazi.js` §BÖLME). */
+  display: inline-block;
+  white-space: pre;
+}
+
+/* Gecikme kademesi. `--n` `js/yazi.js`in kaba yazdığı birim sayısı; sondan
+   başlamak (çıkışlarda) ancak onunla yazılabiliyor. */
+.yz__b {
+  animation-delay: calc(var(--i, 0) * var(--yz-adim, 55ms));
+}
+
+[data-yz-ters="1"] .yz__b {
+  animation-delay: calc((var(--n, 1) - 1 - var(--i, 0)) * var(--yz-adim, 55ms));
+}
+
+/* Çıkış giriş keyframe'inin TERSİ, ayrı bir keyframe değil. İki tarif yazmak
+   ikisinin ayrışmasını davet ederdi: girişi düzeltip çıkışı unutmak. */
+[data-yon="cik"] .yz__b {
+  animation-direction: reverse;
+}
+
+/* ⚠️ DURGUN = HAREKETSİZ DEĞİL, TAM YERİNDE. Hareket azaltmada ve durağan
+   pozda bu yazılıyor; `animation: none` birimleri keyframe'in `from` hâlinde
+   değil KENDİ doğal hâlinde bırakıyor, yani metin okunur. */
+[data-yon="durgun"] .yz__b {
+  animation: none;
+}
+
+/* ── SÜPÜRME ──────────────────────────────────────────────────────────────
+   Maske soldan sağa açılıyor; harfler değişmiyor, görünürlükleri değişiyor.
+   `inset`in dikey kenarları NEGATİF: `0` kutunun kendisini kırpıyor ve `g`,
+   `ğ`, `p` gibi harflerin altı kesiliyordu (ölçüldü — özellikle
+   `--font-display` yığınında). */
+[data-yz="supur"] .yz__b {
+  animation-name: yz-supur;
+  animation-duration: var(--yz-sure, 620ms);
+  animation-timing-function: var(--ease-out);
+  animation-fill-mode: both;
+}
+
+@keyframes yz-supur {
+  from {
+    clip-path: inset(-0.35em 100% -0.35em -0.12em);
+    opacity: 0.25;
+    transform: translateY(0.18em);
+  }
+  to {
+    clip-path: inset(-0.35em -0.12em -0.35em -0.12em);
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── NETLEŞME ─────────────────────────────────────────────────────────────
+   Kelime bulanık ve büyük doğup odağa giriyor. `filter: blur()` kelimenin
+   KUTUSUNU büyütmüyor (boyanmayı etkiliyor, düzeni değil), yani satır
+   uzunluğu hiç oynamıyor — `letter-spacing`le yapılsaydı her kare yeniden
+   satır kırardı. */
+[data-yz="netles"] .yz__b {
+  animation-name: yz-netles;
+  animation-duration: var(--yz-sure, 620ms);
+  animation-timing-function: var(--ease-out);
+  animation-fill-mode: both;
+}
+
+@keyframes yz-netles {
+  from {
+    opacity: 0;
+    filter: blur(0.42em);
+    transform: scale(1.3);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+/* ── DAKTİLO ──────────────────────────────────────────────────────────────
+   Metni JS yazıyor (`js/yazi.js` §DAKTİLO); CSS'in işi yalnız imleç ve
+   ⚠️ YERİN ÖNCEDEN AYRILMASI.
+
+   Hayalet kopya olmasaydı şu olurdu: dilim dikeyde ortalanmış, metin ise
+   büyüyor — yani her yeni satırda bütün blok yukarı kayardı. Okunmakta olan
+   satırın altından kaymasından daha rahatsız edici az şey var. Hayalet metnin
+   TAM hâlini görünmez tutuyor, akan kopya onun üstüne biniyor. */
+.kr__daktilo {
+  position: relative;
+  white-space: pre-line; /* kaynaktaki satır sonları korunuyor */
+}
+
+.yz__hayalet {
+  visibility: hidden;
+}
+
+.yz__akan {
+  position: absolute;
+  inset: 0;
+}
+
+/* İmleç YALNIZ YAZARKEN yanıyor. Durmuş bir daktiloda yanıp sönen imleç
+   "devam edecek" diye okunuyor ve okur boşuna bekliyor.
+
+   ⚠️ ÖZNİTELİK AKAN KOPYANIN ÜSTÜNDE, kutunun değil: `daktilo()` kendisine
+   verilen elemana yazıyor ve ona verilen şey `hayaletKur()`un döndürdüğü akan
+   kopya (bkz. `js/yazi.js` §DAKTİLO). Seçici `.kr__daktilo[data-yon]` diye
+   yazılsaydı imleç hiç görünmezdi. */
+.yz__akan[data-yon="gir"]::after {
+  content: "▌";
+  animation: yz-imlec 1s steps(1, end) infinite;
+}
+
+@keyframes yz-imlec {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* ----------------------------------------------------------------------------
+   TİPOGRAFİ — okunacak cümlelerin kendi ölçüsü
+   ----------------------------------------------------------------------------
+   ⚠️ TARLANIN TEK PUNTOSU BURADA GEÇERLİ DEĞİL. Yukarıdaki `--fs-sm` + `scale`
+   düzeni beş harflik bir kelimenin yirmi üç kopyası için tasarlandı; bu üç
+   dilim SARAN cümleler taşıyor ve ölçekle büyütülen bir paragraf satır
+   uzunluğunu da büyütüyor — 3:4 tuvalde ilk taşan şey o oluyor.
+
+   `max-inline-size` karakter cinsinden: satır uzunluğunun okunabilir sınırı
+   piksel değil karakter sayısı. `text-wrap: balance` son satırda tek kelime
+   bırakmıyor.
+   -------------------------------------------------------------------------- */
+.kr__metin,
+.kr__alinti,
+.kr__daktilo,
+.kr__cagri,
+.kr__dipnot {
+  margin: 0;
+  font-family: var(--kr-yazi, var(--font-display));
+  color: var(--ink);
+  text-align: center;
+  text-wrap: balance;
+  max-inline-size: 24ch;
+}
+
+.kr__metin,
+.kr__daktilo {
+  font-size: var(--fs-base);
+  line-height: 1.4;
+}
+
+/* ⚠️ DAKTİLO DAHA GENİŞ ve sebebi metnin biçimi. Öbür dilimler tek cümle
+   taşıyor; bu bir LİSTE ve kaynakta kendi satır sonları var (bkz.
+   `sayfa.html` 4. dilim). Ortak 24ch'de o satırların her biri ikiye üçe
+   bölünüyordu, yani yazarın koyduğu duraklar görünmez oluyordu. Ölçüldü:
+   24ch'de blok 275×257, 30ch'de satır başına ~6 karakter daha düşüyor.
+
+   Daha genişi 3:4 tuvale sığmıyor: en uzun kaynak satırı 52 karakter ve o
+   uzunluk bu puntoda tuvalin kendisinden geniş. Yani sarma kaçınılmaz;
+   seçilen şey NE KADAR sardığı. */
+.kr__daktilo {
+  max-inline-size: 30ch;
+}
+
+/* İkinci cümle ilkinin altında ve ondan sönük: dilim iki beyitli, ikisi eşit
+   ağırlıkta olsaydı göz nereden başlayacağını bilemezdi. */
+.kr__metin--kisik {
+  color: var(--ink-soft);
+  font-size: var(--fs-sm);
+  margin-block-start: var(--sp-3);
+}
+
+/* Alıntı sayfanın en iri yazısı — `ed-2`de de `.pull` öyle duruyor.
+   16ch denendi ve 54 karakterlik alıntıyı DÖRT satıra bölüyordu (satır başına
+   ~16 karakter); 20ch üçe indiriyor. Alıntının gücü satır sayısında değil,
+   tek nefeste okunmasında. */
+.kr__alinti {
+  font-size: var(--fs-lg);
+  line-height: 1.15;
+  max-inline-size: 20ch;
+}
+
+.kr__cagri {
+  font-size: var(--fs-xl);
+  line-height: 1;
+  max-inline-size: 14ch;
+}
+
+.kr__dipnot {
+  font-size: var(--fs-xs);
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin-block-start: var(--sp-3);
+  max-inline-size: 30ch;
+}
+
+/* Dilim içindeki öbekler arası boşluk. `.kr__slayt` sütun yönünde ortalıyor;
+   tarla dilimlerinde satırların kendi `margin`ı var, bunlarda yok. */
+.kr__slayt:has(> .kr__metin, > .kr__alinti, > .kr__daktilo, > .kr__cagri) {
+  padding-inline: var(--sp-5);
+}
+
+/* ============================================================================
+   §TEZGÂH — yalnız `tezgah-karistir.html`in açtığı kancalar
+   ----------------------------------------------------------------------------
+   ⚠️ İKİSİ DE SAYIDA AÇILMIYOR. `data-sabit` genişliği `ch` cinsinden
+   çiviliyor — zıplamanın ilacı bu mu diye ölçmek için. `data-olcum` ise
+   geçişleri kapatıyor: ölçek bir geçiş olduğu için, ölçeği yazıp hemen ölçmek
+   ESKİ ölçeğin genişliğini okurdu.
+   ========================================================================= */
+
+.kr[data-sabit="1"] .kr--merkez {
+  display: inline-block;
+  min-width: var(--kr-en, 22ch);
+  text-align: center;
+}
+
+.kr[data-olcum="1"] .kr__slayt,
+.kr[data-olcum="1"] .kr__satir p,
+.kr[data-olcum="1"] .kr__son {
+  transition: none;
+}
+
+/* ============================================================================
+   HAREKET AZALTMA
+   ----------------------------------------------------------------------------
+   Çift yazım — `.kr`ın kendi geçişleri için. `--dur-scene` kullanan kurallar
+   `tokens.css` §ERİŞİLEBİLİRLİK'teki indirimden zaten etkileniyor; aşağıdaki
+   bloklar yerel belirteçleri düşürüyor ve SÜREKLİ animasyonları susturuyor.
+
+   ⚠️ SÜZÜLMEYİ SUSTURMAK ŞART, süreyi kısaltmak yetmez: `infinite` bir
+   animasyon 1ms'ye indirildiğinde durmuyor, saniyede binlerce kez koşuyor.
+   `animation: none` tek doğru cevap.
+
+   Yazı animasyonlarının kendisi ayrıca JS'te de kapanıyor (`js/yazi.js` →
+   `azHareket()`): metin doğrudan yerine yazılıyor. Buradaki kural o yolun
+   GÖRÜNTÜSÜ — ikisi birden gerekiyor, çünkü JS `data-motion="off"`u okuyor,
+   CSS ise sistem tercihini.
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .kr {
+    --kr-zemin-sure: 1ms;
+    --kr-giris-sure: 1ms;
+    --kr-perde-sure: 1ms;
+  }
+  .kr__sahne,
+  .kr__sahne > *,
+  .yz__b,
+  .yz__akan::after {
+    animation: none !important;
+  }
+}
+
+:root[data-motion="off"] .kr {
+  --kr-zemin-sure: 1ms;
+  --kr-giris-sure: 1ms;
+  --kr-perde-sure: 1ms;
+}
+:root[data-motion="off"] .kr__sahne,
+:root[data-motion="off"] .kr__sahne > *,
+:root[data-motion="off"] .yz__b,
+:root[data-motion="off"] .yz__akan::after {
+  animation: none !important;
+}

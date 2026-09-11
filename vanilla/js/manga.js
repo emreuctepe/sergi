@@ -49,6 +49,29 @@ const ADIM = 1.25;
    sığdırmada ~11px olan yazı burada ~26px'e çıkıyor. */
 const RAHAT = 2.4;
 
+/* ⚠️ PENCERE SIĞDIRMADA AÇILMIYOR, 1.5 KATINDA — ve bu sayı ölçülerek seçildi.
+   Sığdırma, tam ekranın SEBEBİNİ karşılamıyordu: 1920×1000'de sayfa 531px'e
+   çıkıyor ve balon yazısı 10.7px'te kalıyor, yani akıştaki 7.6px'ten yalnız üç
+   punto ileride. 1280×720'lik bir pencerede ise sığdırma sayfayı 374px'te
+   bırakıyor ve yazı 7.6px — akıştakinin BİREBİR AYNISI. O ekranda düğmeye
+   basmak hiçbir şey kazandırmıyordu.
+
+   Kat, balon yazısının 16px'i geçtiği yer olarak seçildi (1920×1000'de ölçüldü):
+
+     sığdırma 1.0×   531px sayfa   10.7px balon
+     1.4×            743px         15.0px      ← 16'nın altında kalıyor
+     1.5×            797px         16.1px      ← ilk geçen adım
+     çift tık 2.4×  1274px         25.8px
+
+   Bedeli yatay değil DİKEY: 1.5 katında sayfa 1.42 ekran boyunda, yani okur
+   aşağı kaydırıyor. Yatay taşma masaüstünde hiç doğmuyor (1280×720'de bile
+   sayfa ancak 3.4 katında pencereyi aşıyor); dar/dikey pencerelerde doğuyor ve
+   orada da sığdırmanın kendisi zaten okunamayacak kadar küçük.
+
+   Sığdırmaya dönüş kaybolmadı: bant düğmesi, `0` tuşu ve çift tıklama oraya
+   götürüyor. Değişen yalnız NEREDE AÇILDIĞI. */
+const ACILIS = 1.5;
+
 /* Sahne ile görüş alanının kenarı arasında bırakılan hava. Sıfır olsaydı
    4. karenin sayfayı taşan balonu (`left: 70%; width: 104%`) ekran kenarına
    yapışırdı. */
@@ -386,11 +409,15 @@ export function mangaAc(sayfa) {
   pencere.showModal();
 
   sigdirma = sigdirmayiOlc();
-  olcek = 1;
+  olcek = ACILIS;
   genisligiYaz();
 
   /* Sahne sığdırmada ekrandan dar olabilir; ortalamayı flexbox yapıyor ama
-     yatayda taşma varsa başlangıç noktası ortası olmalı. */
+     yatayda taşma varsa başlangıç noktası ortası olmalı.
+
+     `top: 0` açılış katı 1'i aştıktan sonra daha da önemli: sayfa artık
+     pencereden uzun ve okur onu BAŞINDAN görmeli. Ortalanmış bir başlangıç
+     mangayı ikinci sırasından açardı. */
   gorusalan.scrollTo({
     left: (gorusalan.scrollWidth - gorusalan.clientWidth) / 2,
     top: 0

@@ -1,6 +1,31 @@
-# Bu depo derlemesiz: `vanilla/` doğrudan servis edilir, build adımı yok.
+# ============================================================================
+# Bu klasör depo KÖKÜ ama tamamı yayınlanmıyor.
+# ----------------------------------------------------------------------------
+# Depoya giren yalnız yayınlanan sayı: `vanilla/` ve onu Cloudflare'e bağlayan
+# `wrangler.jsonc`. Geri kalanı projenin tezgâhı — ölçüm betikleri, tasarım
+# notları, durum dosyası, denenmiş arşivler. Yerelde duruyorlar, sürümlenmiyorlar.
+#
+# ⚠️ İZİN LİSTESİ, YASAK LİSTESİ DEĞİL. Önce her şey dışarıda bırakılıyor,
+# sonra yayına giren üçü geri alınıyor. Ters yazılsaydı (tek tek "şunu
+# yoksay") köke eklenen her yeni çalışma dosyası sessizce izlenmeye başlar ve
+# bir gün kazara yayına giderdi. Yeni bir şey yayınlanacaksa buraya bir
+# `!` satırı eklemek gerekiyor — yani karar bilerek veriliyor.
+#
+# ⚠️ `referans/araclar/olcum/` bir venv ve TEK BAŞINA 256 MB. Kural
+# kaldırılacaksa önce o dışarıda bırakılmalı; yoksa depo yirmi katına çıkar.
+# ============================================================================
+
+/*
+!/.gitignore
+!/vanilla/
+!/wrangler.jsonc
+
+# `vanilla/` içinde de derleme artığı istemiyoruz. `sayfalar/ms-galeri/`
+# altındaki `uret.py` çalışınca __pycache__ bırakıyor.
 __pycache__/
 *.pyc
+
+# OS / editör
 .DS_Store
 Thumbs.db
 *.swp

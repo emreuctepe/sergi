@@ -35,11 +35,16 @@ Sıranın **tek** kaynağı `index.html` içindeki `#sira` bloğu:
 ```html
 <script id="sira" type="text/plain">
   sayfalar/kapak-1
-  sayfalar/ed-1
-  sayfalar/ed-2
+  sayfalar/ed-sunus
+  sayfalar/k-acilis
   …
 </script>
 ```
+
+> `sayfalar/ed-1` ("Eylül, aslında bir veda") ve `sayfalar/ed-2` **sırada yok**:
+> ikisinin de yerini `ed-sunus` aldı. `ed-2`nin metni oraya taşındı (son üç
+> dilim), yani sayıda iki kez durmuyor. Klasörleri diskte duruyor, geri
+> getirmek listeye bir satır yazmak.
 
 | Ne istiyorsun | Ne yapacaksın |
 |---|---|
@@ -79,8 +84,8 @@ ilk düzenlemeden sonra yanlış olurlardı.
 
 ## Okuma modları
 
-Üç mod var ve **sayfalar DOM'dan çıkmıyor, yalnızca gizleniyor** — süzme
-`css/bilesen.css` §7'deki üç CSS kuralında:
+Okura **iki mod** soruluyor ve **sayfalar DOM'dan çıkmıyor, yalnızca
+gizleniyor** — süzme `css/bilesen.css` §7'deki CSS kurallarında:
 
 ```css
 :root[data-depth='min'] .page:not([data-mod~='min']):not([data-mod~='all']) { display: none; }
@@ -89,8 +94,8 @@ ilk düzenlemeden sonra yanlış olurlardı.
 | Mod | Sayfa | Not |
 |---|---|---|
 | `min` — Doomscroller | 20 | |
-| `mid` — Dengeli | 30 | |
 | `full` — Doomreader | 33 | |
+| `mid` — Dengeli | 30 | okura **sorulmuyor** (aşağıya bak) |
 | **DOM'daki toplam** | **34** | |
 
 (Sayılar tarayıcıda ölçüldü. Önceki tablo 19/28/31 ve toplam 32 diyordu; o
@@ -101,12 +106,45 @@ sayfası ("Üç cümlede 1923") yalnızca `min` modunda var — uzun dosyanın �
 cümlelik karşılığı. Bu yüzden "full'ü göster, fazlasını gizle" gibi bir kısayol
 kullanılamıyor.
 
-Mod, üst banttaki çipe tıklayınca açılan kartlardan seçiliyor ve
-`localStorage`da hatırlanıyor.
+**`mid` gizli, silinmiş değil.** Seçenek listesinden (`js/okuyucu.js`
+§`MODLAR`) çıkarıldı; sayfalardaki `data-mod="mid full"` etiketleri ve §7'deki
+süzgeç kuralı yerinde duruyor, yani modu geri açmak o listeye bir satır eklemek
+(bir de çipin çubuğunu geri koymak, `css/canvas.css`). Hiçbir sayfa bu arada
+sahipsiz kalmıyor: yalnız `mid` etiketli tek bir sayfa yok, `mid`in gösterdiği
+her şey `full`de de var. Kayıtlı tercih de aynı listeden doğrulandığı için
+"Dengeli"de kalmış bir okura seçim ekranı bir kez daha açılıyor — artık
+sorulmayan bir modda okumaya devam eden kimse olmuyor.
 
-Aynı ekranın altında ikinci bir soru daha var: **görünüm** (aydınlık/karanlık).
-Mod seçimi modalı kapatır, tema seçimi kapatmaz — tema anında uygulanıyor ve
-okurun sonucu arkadaki sayıda görüp fikrini değiştirebilmesi gerekiyor.
+Mod, üst banttaki çipe tıklayınca açılan seçiciden geliyor ve `localStorage`da
+hatırlanıyor. Aynı ekranda ikinci bir soru daha var: **görünüm**
+(aydınlık/karanlık). İkisi de aynı desende çiziliyor — bir önizleme kutusu,
+altında tek kelime. Kutuların çerçevesi ortak, içleri değil: okuma modunda
+ortada modun simgesi, görünümde kâğıt rengini taşıyan bir sayfa taklidi.
+
+Okuma modunun kutuların altında bir de açıklaması var — ama **yalnız seçili
+olanınki**, tek satır, seçimle birlikte değişiyor. Her kutunun kendi cümlesi
+(eskiden öyleydi) seçenekleri karşılaştırılacak metin bloklarına çeviriyordu;
+iki kutu yan yanaysa fark zaten bakarak görülüyor. Tek satır onun yerine "şu an
+buradasın"ı anlatıyor. Dakika ve sayfa künyesi bilerek yok.
+
+⚠️ O iki cümle **sayıdan bağımsız** yazılmalı. `js/acilis.js` kabuğun parçası,
+içeriğin değil: sayı her ay değişiyor, o satırlar değişmiyor. Bir dönem "manga,
+foto-öykü ve bulmaca kısalmaz" diyorlardı — yani 2026-09'un bölüm listesini;
+mangası olmayan ilk sayıda sessizce yalan olurlardı. Şimdi modun kuralını
+anlatıyorlar (neyin kısaldığı, neyin kalmadığı). Ölçü: cümle önümüzdeki sayı
+için de doğru mu?
+
+**Hiçbir seçim modalı kapatmıyor.** İkisi de tıklandığı anda uygulanıp
+kaydediliyor, kapatma kararı okurun. Mod seçimi bir dönem tıklanınca
+kapatıyordu; aynı ekranda bir soru kaçarken öbürü durduğu için kaldırıldı —
+kaçan taraf hem modu seçtikten sonra temaya dokunmayı hem de "seçtim ama
+öbürüne de bakayım"ı imkânsız kılıyordu. Bedeli: seçim geri alınamıyor, Escape
+"vazgeç" değil "kapat" demek. Okur sonucu arkadaki sayıda zaten gördüğü için
+doğrusu bu.
+
+Kapanış yolu açılışa göre değişiyor: ilk açılışta ✕/Escape/perde yok, altta
+"Sayıyı aç" düğmesi var (sayıyı açmak bilinçli bir hareket kalsın diye);
+çipten açılınca üçü de çalışıyor.
 
 **Varsayılan karanlık.** Kural tek bir yerde yazılı, `index.html`in
 `<head>`indeki tema betiğinde; `js/acilis.js` temayı kendi varsayılanından
@@ -122,13 +160,19 @@ işletim sistemi o kararı ne zaman ezeceği belirsiz bir üçüncü ses olurdu.
 index.html          sıra + kabuk (bantlar, folio, ilerleme çubuğu)
 NOTLAR.md           index.html'in geliştirici notları — `<!-- not: … §x -->` işaretlerinin karşılığı
 tezgah-*.html       tek parçayı başsız tarayıcıya poz verdiren tezgâhlar (sayı bunlara bakmıyor)
-js/acilis.js        tek giriş noktası: yükleme → tanıtım → mod + tema seçimi → sayı
+js/acilis.js        tek giriş noktası: yükleme → mod + tema seçimi → sayı
 js/okuyucu.js       dizme, mod, folio, ilerleme, gezinme, giriş animasyonları
 js/manga.js         manga sayfasının tam ekran / yakınlaştırma katmanı
 js/telif.js         çizerin görsellerine dokunma engeli (kapsam: 18 görsel)
 js/kanto.js         alev hortumunun SMIL saati (hareket tercihi CSS'e işlemiyor)
-js/sahneler.js      tanıtım kartlarının arka planları (tohumlu üretim)
+js/sahneler.js      ŞU AN KULLANILMIYOR — beş üretilmiş arkalık, outro için ayrıldı
 js/bulmaca.js       emoji bilmecesi (bl-1) — sorular da bu dosyada
+js/hikaye.js        hikâye kabuğu: süre çubukları, dokunma bölgeleri, duraklatma
+                    (içeriği tanımaz — dilimin içi boş bir kanvas)
+js/karistir.js      metni karakter karakter çözen yazı motoru (scramble text)
+js/yazi.js          karıştırmayan üç yazı animasyonu: süpürme, daktilo, netleşme
+js/perde.js         SVG sahneyi satır içine indirir (katmanları animasyona açılsın)
+js/sunus.js         `ed-sunus`un koreografisi — sayı ve tezgâh aynı zinciri oynatır
 css/app.css         katman sırasını beyan eder ve diğerlerini çağırır
 css/bilesen.css     ana projede bileşenlerin içinde kalan kurallar + mod süzgeci
 css/*.css           derginin küresel stilleri
@@ -161,13 +205,96 @@ yeniden tanımlanıyor), böylece `blocks.css`'teki plan formülü tek satırı
 değişmeden çalışıyor. Dönüşüm kullanılsaydı `srcset` düzen boyutuna baktığı
 için tarayıcı 600w dosyada kalır ve büyüdükçe çizim bulanıklaşırdı.
 
-| | akışta | sığdırma | çift tıklama |
-|---|---|---|---|
-| sayfa genişliği | 374px | 531px | 1274px |
-| balon yazısı | 7.6px | 10.7px | **25.8px** |
+| | akışta | sığdırma | **açılış (1.5×)** | çift tıklama |
+|---|---|---|---|---|
+| sayfa genişliği | 374px | 531px | **797px** | 1274px |
+| balon yazısı | 7.6px | 10.7px | **16.1px** | 25.8px |
 
-(1920×1000 ekranda ölçüldü.) Ayrıntı ve gerekçeler `js/manga.js` başındaki
-blokta ve `css/overlays.css` §TAM EKRAN MANGA'da.
+(1920×1000 ekranda ölçüldü.) Katman **sığdırmada değil 1.5 katında açılıyor**:
+sığdırma balonu 10.7px'te bırakıyordu, yani akıştaki 7.6px'ten yalnız üç punto
+ileride — 1280×720'lik bir pencerede ise ikisi birebir aynı çıkıyor ve düğme
+hiçbir şey kazandırmıyordu. 1.5, balon yazısının 16px'i geçtiği ilk adım
+(1.4× → 15.0px). Bedeli dikey: sayfa 1.42 ekran boyunda, okur aşağı kaydırıyor.
+Sığdırmaya dönüş banttaki düğmede, `0` tuşunda ve çift tıklamada duruyor.
+
+Ayrıntı ve gerekçeler `js/manga.js` başındaki blokta ve
+`css/overlays.css` §TAM EKRAN MANGA'da.
+
+---
+
+## Sunuş sayfası (`ed-sunus`) nasıl çalışıyor?
+
+Kapaktan sonraki ikinci sayfa bir **Instagram hikâyesi**: üstte altı süre
+çubuğu, kenarlarda dokunma bölgeleri, arkada bir SVG sahne, önünde dört ayrı
+dilde açılan yazı.
+
+| # | dilim | yazı animasyonu | arkasındaki sahne | ne söylüyor |
+|---|---|---|---|---|
+| 1 | `baslik` | karıştırma | `ay` (`04.svg`) | kelime çoğalır → çekilir → kalan sayının adı olur |
+| 2 | `sozler` | karıştırma | `ay` | dergi ne, dokuz cümlede |
+| 3 | `sehir` | **süpürme** | `fener` (`02.svg`) | Kantō yazısı |
+| 4 | `icerik` | **daktilo** | `yagmur` (`09.svg`) | röportaj, manga, masal |
+| 5 | `cagri` | **netleşme** | `halka` (`06.svg`) | alıntı + "aşağı kaydır" |
+| 6 | `kunye` | karıştırma | `ay` | Aylık · Eylül 2026 → Sayı 03 |
+
+3–5'in metni `ed-2`den geldi (o sayfa sıradan çıktı) ve **bölündü, yeniden
+yazılmadı**. Tam tur ~37 saniye; okur beklemek zorunda değil, kenara dokunup
+geçiyor.
+
+**Neden dört ayrı yazı dili?** İkisi için. Biri üslup: aynı karıştırma altı
+dilim sürseydi üçüncüden sonra "efekt", dördüncüden sonra görünmez olurdu.
+Öbürü daha somut — karıştırma **uzun cümle için yanlış araç**: okur metni ancak
+tamamen çözüldükten sonra okumaya başlayabiliyor. Beş harflik bir kelimede
+bedeli yok; on altı kelimelik bir cümlede dilimin yarısı okunamayan bir yazıya
+bakmakla geçiyor. Süpürme ve daktilo açılırken okunuyor.
+
+Altı dosya, altı iş, hiçbiri öbürünü tanımıyor:
+
+| dosya | işi |
+|---|---|
+| `sayfalar/ed-sunus/sayfa.html` | işaretleme — 23 kopyalı baklava dilimi ve bütün metin |
+| `js/sunus.js` | koreografi — hangi metin, hangi sırayla, kaç milisaniye |
+| `js/hikaye.js` | kabuk — çubuklar, dokunma, duraklatma (içeriği tanımaz) |
+| `js/karistir.js` | motor — metni karakter karakter çözer |
+| `js/yazi.js` | motor — süpürme, daktilo, netleşme |
+| `js/perde.js` | arkadaki SVG'yi satır içine indirir, katmanlarını numaralar |
+
+**Arkadaki sahne neden `<img>` değil?** Çünkü istenen şey katmanların
+**birbirine göre** süzülmesi — dağ ayrı, ay ayrı. Dışarıdan yüklenen bir SVG'nin
+içine CSS giremiyor, o yüzden dosya `fetch` edilip satır içine indiriliyor
+(kopyalanmıyor: iki kopya ilk düzenlemede ayrışır). Çizimler sergi bölümüyle
+ortak ve **yer tutucu** — Ece Özgür'ün asılları gelince sunuşun arkası
+kendiliğinden değişecek, tek satır kod düzenlemeden.
+
+**Opaklık (`--kr-perde-opak: 0.38`) ölçülerek seçildi.** Sınırı koyan katman her
+perdede aynı: `#e8d9b0`, ayın/fenerin içindeki krem leke. `--ink` ile kontrastı
+α=0.38'de 5.1:1, α=0.42'de tam 4.5:1 (AA eşiği, payı yok), α=0.50'de 3.6:1.
+Hesap analitik (`sonuç = zemin·(1-α) + katman·α`), yani ekran görüntüsü
+gerekmiyor; tezgâhtaki **KONTRAST** panosu her perde için bu tabloyu yazıyor ve
+"eşiği geçen en yüksek α"yı söylüyor.
+
+**Sayfa döngüde.** Son perde künyeyi dağıtıyor, yani bitişte ekranda boş bir
+kâğıt kalırdı; okur sayfaya geç gelirse hiçbir şey görmemiş olurdu. Zeminin son
+dağılmayla birlikte açılış rengine dönmesi de zaten başa sarmak için tasarlandı
+— sarışta tek bir renk geçişi oluyor, kâğıt parlaması yok.
+
+**Ekrandan çıkınca perde geri sarılıyor.** Okur kapaktayken hikâyenin arkada
+yanıp bitmemesi gerekiyordu. Saati durdurmak yetmedi: koreografi kendi
+`setTimeout` zinciriyle akmaya devam ediyordu ve kapakta üç saniye duran okur
+ilk perdenin yarısını kaçırıyordu. `hikaye.js` artık "kimse bakmıyor"
+duraklatmasında (`gorus` / `gizli`) zinciri kesip dilimi **başa sarıyor** —
+okur döndüğünde perdeyi baştan görüyor. Bakarak beklemek (`elle`, basılı tutma)
+geri sarmıyor, kareyi donduruyor. Ayrıntı `js/hikaye.js` §IZLENMIYOR'da.
+
+**Tezgâhı `tezgah-karistir.html`.** Koreografiyi kopyalamıyor: sayfayı `fetch`
+edip `js/sunus.js`i çağırıyor, yani ölçtüğü zincir sayının oynattığı zincirin ta
+kendisi. Üç panel var — satırın karışırken ne kadar "zıpladığı", perde
+opaklığının kontrastı, ve her dilimin beyan/ölçülen süre payı.
+
+> Son üç dilimin süresi **elle yazılmıyor, metnin uzunluğundan hesaplanıyor**
+> (`js/sunus.js` §SÜRELER). Bir cümleye kelime eklemek dilimi kendiliğinden
+> uzatıyor. Hesap tezgâhta doğrulandı: `sehir` 5748ms ölçüldü, hesap 5746
+> demişti; `cagri` 7127'ye karşı 7126.
 
 ---
 
@@ -175,7 +302,7 @@ blokta ve `css/overlays.css` §TAM EKRAN MANGA'da.
 
 Kantō Depremi dosyasının (`k-*`) altı arka planı fotoğraf değil, satır içi SVG —
 ana projedeki `src/lib/art/kanto/` klasörünün vanilla karşılığı. Yanlarındaki
-öbür üretilmiş sahneler (`ed-1`, `son-kunye`, tanıtım kartları) renklerini
+öbür üretilmiş sahneler (`ed-1`, `son-kunye`) renklerini
 `var(--paper)` / `var(--accent)`ten alıyor ve tema koyuya dönünce onlar da
 dönüyor. **Bunlar dönmüyor: hexleri sabit.**
 
@@ -293,11 +420,6 @@ Klon **yalnızca okumak** için. Ana projedeki şu şeyler burada yok:
 
 Ana projenin **bulmaca motoru** da burada yok — ama `bl-1` artık boş değil:
 yerinde kendi başına yeten tek bir oyun var (aşağıya bak).
-
-Tanıtımın dördüncü kartı "Nereye istersen yorum yaz" diyor. Bu bir vaat ve
-klonda karşılığı yok — ama ana projede de henüz yok (yorum sistemi ayrı bir
-faz). Kart bilerek olduğu gibi bırakıldı; kopya, kopyaladığı şeyden daha
-iddialı da daha mütevazı da olmamalı.
 
 ---
 

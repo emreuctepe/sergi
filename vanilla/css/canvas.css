@@ -337,7 +337,10 @@
   opacity: 0.7;
 }
 
-/* --- okuma modu göstergesi (üç çubuk) ------------------------------------- */
+/* --- okuma modu göstergesi (iki çubuk) ------------------------------------
+   Çubuk sayısı MOD SAYISI kadar: `okuyucu.js`teki MODLAR listesi kısalırsa
+   buradaki `<i>`ler ve aşağıdaki kurallar da kısalmalı, yoksa çip hiç
+   yanmayan bir çubuk taşır ve okura olmayan bir mod vaat eder. */
 .depth-chip {
   display: inline-flex;
   align-items: center;
@@ -368,16 +371,12 @@
     opacity var(--dur-base) var(--ease-out);
 }
 .depth-chip__bars i:nth-child(1) {
-  height: 5px;
+  height: 6px;
 }
 .depth-chip__bars i:nth-child(2) {
-  height: 8.5px;
-}
-.depth-chip__bars i:nth-child(3) {
   height: 12px;
 }
 :root[data-depth="min"] .depth-chip__bars i:nth-child(1),
-:root[data-depth="mid"] .depth-chip__bars i:nth-child(-n + 2),
 :root[data-depth="full"] .depth-chip__bars i {
   opacity: 1;
 }

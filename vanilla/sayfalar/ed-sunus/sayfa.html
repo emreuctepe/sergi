@@ -1,0 +1,128 @@
+<!--
+  ed-sunus — sayının sunuşu: karıştırılan yazıdan bir hikâye.
+
+  Kapaktan sonraki ilk sayfa ve "Sunuş"un yerini aldığı yer. ALTI perde:
+  kelime çoğalır → hepsi çekilir → kalan sayının adı olur; sonra derginin ne
+  olduğunu söyleyen dokuz cümle; sonra sayının İÇİNDE ne olduğu üç perdede;
+  sonra künye.
+
+  ⚠️ SON ÜÇ PERDENİN METNİ `ed-2`DEN GELDİ ve o sayfa `#sira`dan çıktı
+  (`ed-1`de yapılanın aynısı). Aynı metnin sayıda iki kez durması — biri
+  hikâye, biri düz makale — okura iki kez aynı şeyi söylerdi. Klasör diskte
+  duruyor; sıraya geri koymak tek satır.
+
+  BEŞ DOSYA, BEŞ İŞ — hiçbiri öbürünü tanımıyor:
+    js/sunus.js    koreografi: hangi metin, hangi sırayla, kaç milisaniye
+    js/hikaye.js   kabuk: süre çubukları, dokunma bölgeleri, duraklatma
+    js/karistir.js 1, 2 ve 6. perde: metni karakter karakter çözen motor
+    js/yazi.js     3, 4 ve 5. perde: süpürme, daktilo, netleşme
+    js/perde.js    yazının arkasındaki SVG sahneyi satır içine indirir
+
+  ⚠️ İŞARETLEME YALNIZ DİNLENME DÜZENİ. Buradaki metinler açılış kareleri
+  değil, KAYNAK: `sunus.js` metinleri bu düğümlerden okuyor ve uzaklıklarını
+  bu düzende ölçüyor (boşaltılmış bir `<p>` sıfır genişliğe iner ve dalga
+  kaybolur). Bir cümleyi değiştirmek için JS'e dokunmak gerekmiyor; buradaki
+  satırı değiştirmek yetiyor.
+
+  ⚠️ 23 KOPYA ELLE YAZILI ve öyle kalmalı. Baklava dilimi (2-3-4-5-4-3-2) bir
+  kompozisyon; JS'te üretilseydi sayfanın neye benzediği dosyaya bakarak
+  anlaşılamazdı. "sErgi" beş karakter olduğu için bu diziliş 3:4 tuvale
+  sığıyor — demodaki 11 karakterlik kelime taşardı.
+-->
+<section
+  class="page"
+  data-page-id="ed-sunus"
+  data-mod="all"
+  data-section="editorden"
+  data-section-title="Editörden"
+  data-kind="sunus"
+  data-scene="none"
+  data-fit="contain"
+  data-bleed="full"
+  data-inview="true"
+  role="group"
+  aria-roledescription="sayfa"
+>
+  <!-- ⚠️ `.hik` sınıfı BURADA YAZMIYOR, `hikaye()` ekliyor: kutu motor
+       çalışmadan hikâye gibi davranmamalı. JS inmezse ekranda üst üste binmiş
+       altı dilim değil, sayfanın kendisi duruyor. -->
+  <div class="kr" data-zemin="1">
+    <!-- Sahneler buraya iniyor (`js/perde.js`). Kap işaretlemede duruyor ki
+         sayfanın yapısı dosyaya bakarak anlaşılsın; içi boş doğuyor çünkü
+         çizimler `assets/2026-09/akilli-kiz/`te yaşıyor ve kopyalanmıyor. -->
+    <div class="kr__perdeler" aria-hidden="true"></div>
+
+    <!-- 1 · BAKLAVA DİLİMİ -->
+    <div class="hik__dilim kr__slayt" data-dilim="baslik">
+      <div class="kr__satir"><p>sErgi</p><p>sErgi</p></div>
+      <div class="kr__satir"><p>sErgi</p><p>sErgi</p><p>sErgi</p></div>
+      <div class="kr__satir"><p>sErgi</p><p>sErgi</p><p>sErgi</p><p>sErgi</p></div>
+      <div class="kr__satir">
+        <p>sErgi</p><p>sErgi</p><p class="kr--merkez">sErgi</p><p>sErgi</p><p>sErgi</p>
+      </div>
+      <div class="kr__satir"><p>sErgi</p><p>sErgi</p><p>sErgi</p><p>sErgi</p></div>
+      <div class="kr__satir"><p>sErgi</p><p>sErgi</p><p>sErgi</p></div>
+      <div class="kr__satir"><p>sErgi</p><p>sErgi</p></div>
+    </div>
+
+    <!-- 2 · SÖZLER — derginin ne olduğu, dokuz cümlede.
+         ⚠️ Silinen tanıtımın "Nereye istersen yorum yaz" kartı BİLEREK
+         alınmadı: yorum sistemi bu klonda yok, o cümle tutulamayan bir söz
+         olurdu (aynı gerekçe BENIOKU'dan da bu yüzden silindi). -->
+    <div class="hik__dilim kr__slayt" data-dilim="sozler">
+      <div class="kr__satir"><p>Bu bir dergi.</p><p>Akış değil.</p></div>
+      <div class="kr__satir"><p>Ayda bir sayı.</p><p>Bir oturuşta.</p><p>Sonra kapanır.</p></div>
+      <div class="kr__satir"><p>İki okuma derinliği.</p><p>Acelen varsa kısası.</p></div>
+      <div class="kr__satir"><p>Başlıyor</p><p>ve bitiyor.</p></div>
+    </div>
+
+    <!-- 3 · ŞEHİR — SÜPÜRME (`js/yazi.js`)
+         İki beyit: iri olan ne olduğunu, sönük olan nedenini söylüyor. Maske
+         soldan sağa açılıyor, yani okur cümleyi ilk andan itibaren DOĞRU
+         okuyor — karıştırma bunu yapamıyor ve bu uzunlukta bir cümlede
+         yapamaması asıl mesele. -->
+    <div class="hik__dilim kr__slayt" data-dilim="sehir">
+      <p class="kr__metin">
+        Bir şehrin öğle vakti nasıl yandığını anlatan uzun bir yazı var.
+      </p>
+      <p class="kr__metin kr__metin--kisik">
+        Belki de Japonların deprem gibi afetlere bu denli duyarlı olma nedenini
+        yüz sene öncesinde bulabiliriz.
+      </p>
+    </div>
+
+    <!-- 4 · İÇERİK — DAKTİLO (`js/yazi.js`)
+         ⚠️ SATIR SONLARI KAYNAKTA, `<br>` İLE DEĞİL: kutu `white-space:
+         pre-line` (bkz. `css/sunus.css` §YAZI) ve daktilo metni karakter
+         karakter yazdığı için satır sonunun da bir KARAKTER olması gerekiyor.
+         `<br>` olsaydı `textContent` onu hiç görmezdi.
+
+         Girintiler `sunus.js`te temizleniyor (her satır `trim`): burada
+         hizalı durmaları okunabilirlik için, metnin parçası değil. -->
+    <div class="hik__dilim kr__slayt" data-dilim="icerik">
+      <p class="kr__daktilo">
+        Çizer KargaManga ile yapılmış bir röportaj
+        ve yine onun kaleminden one-shot manga.
+        Erü Japonoloji öğrencisi Ece Özgür'ün kaleminden ise
+        Japon masalı ve sergi deneyimi harmanlandı.
+      </p>
+    </div>
+
+    <!-- 5 · ÇAĞRI — NETLEŞME (`js/yazi.js`)
+         `ed-2`nin alıntısı ve son cümlesi. Dipnot alıntıdan SONRA açılıyor:
+         önce sebep ("bitişi olan bir şey"), sonra ne yapılacağı ("aşağı
+         kaydır"). Ters sırada çağrı havada kalırdı. -->
+    <div class="hik__dilim kr__slayt" data-dilim="cagri">
+      <p class="kr__alinti">Bitişi olan bir şey okumayı özlediysen, doğru yerdesin.</p>
+      <p class="kr__dipnot">
+        Aşağı kaydır. Evet, bu dergi projesini sosyal medyada kaydırmayı
+        sevenler için kurduk.
+      </p>
+    </div>
+
+    <!-- 6 · KÜNYE -->
+    <div class="hik__dilim kr__slayt" data-dilim="kunye">
+      <p class="kr__son">Sayı 03</p>
+    </div>
+  </div>
+</section>

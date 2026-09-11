@@ -323,6 +323,11 @@ picture {
    (sayının kendisi öyle yazılmış — o sayfa uzun anlatının üç cümlelik özeti).
    Bu yüzden üç kural da ayrı ayrı yazılıyor, "full'ü göster gerisini gizle"
    gibi bir kısayol o sayfayı kaybederdi.
+
+   `mid` kuralı ŞU AN ÖLÜ ve bilerek duruyor: mod okura sorulmuyor
+   (`js/okuyucu.js` §MODLAR), yani `data-depth` hiçbir zaman `mid` olmuyor.
+   Silinmedi çünkü sayfalar hâlâ `data-mod="mid full"` diye etiketli — kural da
+   etiketler de yerinde durduğu sürece modu geri açmak tek satırlık iş.
    ======================================================================= */
 
 :root[data-depth='min'] .page:not([data-mod~='min']):not([data-mod~='all']) {

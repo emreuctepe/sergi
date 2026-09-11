@@ -26,6 +26,7 @@ import { galeriBaslat, galeriDugmeleriniAyarla } from './galeri.js';
 import { icindekilerBaslat } from './icindekiler.js';
 import { kantoHareketiniBaslat } from './kanto.js';
 import { mangaBaslat, mangaDugmesiniAyarla } from './manga.js';
+import { sunusuBaslat } from './sunus.js';
 import { telifBaslat } from './telif.js';
 import { wikiKapisiniBaslat } from './wiki.js';
 
@@ -50,10 +51,22 @@ const cipEtiketi = document.querySelector('.depth-chip__label');
 const geriDugmesi = document.getElementById('btn-geri');
 const ileriDugmesi = document.getElementById('btn-ileri');
 
-/** Modların kimliği ve okura görünen adı. Sıra çipin döngü sırası. */
+/**
+ * Okura SUNULAN modlar — kimlik ve görünen ad.
+ *
+ * ⚠️ `mid` (Dengeli) buradan çıkarıldı, ama sayının içinden SİLİNMEDİ:
+ * sayfalardaki `data-mod="mid full"` etiketleri ve `bilesen.css` §7'deki süzgeç
+ * kuralı duruyor. Geri açmak buraya bir satır eklemek; hiçbir sayfa bu arada
+ * sahipsiz kalmıyor, çünkü `mid`e ait her sayfa `full`de de var (yalnız `mid`
+ * etiketli tek bir sayfa yok — sayıldı).
+ *
+ * Liste aynı zamanda "hangi tercih geçerli"nin tek kaynağı: `acilis.js`
+ * kayıtlı modu buradan doğruluyor, yani "Dengeli"de kalmış bir okurun tercihi
+ * geçersiz sayılıp seçim ekranı bir kez daha açılıyor. Artık sorulmayan bir
+ * modda okumaya devam eden okur olmuyor.
+ */
 export const MODLAR = [
   { id: 'min', ad: 'Doomscroller' },
-  { id: 'mid', ad: 'Dengeli' },
   { id: 'full', ad: 'Doomreader' }
 ];
 
@@ -351,8 +364,9 @@ export function geri() {
  * gözünde, yani AKIŞTA, ve `width`/`height` taşımıyorlar — yüklenmeden önce
  * yükseklikleri sıfır. Ölçüm sırası bunu kaçınılmaz yapıyordu:
  *
- *     acilis.js §460  baslat() → olc()            görseller HENÜZ inmemiş
- *     acilis.js §470  await yuklemeEkrani()       görselleri BURADA bekliyor
+ *     acilis.js §AKIŞ, sırayla:
+ *       baslat() → olc()          görseller HENÜZ inmemiş
+ *       await yuklemeEkrani()     görselleri BURADA bekliyor
  *
  * Yani ilk ölçüm, yükleme ekranının beklediği şeyin öncesinde alınıyordu.
  * Kaydırma olduğunda tazeleniyordu (§419) ama HİÇ kaydırmamış okur —
@@ -577,6 +591,16 @@ export function baslat({ modDegistir }) {
   galeriBaslat();
   bulmacaBaslat();
 
+  /* ⚠️ TEK BEKLEMEYEN BAŞLATICI BU. `sunusuBaslat` içeride
+     `document.fonts.ready`i bekliyor (uzaklıklar yedek yüzün kutularıyla
+     ölçülmesin diye), yani bir söz döndürüyor. Beklenmiyor çünkü `baslat()`
+     senkron olmak zorunda: `acilis.js` bunun hemen ardından yükleme ekranını
+     açıyor ve sayfanın gezinmesi o söze bağlı değil.
+
+     Hikâye kendi gözcüsüyle ekrandan çıkınca duruyor, yani yükleme ekranının
+     arkasında yanıp bitmiyor (bkz. `js/hikaye.js` §EKRANDAN ÇIKTI). */
+  sunusuBaslat(kap).catch((hata) => console.error('Sunuş başlatılamadı:', hata));
+
   /* İçindekiler okuyucuyu içe aktarmıyor, ihtiyacı olan üç şeyi buradan
      alıyor — karşılıklı import iki modülü de kırılgan yapardı.
 
@@ -588,7 +612,7 @@ export function baslat({ modDegistir }) {
   icindekilerBaslat({
     /* Liste kurulmadan ÖNCE yeniden ölçülüyor. Ölçüm normalde kaydırmada
        tazeleniyor ama açılış akışından yeni çıkmış, henüz hiç kaydırmamış bir
-       okurda bayat olabiliyor: tanıtım perdesi kalkarken sayfaların bir kısmı
+       okurda bayat olabiliyor: yükleme ekranı kalkarken sayfaların bir kısmı
        daha yüksekliksizdi ve `olcumler` kısa kalmıştı (folio da o anda
        "01 / 05" diyordu). O hâlde liste sayının yarısını yutardı. */
     sayfalariVer: () => {

@@ -1,21 +1,19 @@
 /* ============================================================================
-   AÇILIŞ — yükleme ekranı, tanıtım, mod seçimi
+   AÇILIŞ — yükleme ekranı, mod seçimi
    ----------------------------------------------------------------------------
    Sayfanın TEK giriş noktası (`index.html`in sonundaki script). Okuyucunun
    kendisi `okuyucu.js`te; burada yalnız sayının nasıl AÇILDIĞI var.
 
    Akış:
      her ziyaret      → Yükleme (görseller + fontlar inene kadar)
-     ilk ziyaret      → Yükleme → Tanıtım (5 kart) → Mod seçimi → sayı
      mod seçilmemiş   → Yükleme → Mod seçimi → sayı
      dönen okur       → Yükleme → sayı, kendi modunda
 
-   Hiçbiri sunucu istemiyor: yükleme görsel sayıyor, tanıtım kaydırıyor, mod
-   seçimi CSS sınıfı değiştiriyor. "Altyapı" diye bir şey yok.
+   Hiçbiri sunucu istemiyor: yükleme görsel sayıyor, mod seçimi CSS sınıfı
+   değiştiriyor. "Altyapı" diye bir şey yok.
    ========================================================================= */
 
 import { MODLAR, baslat, modAyarla, sayfalariDiz, yenidenOlc } from './okuyucu.js';
-import { SAHNELER } from './sahneler.js';
 
 const kabuk = document.getElementById('shell');
 const kap = document.getElementById('pages');
@@ -23,7 +21,9 @@ const kap = document.getElementById('pages');
 /* ==========================================================================
    1 · TERCİHLER
    --------------------------------------------------------------------------
-   İki alan, ikisi de bu cihaza ait: hangi modda okuyor ve tanıtımı gördü mü.
+   Kayıtta iki alan var, ikisi de bu cihaza ait: hangi modda okuyor ve hangi
+   temada. Buradan yalnız `mod` okunuyor; `tema`yı `index.html`in <head>'indeki
+   betik okuyor, çünkü ona bu dosya çalışmadan ÖNCE gerek var.
    Okuru tanımıyoruz, hesap yok, sunucuya hiçbir şey gitmiyor.
 
    Okuma ve yazma HİÇ HATA ATMIYOR: localStorage gizli sekmede ya da sıkı
@@ -39,11 +39,10 @@ function tercihOku() {
   try {
     const ham = JSON.parse(localStorage.getItem(ANAHTAR) ?? '{}');
     return {
-      mod: MODLAR.some((m) => m.id === ham.mod) ? ham.mod : null,
-      tanitimGoruldu: ham.tanitimGoruldu === true
+      mod: MODLAR.some((m) => m.id === ham.mod) ? ham.mod : null
     };
   } catch {
-    return { mod: null, tanitimGoruldu: false };
+    return { mod: null };
   }
 }
 
@@ -196,140 +195,40 @@ async function yuklemeEkrani() {
 }
 
 /* ==========================================================================
-   3 · TANITIM — beş kart
+   3 · MOD SEÇİCİ
    --------------------------------------------------------------------------
-   Kendi snap kaydırıcısı olan beş kart. Arka planları `sahneler.js`te
-   üretiliyor.
-   ======================================================================= */
+   İki ayrı soru soruyor ve ikisi AYNI biçimde soruluyor: bir önizleme karesi,
+   altında tek kelime. Kutuların ÇERÇEVESİ ortak (ölçü, köşe, seçili halkası),
+   İÇLERİ değil — okuma modunda ortada modun simgesi, görünümde kâğıdın rengini
+   taşıyan bir sayfa taklidi.
 
-const KARTLAR = [
-  {
-    sahne: 'paper',
-    baslik: 'Bu bir dergi.',
-    alt: 'Akış değil. Başlıyor ve bitiyor.'
-  },
-  {
-    sahne: 'leaves',
-    baslik: 'Ayda bir sayı.',
-    alt: 'Bir oturuşta okunur. Sonra kapanır ve gelecek ayı bekler.'
-  },
-  {
-    sahne: 'waves',
-    baslik: 'Üç okuma derinliği.',
-    alt: 'Acelen varsa en az. Vaktin varsa klasik. Aynı sayı, üç farklı uzunluk.'
-  },
-  {
-    sahne: 'street',
-    baslik: 'Nereye istersen yorum yaz.',
-    alt: 'Bir cümlenin altına, bir fotoğrafın köşesine. Hesap açmana gerek yok.'
-  },
-  {
-    sahne: 'torii',
-    baslik: 'Hazırsan başlayalım.',
-    alt: 'Sayı 03 · Kızıl Mevsim',
-    son: true
-  }
-];
+   Okuma modunun bir de açıklaması var ama YALNIZ SEÇİLİ OLANINKİ, kutuların
+   altında tek satır. Burada bir dönem her kartın kendi tanıtım cümlesi,
+   açıklama satırı ve "~9 dk / 30 sayfa" künyesi vardı; o biçim seçenekleri
+   karşılaştırılacak metin blokları hâline getiriyordu, oysa iki kutu yan yana
+   duruyorsa fark BAKARAK görülüyor. Tek satır başka bir iş yapıyor: karşılaştır
+   demiyor, "şu an buradasın"ı anlatıyor — bu yüzden seçimle birlikte
+   değişiyor ve bu yüzden tek.
 
-function tanitimGoster() {
-  const host = document.createElement('div');
-  host.className = 'intro-host';
-  host.setAttribute('role', 'dialog');
-  host.setAttribute('aria-modal', 'true');
-  host.setAttribute('aria-label', `${KARTLAR.length} kartlık tanıtım`);
-  host.dataset.on = 'false';
+   ⚠️ HİÇBİR SEÇİM MODALI KAPATMIYOR. Kapatma kararı okurun: ✕, Escape, perde
+   ya da açılıştaki "Sayıyı aç" düğmesi. Mod seçimi bir dönem TIKLANINCA
+   KAPATIYORDU ("tek bir karar, verilince iş biter" diye yazılmıştı) ama o
+   gerekçe temayı da kapsamalıydı ve kapsamıyordu: aynı ekranda iki soru
+   varken biri tıklayınca kaçıyor, öbürü duruyordu. Kaçan taraf iki şeyi birden
+   imkânsız kılıyor — modu seçtikten sonra temaya dokunmayı, ve "seçtim ama
+   öbürüne de bir bakayım"ı.
 
-  const slaytlar = KARTLAR.map(
-    (kart, i) => `
-      <section class="intro__slide" data-i="${i}">
-        <div class="intro__bg">${SAHNELER[kart.sahne]()}</div>
-        <div class="intro__text">
-          <h2 class="intro__big">${kart.baslik}</h2>
-          <p class="intro__small">${kart.alt}</p>
-          ${
-            kart.son
-              ? '<button class="intro__start" type="button">Sayıyı aç</button>'
-              : '<span class="intro__chev" aria-hidden="true">⌄</span>'
-          }
-        </div>
-      </section>`
-  ).join('');
+   Bunun bedeli: seçim ARTIK GERİ ALINAMIYOR. Tıklanan mod da tema da anında
+   uygulanıp anında kaydediliyor, yani Escape "vazgeç" değil yalnızca "kapat"
+   demek. Doğrusu bu: okur sonucu arkadaki sayıda zaten görüyor, bir de
+   onaylaması istenseydi görmediği bir şeyi onaylıyor olurdu.
 
-  const noktalar = KARTLAR.map(
-    (_, i) => `<i data-i="${i}" data-on="${i === 0}"></i>`
-  ).join('');
-
-  host.innerHTML = `
-    <div class="intro__slides" tabindex="-1">${slaytlar}</div>
-    <div class="intro__dots" aria-hidden="true">${noktalar}</div>
-    <button class="intro__skip" type="button">Atla</button>`;
-
-  document.body.append(host);
-
-  const kaydirici = host.querySelector('.intro__slides');
-  const nokta = [...host.querySelectorAll('.intro__dots i')];
-
-  /* Açılış BİR KARE SONRA: `data-on` DOM'a eklenirken zaten "true" olsaydı
-     tarayıcının başlangıç değeri diye görecek bir hâli olmaz ve geçiş hiç
-     başlamazdı. */
-  requestAnimationFrame(() => (host.dataset.on = 'true'));
-  kaydirici.focus({ preventScroll: true });
-
-  return new Promise((bitti) => {
-    let kapandi = false;
-
-    const kapat = () => {
-      /* Tek atışlık: "Atla", son karttaki düğme ve Escape aynı kapıya çıkıyor,
-         ikisi birden tetiklenirse söz iki kez verilirdi. */
-      if (kapandi) return;
-      kapandi = true;
-      host.dataset.on = 'false';
-      document.removeEventListener('keydown', kacis);
-      setTimeout(
-        () => {
-          host.remove();
-          bitti();
-        },
-        azHareket() ? 0 : 420
-      );
-    };
-
-    const kacis = (olay) => {
-      if (olay.key === 'Escape') kapat();
-    };
-
-    let kare = 0;
-    kaydirici.addEventListener(
-      'scroll',
-      () => {
-        if (kare) return;
-        kare = requestAnimationFrame(() => {
-          kare = 0;
-          const simdiki = Math.round(kaydirici.scrollTop / kaydirici.clientHeight);
-          nokta.forEach((n, i) => (n.dataset.on = String(i === simdiki)));
-        });
-      },
-      { passive: true }
-    );
-
-    host.querySelector('.intro__skip').addEventListener('click', kapat);
-    host.querySelector('.intro__start').addEventListener('click', kapat);
-    document.addEventListener('keydown', kacis);
-  });
-}
-
-/* ==========================================================================
-   4 · MOD SEÇİCİ
-   --------------------------------------------------------------------------
-   İki yüzü var: açılışta KAPANMAZ (mod seçilmeden sayı açılmıyor), banttaki
-   çipten açılınca kapanabilir.
-
-   İki ayrı soru soruyor ve ikisi farklı davranıyor:
-
-     OKUMA DERİNLİĞİ → seçim modalı KAPATIR. Tek bir karar, verilince iş biter.
-     GÖRÜNÜM (tema)  → seçim modalı AÇIK BIRAKIR. Tema anında uygulanıyor ve
-                       okur arkadaki sayıda sonucu görüyor; kapanan bir modal
-                       "beğenmedim, öbürüne bakayım"ı imkânsız kılardı.
+   Açılıştaki tek fark, kapatma yolunun hangisi olduğu:
+     ilk açılış → ✕ / Escape / perde YOK, altta "Sayıyı aç" düğmesi var.
+                  Kapatmak hâlâ okurun elinde ama kazara olmuyor; sayıyı
+                  açmak bilinçli bir hareket kalıyor.
+     çipten     → ✕, Escape ve perde çalışıyor. Burada okur zaten sayının
+                  içinde, kapanış onun bildiği yollardan olmalı.
    ======================================================================= */
 
 /* Aydınlık/karanlık dışında üçüncü bir "sistem" seçeneği bilerek YOK. Sistem
@@ -337,8 +236,8 @@ function tanitimGoster() {
    bir üçüncü ses eklemek olurdu. Varsayılan (karanlık) `index.html`in
    <head>'inde, bir kez. */
 const TEMALAR = [
-  { id: 'dark', ad: 'Karanlık', simge: '☾' },
-  { id: 'light', ad: 'Aydınlık', simge: '☀' }
+  { id: 'dark', ad: 'Karanlık' },
+  { id: 'light', ad: 'Aydınlık' }
 ];
 
 /** Şu anki tema — kaynağı DOM, çünkü onu <head>'deki betik yazıyor. */
@@ -351,47 +250,98 @@ function temaAyarla(tema) {
   tercihYaz({ tema });
 }
 
-const MOD_KARTLARI = [
-  {
-    id: 'min',
-    ad: 'Doomscroller',
-    simge: '🫠',
-    satir: 'Sosyal medya kullanmaktan beyni sıvı olanlar için.',
-    detay:
-      'Dosya tek sayfalık özete iner, söyleşiden dört soru kalır. Manga, foto-öykü ve bulmaca kısalmaz.',
-    dakika: 7
-  },
-  {
-    id: 'mid',
-    ad: 'Dengeli',
-    simge: '⚖️',
-    satir: 'Emin değilsen buradan başla.',
-    detay: 'Dosyanın gövdesi, söyleşinin yedi sayfası, sözlüğün tamamı.',
-    dakika: 9
-  },
-  {
-    id: 'full',
-    ad: 'Doomreader',
-    simge: '🧠',
-    satir: 'Hâlâ uzun metin okuyabilen üst insanlar için.',
-    detay: 'Dosyanın son iki bölümü ve söyleşinin tamamı — kesilen hiçbir şey yok.',
-    dakika: 10
-  }
-];
+/** Tema gibi mod da ANINDA uygulanıp anında kaydediliyor (bkz. §3 başlığı). */
+function modSec(mod) {
+  modAyarla(mod);
+  tercihYaz({ mod });
+}
 
 /**
- * Bir modun kaç sayfa gösterdiği DOM'dan SAYILIYOR, karta yazılmıyor.
- * `index.html`deki sıradan bir satır silinirse kart da kendiliğinden doğru
- * kalsın diye — yazılı bir sayı ilk düzenlemede yalan olurdu.
+ * Her modun simgesi ve açıklaması.
  *
- * (Dakikalar sabit: onları saymak sayfadaki her kelimeyi saymak demek ve bu
- * klon sayıyı okumak için var, yeniden ölçmek için değil.)
+ * Simge kutunun ASIL içeriği, süsü değil: kutuda bir dönem sahte metin
+ * satırları vardı ve simge köşede duruyordu, orada süs gibi okunuyordu. Sayfa
+ * taklidi yalnız TEMA kutularında kaldı — orada sorulan şey gerçekten sayfanın
+ * görünüşü.
+ *
+ * Açıklama kutunun İÇİNDE değil, ALTINDA ve tek tane: yalnız SEÇİLİ modunki
+ * yazılıyor (bkz. §3 başlığı). Ses kaldırılan kartlardan devralındı.
+ *
+ * ⚠️ METİNLER SAYIDAN BAĞIMSIZ OLMALI. Bu dosya kabuğun parçası, içeriğin
+ * değil: sayı her ay değişiyor, bu satırlar değişmiyor. Devraldıkları hâlde
+ * "manga, foto-öykü ve bulmaca kısalmaz", "söyleşinin yedi sayfası" gibi
+ * 2026-09'un bölümlerini sayıyorlardı — mangası olmayan ilk sayıda sessizce
+ * yalan olurlardı. Yerlerine modun KURALI yazılı: neyin kısaldığı, neyin
+ * kalmadığı. Buraya yeni bir cümle eklerken ölçü şu — cümle önümüzdeki sayı
+ * için de doğru mu?
+ *
+ * Modun ADI buraya yazılmıyor, `MODLAR`dan geliyor: çipteki ad ile seçicideki
+ * ad ayrışırsa okur aynı şeyi iki isimde görürdü. Buraya yalnız `MODLAR`da
+ * olan bir mod eklenir; karşılığı unutulursa o modun kutusu boş çıkar, yani
+ * hata ilk bakışta görünür.
  */
-function sayfaSayisi(mod) {
-  return [...kap.querySelectorAll('.page')].filter((sayfa) => {
-    const modlar = sayfa.dataset.mod.split(' ');
-    return modlar.includes('all') || modlar.includes(mod);
-  }).length;
+const MOD_KUTUSU = {
+  min: {
+    simge: '🫠',
+    aciklama:
+      'Sosyal medya kullanmaktan beyni sıvı olanlar için. Uzun yazılar kısa özetlerine iniyor, görsel bölümler olduğu gibi kalıyor.'
+  },
+  full: {
+    simge: '🧠',
+    aciklama:
+      'Hâlâ uzun metin okuyabilen üst insanlar için. Her yazı tam uzunluğunda, kısaltılmış hiçbir bölüm yok.'
+  }
+};
+
+/**
+ * Bir önizleme karesi. İki soruya iki farklı iç veriyor, dış çerçeve aynı:
+ *
+ *   SİMGE (okuma modu) → kutunun ortasında tek bir emoji, başka hiçbir şey.
+ *   SAYFA (tema)       → `satir` tane sahte metin satırı, sağ altta vurgu
+ *                        renginden bir nokta.
+ *
+ * Ortak kalan şey kutunun kendisi: ölçüsü, köşesi, seçili halkası. İki soru
+ * böylece aynı dilde konuşuyor ama aynı şeyi göstermiyor.
+ *
+ * `sinif` yalnız tema kutularında dolu (`pv--light` / `pv--dark`); okuma modu
+ * kutuları o anki temanın renklerinde kalıyor, çünkü orada sorulan şey renk
+ * değil modun kimliği.
+ */
+function onizleme({ sinif = '', satir = 0, simge = '' }) {
+  const ic = simge
+    ? `<i class="pv__simge">${simge}</i>`
+    : `${Array.from({ length: satir }, () => '<i class="pv__satir"></i>').join('')}
+       <i class="pv__nokta"></i>`;
+  return `
+    <span class="${sinif ? `pv ${sinif}` : 'pv'}" aria-hidden="true">
+      <span class="pv__kagit${simge ? ' pv__kagit--simge' : ''}">${ic}</span>
+    </span>`;
+}
+
+/** Bir gruptaki basılı hâli tek düğmeye taşır. İki soru da aynı işi yapıyor. */
+function basiliHal(dugmeler, secilen) {
+  for (const d of dugmeler) {
+    const secili = String(d === secilen);
+    d.dataset.active = secili;
+    d.setAttribute('aria-pressed', secili);
+  }
+}
+
+/**
+ * İki sorunun da düğmesi aynı iskelet.
+ *
+ * `data-active` VE `aria-pressed` birlikte: ilki `overlays.css`in seçili
+ * kutuyu boyadığı kanca (§SEÇİCİLER), ikincisi ekran okuyucununki. Burada önce
+ * yalnız `aria-pressed` yazılıyordu ve seçili seçenek hiç vurgulanmıyordu —
+ * CSS'in beklediği öznitelik hiç doğmuyordu.
+ */
+function secenekDugmesi({ oznitelik, id, ad, secili, kutu }) {
+  return `
+    <button class="pick__opt" type="button" ${oznitelik}="${id}"
+            data-active="${secili}" aria-pressed="${secili}">
+      ${kutu}
+      <span class="pick__ad">${ad}</span>
+    </button>`;
 }
 
 function modSecici({ kapanabilir, secili }) {
@@ -405,52 +355,51 @@ function modSecici({ kapanabilir, secili }) {
   host.className = 'modal-host';
   host.dataset.on = 'false';
 
-  /* `data-active` VE `aria-pressed` birlikte: ilki `overlays.css`in seçili
-     kartı boyadığı kanca (§OKUMA MODU SEÇİMİ), ikincisi ekran okuyucununki.
-     Burada önce yalnız `aria-pressed` yazılıyordu ve seçili mod hiç
-     vurgulanmıyordu — CSS'in beklediği öznitelik hiç doğmuyordu. */
-  const kartlar = MOD_KARTLARI.map(
-    (kart) => `
-      <button class="depth-card" type="button" data-mod="${kart.id}"
-              data-active="${kart.id === secili}"
-              aria-pressed="${kart.id === secili}">
-        <span class="depth-card__icon" aria-hidden="true">${kart.simge}</span>
-        <span class="depth-card__main">
-          <b>${kart.ad}</b>
-          <span class="depth-card__line">${kart.satir}</span>
-          <span class="depth-card__detail">${kart.detay}</span>
-        </span>
-        <span class="depth-card__meta">
-          <b>~${kart.dakika} dk</b>
-          <span>${sayfaSayisi(kart.id)} sayfa</span>
-        </span>
-      </button>`
+  const modDugmeleri = MODLAR.map((m) =>
+    secenekDugmesi({
+      oznitelik: 'data-mod',
+      id: m.id,
+      ad: m.ad,
+      secili: m.id === secili,
+      kutu: onizleme({ simge: MOD_KUTUSU[m.id].simge })
+    })
   ).join('');
 
   const simdikiTema = temaOku();
-  const temaDugmeleri = TEMALAR.map(
-    (t) => `
-      <button class="tema-btn" type="button" data-tema="${t.id}"
-              data-active="${t.id === simdikiTema}"
-              aria-pressed="${t.id === simdikiTema}">
-        <span class="tema-btn__simge" aria-hidden="true">${t.simge}</span>
-        ${t.ad}
-      </button>`
+  const temaDugmeleri = TEMALAR.map((t) =>
+    secenekDugmesi({
+      oznitelik: 'data-tema',
+      id: t.id,
+      ad: t.ad,
+      secili: t.id === simdikiTema,
+      kutu: onizleme({ sinif: `pv--${t.id}`, satir: 3 })
+    })
   ).join('');
 
+  /* Grupların adı `aria-labelledby` ile GÖRÜNEN etiketten geliyor, ayrı bir
+     `aria-label` yazılmıyor: iki yerde duran aynı metin bir gün ayrışır ve ekran
+     okuyucu ekranda yazmayan bir başlık okur. Aynı anda tek modal yaşadığı için
+     (`ac()` de çip de bu sözü bekliyor) sabit `id`ler çakışmıyor. */
   host.innerHTML = `
     <div class="modal" role="dialog" aria-modal="true" aria-label="Nasıl okumak istersin?">
       <header class="modal__head">
         <h2 class="modal__title">Nasıl okumak istersin?</h2>
         ${kapanabilir ? '<button class="modal__x" type="button" aria-label="Kapat">✕</button>' : ''}
       </header>
-      <div class="depth-pick">
-        ${kartlar}
+      <div class="pick" role="group" aria-labelledby="pick-mod">
+        <span class="pick__etiket" id="pick-mod">Okuma</span>
+        <div class="pick__sira">${modDugmeleri}</div>
+        <p class="pick__aciklama" aria-live="polite">${MOD_KUTUSU[secili].aciklama}</p>
       </div>
-      <div class="tema-sec" role="group" aria-label="Görünüm">
-        <span class="tema-sec__etiket">Görünüm</span>
-        <div class="tema-sec__sira">${temaDugmeleri}</div>
+      <div class="pick" role="group" aria-labelledby="pick-tema">
+        <span class="pick__etiket" id="pick-tema">Görünüm</span>
+        <div class="pick__sira">${temaDugmeleri}</div>
       </div>
+      ${
+        kapanabilir
+          ? ''
+          : '<div class="modal__alt"><button class="modal__ac" type="button">Sayıyı aç</button></div>'
+      }
     </div>`;
 
   document.body.append(perde, host);
@@ -458,10 +407,15 @@ function modSecici({ kapanabilir, secili }) {
     perde.dataset.on = 'true';
     host.dataset.on = 'true';
   });
-  host.querySelector('.depth-card').focus({ preventScroll: true });
+  host.querySelector('.pick__opt').focus({ preventScroll: true });
 
   return new Promise((bitti) => {
-    const kapat = (secim) => {
+    /* Kapanışta dönen değer, o an SEÇİLİ olan mod. "Hangi düğmeye basıldı"
+       değil: seçim zaten uygulanmış oluyor ve okur hiç dokunmadan da
+       kapatabiliyor, o durumda geçerli cevap içeri girdiği moddur. */
+    let simdikiMod = secili;
+
+    const kapat = () => {
       perde.dataset.on = 'false';
       host.dataset.on = 'false';
       document.removeEventListener('keydown', kacis);
@@ -469,44 +423,49 @@ function modSecici({ kapanabilir, secili }) {
         () => {
           perde.remove();
           host.remove();
-          bitti(secim);
+          bitti(simdikiMod);
         },
         azHareket() ? 0 : 240
       );
     };
 
     const kacis = (olay) => {
-      if (olay.key === 'Escape' && kapanabilir) kapat(null);
+      if (olay.key === 'Escape' && kapanabilir) kapat();
     };
 
-    for (const dugme of host.querySelectorAll('.depth-card')) {
-      dugme.addEventListener('click', () => kapat(dugme.dataset.mod));
+    /* İki grup da aynı şeyi yapıyor: seçimi anında uygula, basılı hâli taşı,
+       modalı AÇIK BIRAK (§3 başlığı). */
+    const aciklama = host.querySelector('.pick__aciklama');
+    const modDugmeleri = [...host.querySelectorAll('.pick__opt[data-mod]')];
+    for (const dugme of modDugmeleri) {
+      dugme.addEventListener('click', () => {
+        simdikiMod = dugme.dataset.mod;
+        modSec(simdikiMod);
+        basiliHal(modDugmeleri, dugme);
+        aciklama.textContent = MOD_KUTUSU[simdikiMod].aciklama;
+      });
     }
 
-    /* Tema düğmeleri modalı KAPATMIYOR — okur değişikliği arkadaki sayıda
-       görüp fikrini değiştirebilsin. Bu yüzden `kapat()` çağrılmıyor, yalnız
-       basılı hâl güncelleniyor. */
-    const temaDugmeleri = [...host.querySelectorAll('.tema-btn')];
+    const temaDugmeleri = [...host.querySelectorAll('.pick__opt[data-tema]')];
     for (const dugme of temaDugmeleri) {
       dugme.addEventListener('click', () => {
         temaAyarla(dugme.dataset.tema);
-        for (const d of temaDugmeleri) {
-          const secili = String(d === dugme);
-          d.dataset.active = secili;
-          d.setAttribute('aria-pressed', secili);
-        }
+        basiliHal(temaDugmeleri, dugme);
       });
     }
+
     if (kapanabilir) {
-      host.querySelector('.modal__x').addEventListener('click', () => kapat(null));
-      perde.addEventListener('click', () => kapat(null));
+      host.querySelector('.modal__x').addEventListener('click', kapat);
+      perde.addEventListener('click', kapat);
+    } else {
+      host.querySelector('.modal__ac').addEventListener('click', kapat);
     }
     document.addEventListener('keydown', kacis);
   });
 }
 
 /* ==========================================================================
-   5 · ORTAK YARDIMCILAR
+   4 · ORTAK YARDIMCILAR
    ======================================================================= */
 
 function azHareket() {
@@ -519,7 +478,7 @@ function azHareket() {
 const bekle = (ms) => new Promise((c) => setTimeout(c, ms));
 
 /* ==========================================================================
-   6 · AKIŞ
+   5 · AKIŞ
    ======================================================================= */
 
 async function ac() {
@@ -532,38 +491,35 @@ async function ac() {
   let mod = tercih.mod ?? 'full';
   modAyarla(mod);
 
+  /* Modal seçimi kendi içinde uygulayıp kaydediyor (`modSec`), burada yalnız
+     "hangi moddayız" hatırlanıyor — bir sonraki açılışta seçili kutu doğru
+     olsun diye. */
   baslat({
     modDegistir: async () => {
-      const secim = await modSecici({ kapanabilir: true, secili: mod });
-      if (!secim) return;
-      mod = secim;
-      modAyarla(mod);
-      tercihYaz({ mod });
+      mod = await modSecici({ kapanabilir: true, secili: mod });
     }
   });
 
   await yuklemeEkrani();
 
-  if (!tercih.tanitimGoruldu) {
-    await tanitimGoster();
-    tercihYaz({ tanitimGoruldu: true });
-  }
-
   if (!tercih.mod) {
     mod = await modSecici({ kapanabilir: false, secili: mod });
-    modAyarla(mod);
+    /* ⚠️ Kayıt BURADA da yazılıyor, `modSec()` yazıyor olsa bile: hiçbir kutuya
+       dokunmadan "Sayıyı aç"a basan okur için `modSec()` hiç çalışmıyor ve
+       varsayılan mod kaydedilmemiş kalırdı — sayı her açılışta bu ekranı bir
+       daha sorardı. */
     tercihYaz({ mod });
   }
 
   /* ⚠️ ÖLÇÜM BURADA TAZELENİYOR — `baslat()`teki ilk ölçüm artık bayat.
      Yeri bilinçli: okur gezinme yetkisini bir sonraki satırda kazanıyor, yani
-     düzeni değiştirebilecek her şey (yükleme ekranı, tanıtım, mod seçici)
-     ARKADA kaldı. Daha erken ölçmek yetmezdi, çünkü aradaki üç perde de
-     kapanırken düzeni oynatabiliyor.
+     düzeni değiştirebilecek her şey (yükleme ekranı, mod seçici) ARKADA kaldı.
+     Daha erken ölçmek yetmezdi, çünkü aradaki iki perde de kapanırken düzeni
+     oynatabiliyor.
 
-     Bayatlığın kaynağı sıranın kendisi: `baslat()` §460'ta ölçüyor,
-     `yuklemeEkrani()` §470'te `document.fonts.ready`i ve BÜTÜN görselleri
-     bekliyor. Beklediği şey, ölçümü geçersiz kılan şeyin ta kendisi —
+     Bayatlığın kaynağı sıranın kendisi: yukarıdaki `baslat()` çağrısı ölçüyor,
+     ondan hemen sonraki `yuklemeEkrani()` `document.fonts.ready`i ve BÜTÜN
+     görselleri bekliyor. Beklediği şey, ölçümü geçersiz kılan şeyin ta kendisi —
      söyleşi çizimleri ızgara gözünde (akışta) ve `width`/`height` taşımıyor,
      inmeden önce yükseklikleri sıfır.
 

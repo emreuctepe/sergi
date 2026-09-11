@@ -1,7 +1,14 @@
 /* ============================================================================
-   SAHNELER — tanıtım kartlarının arka planları
+   SAHNELER — beş üretilmiş tam ekran arkalık
    ----------------------------------------------------------------------------
-   Beş kartın arkasındaki SVG'ler burada ÜRETİLİYOR, dosyaya gömülü durmuyor.
+   ⚠️ ŞU AN HİÇBİR YERDEN ÇAĞRILMIYOR — çağıranını arama, yok. Bu beş sahne
+   açılıştaki tanıtım kartlarının arkalığıydı; tanıtım kaldırıldı, dosya
+   BİLEREK duruyor: `roadmap.md`deki "outro" aynı işi isteyecek ve buradaki
+   ölçüler (tam ekran, kâğıt zemin, tohumlu serpiştirme) ona hazır. Outro
+   yazılırken `SAHNELER` import edilip kullanılabilir; o da olmazsa dosya
+   gönül rahatlığıyla silinir.
+
+   Beş sahnenin SVG'si burada ÜRETİLİYOR, dosyaya gömülü durmuyor.
    Sebebi ölçüldü: `waves` tek başına 21,6 KB'lık üretilmiş işaretleme —
    360 çember. Onu bir HTML dosyasına yapıştırmak hem okunamaz bir blob
    bırakırdı hem de "neden bu çember burada?" sorusunun cevabını silerdi.

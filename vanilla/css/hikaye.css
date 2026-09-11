@@ -1,0 +1,227 @@
+/* ============================================================================
+   HİKÂYE — Instagram hikâyesi kabuğu: üstte süre çubukları, kenarlarda dokunma
+   ----------------------------------------------------------------------------
+   Motoru `js/hikaye.js`te. Bu dosya YALNIZ KABUĞU giydiriyor; dilimin İÇİNE ne
+   konduğuna dair tek bir kural yok ve olmamalı — `.hik__dilim` boş bir kanvas,
+   içine bir gün fotoğraf, bir gün karıştırılan yazı, bir gün SVG girecek.
+
+   Bu yüzden aşağıda `.hik__dilim`in yalnız KUTUSU var: nerede duruyor, ne zaman
+   görünüyor. Tipografisi, zemini, düzeni dilimi yazanın işi.
+
+   ⚠️ KUTU TUVALİ TAKLİT ETMİYOR, tuvalin İÇİNDE duruyor. `container-type`
+   burada açılmıyor: `.hik` bir `.page`in (ya da tezgâhtaki `.kutu`nun) içine
+   `inset: 0` ile oturuyor ve `cqi` birimleri ZATEN o tuvalin container'ına
+   bağlı (`canvas.css` §.canvas). Burada ikinci bir container açmak `--fs-*` ve
+   `--sp-*`ı hikâye kutusunun kendi genişliğine bağlardı — aynı belirteçler
+   sayfanın geri kalanında başka bir şey ölçerdi.
+   ========================================================================= */
+
+.hik {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   1 · SÜRE ÇUBUKLARI
+   --------------------------------------------------------------------------
+   Hikâyenin tek gerçek arayüz parçası: kaç dilim var, kaçıncısındayız, ve
+   şimdikinin ne kadarı geçti.
+   ======================================================================= */
+
+.hik__cubuklar {
+  --hik-cubuk-h: 0.6cqi;
+
+  position: absolute;
+  z-index: 3; /* dilimlerin (1) ve bölgelerin (2) üstünde */
+  top: calc(var(--sp-2) + env(safe-area-inset-top, 0px));
+  left: var(--sp-3);
+  right: var(--sp-3);
+  display: flex;
+  gap: var(--sp-1);
+  pointer-events: none; /* çubuk gösterge, düğme değil */
+}
+
+.hik__cubuk {
+  flex: 1;
+  height: max(2px, var(--hik-cubuk-h));
+  border-radius: var(--radius-full);
+  overflow: hidden;
+
+  /* Zemin `currentColor`dan türüyor, sabit bir renkten değil: hikâye kutusu
+     açık da koyu da olabilen bir dilimin üstünde duruyor ve çubuk oraya
+     uymak zorunda. Aynı kalıp `.band__btn`de de var (`canvas.css` §alt bant).
+     Rengi dilim `color` yazarak ezebilir. */
+  background: color-mix(in oklab, currentColor 22%, transparent);
+}
+
+.hik__dolgu {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+/* ⚠️ `transform` animasyonu, `width` DEĞİL: dolgu her karede düzeni yeniden
+   hesaplatmamalı. Kapatılan bir hikâyede bile bu fark ölçülebilir — çubuk
+   şeridi dilimin içindeki metnin üstünde duruyor. */
+@keyframes hik-dolgu {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Dolgu YALNIZ şimdiki çubukta akıyor. Süre motordan geliyor: `js/hikaye.js`
+   dilim başında `--hik-sure`yi bu çubuğa yazıyor. */
+.hik__cubuk[data-durum="simdiki"] .hik__dolgu {
+  animation: hik-dolgu var(--hik-sure, 3000ms) linear forwards;
+}
+
+/* Geçilmiş dilimler dolu duruyor — animasyon değil, durum. */
+.hik__cubuk[data-durum="dolu"] .hik__dolgu {
+  transform: scaleX(1);
+}
+
+/* ⚠️ BEDAVA DURAKLATMA. `animation-play-state` dolguyu bulunduğu karede
+   donduruyor; bir `transition` olsaydı hesaplanmış `transform`u okuyup geri
+   yazmak gerekirdi (bkz. `js/hikaye.js` §SAAT). */
+.hik[data-durakta="true"] .hik__dolgu {
+  animation-play-state: paused;
+}
+
+/* ==========================================================================
+   2 · DİLİM — BOŞ KANVAS
+   --------------------------------------------------------------------------
+   Hikâyenin içine ne konacağı buraya yazılmıyor. Tek kural: kutu tuvali
+   dolduruyor ve bir kerede yalnız biri görünüyor.
+   ======================================================================= */
+
+.hik__dilim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  /* Görünmez dilim tıklanamaz olmalı: üstündeki saydam kutu, altındaki etkin
+     dilimin kendi etkileşimini yerdi. */
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+.hik__dilim[data-on="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ==========================================================================
+   3 · DOKUNMA BÖLGELERİ
+   --------------------------------------------------------------------------
+   `galeri.css` §2'deki kalıbın eşi ve gerekçesi aynı: düğme görünmüyor,
+   kenara dokunmak yetiyor, ama GÖRÜNMEZ OLMASININ BEDELİ ERİŞİLEBİLİRLİK
+   OLMUYOR — ikisi de gerçek `<button>`, sekiliyor, adları var.
+
+   Ortadaki %40 bilerek boş: dilimin içindeki bir şey tıklanabilir olmak
+   isteyebilir, ve basılı tutup duraklatmanın yeri de orası.
+   ======================================================================= */
+
+.hik__bolge {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  width: 30%;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  touch-action: pan-y; /* dikey snap kaydırma bozulmamak zorunda */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hik__bolge--geri {
+  left: 0;
+}
+.hik__bolge--ileri {
+  right: 0;
+}
+
+/* İşaret normalde YOK. Farede kenara gelince beliriyor: dokunmatikte
+   "dokunulacak kenar" diye bir şey yok, orada bir şeyin tıklanabilir olduğunu
+   söyleyen tek şey imleç. Çubukların kendisi zaten "bu bir hikâye" diyor. */
+.hik__isaret {
+  display: grid;
+  place-items: center;
+  width: max(44px, 9cqi); /* --ui-tap, dokunma hedefinin altına inmiyor */
+  height: max(44px, 9cqi);
+  border: 1px solid color-mix(in oklab, currentColor 30%, transparent);
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--backdrop) 42%, transparent);
+  color: var(--on-backdrop);
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .hik__bolge:hover .hik__isaret {
+    opacity: 1;
+  }
+}
+
+/* Klavyeyle gezerken işaret GÖRÜNMEK ZORUNDA: odağın nerede olduğu görünmeyen
+   bir düğmede başka türlü anlaşılmıyor. */
+.hik__bolge:focus-visible .hik__isaret {
+  opacity: 1;
+}
+
+.hik__isaret .icon {
+  width: 58%;
+  height: 58%;
+  stroke-width: 2;
+}
+
+/* ==========================================================================
+   4 · HAREKET AZALTMA
+   --------------------------------------------------------------------------
+   ⚠️ ÇİFT YAZIM ZORUNLU, ve burada token indirimi İŞE YARAMIYOR. `--hik-sure`
+   bir `--dur-*` değil (dilim süresi saniyeler mertebesinde, motordan geliyor),
+   yani `tokens.css` §ERİŞİLEBİLİRLİK'teki 1ms indirimi buraya ulaşmıyor.
+   Dolgu burada ayrıca susturulmak zorunda.
+
+   Otomatik geçişin kendisi JS'te kapanıyor (`js/hikaye.js` → `azHareket()`
+   → `data-otomatik="false"`): hikâye durağan bir slayt gösterisine dönüyor,
+   okur sağa sola dokunarak geziyor. Aşağıdaki kural o durumun GÖRÜNTÜSÜ —
+   çubuk artık dolan bir saat değil, bulunduğun yeri söyleyen bir gösterge.
+   ======================================================================= */
+
+.hik[data-otomatik="false"] .hik__cubuk[data-durum="simdiki"] .hik__dolgu {
+  animation: none;
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hik__dolgu {
+    animation: none !important;
+  }
+  .hik__cubuk[data-durum="simdiki"] .hik__dolgu {
+    transform: scaleX(1);
+  }
+  .hik__dilim {
+    transition: none;
+  }
+}
+
+:root[data-motion="off"] .hik__dolgu {
+  animation: none !important;
+}
+:root[data-motion="off"] .hik__cubuk[data-durum="simdiki"] .hik__dolgu {
+  transform: scaleX(1);
+}
+:root[data-motion="off"] .hik__dilim {
+  transition: none;
+}

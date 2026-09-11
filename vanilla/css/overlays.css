@@ -1,5 +1,5 @@
 /* ============================================================================
-   OVERLAYS — perde, modal, paneller, tanıtım, giriş, arşiv, sayı sonu
+   OVERLAYS — perde, modal, paneller, giriş, arşiv, sayı sonu
    Bunlar tuvalin DIŞINDA yaşar → `px` tabanlı arayüz ölçeğini kullanırlar.
    ========================================================================= */
 
@@ -224,6 +224,34 @@
   font-size: var(--ui-fs-lg);
   font-weight: 600;
 }
+/* Yalnız İLK AÇILIŞTA var: orada ✕, Escape ve perde kapalı, kapanışın tek yolu
+   bu düğme (bkz. `js/acilis.js` §MOD SEÇİCİ). Çipten açılan seçicide yok —
+   orada okur zaten sayının içinde ve bilinen kapanış yolları çalışıyor. */
+/* ⚠️ YAPIŞKAN, tıpkı `.modal__head` gibi — ve burada zorunlu. `.modal` uzun
+   içerikte kaydırılabiliyor (`overflow-y: auto`); düğme akışta bıraksaydı kısa
+   ekranda (ölçüldü: 400×480) görünür alanın altında kalıyordu. İlk açılışta
+   ✕, Escape ve perde kapalı olduğu için o düğme kapanışın TEK yolu: ekranın
+   dışına düşmesi, okuru sayıyı açamaz hâlde bırakırdı. */
+.modal__alt {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  padding: var(--ui-sp-2) var(--ui-sp-4) var(--ui-sp-4);
+  background: var(--paper-raised);
+}
+.modal__ac {
+  width: 100%;
+  min-height: var(--ui-tap);
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: var(--ui-fs-base);
+  font-weight: 700;
+  transition: transform var(--dur-fast) var(--ease-spring);
+}
+.modal__ac:hover {
+  transform: scale(1.02);
+}
 
 /* --------------------------------------------------------------------------
    WİKİ KARTI — mangaka bağlantılarının modal içeriği (bkz. js/wiki.js)
@@ -310,318 +338,199 @@
 }
 
 /* --------------------------------------------------------------------------
-   TANITIM (about)
+   SEÇİCİLER — okuma modu ve görünüm
+   Modalın iki sorusu da AYNI desende: küçük bir etiket, altında seçenekleri
+   taşıyan bir tepsi, tepside önizleme kutuları ve her kutunun altında tek
+   kelime. Okuma modu daha önce üç satır metin taşıyan büyük kartlardı, tema
+   ise küçük emojili çipler; ikisi ayrı ağırlıkta çizilince modal iki farklı
+   dilde konuşuyordu. Tek desen, iki soru.
+
+   Seçili hâlin kancası `data-active` (JS yazıyor, bkz. `js/acilis.js`
+   §MOD SEÇİCİ). `:focus-visible` bilerek ele alınmıyor: `base.css`teki
+   ortak halka düğmenin TAMAMINI çevreliyor, seçili halkası ise yalnız
+   önizleme kutusunu — ikisi üst üste geldiğinde iç içe iki halka görünüyor ve
+   "klavye burada" ile "seçili olan bu" karışmıyor.
    -------------------------------------------------------------------------- */
-.intro-host {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-intro);
-  background: var(--backdrop);
-  opacity: 0;
-  transition: opacity var(--dur-slow) var(--ease-out);
-}
-.intro-host[data-on="true"] {
-  opacity: 1;
-}
-.intro__slides {
-  height: 100%;
-  overflow-y: auto;
-  scroll-snap-type: y mandatory;
-  scrollbar-width: none;
-}
-.intro__slides::-webkit-scrollbar {
-  display: none;
-}
-.intro__slide {
-  position: relative;
-  height: 100svh;
-  scroll-snap-align: start;
+.pick {
   display: grid;
-  place-items: center;
-  overflow: hidden;
+  gap: var(--ui-sp-2);
+  padding: var(--ui-sp-4);
 }
-.intro__bg {
-  position: absolute;
-  inset: 0;
+/* İkinci soru birinciye yapışmıyor ama aralarına çizgi de girmiyor: sınırı
+   tepsilerin kendi yüzeyi çiziyor. */
+.pick + .pick {
+  padding-top: 0;
 }
-.intro__bg svg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.pick__etiket {
+  font-size: var(--ui-fs-sm);
+  color: var(--ink-faint);
 }
-/* Tanıtım sahneleri aslında SAYFA ARKALIĞIDIR: zeminleri kâğıt rengidir ve bu
-   doğrudur — bir metin sayfasının arkası kâğıt olmalı. Ama burada tam ekran
-   kullanılıyorlar ve karanlık temada kâğıt zaten neredeyse siyah; üstüne bir de
-   koyu perde binince ortaya bomboş siyah bir ekran çıkıyordu. Sahnenin üstüne
-   sayının rengiyle bir tonlama koyarız: kâğıt yerine film karesi. */
-.intro__bg::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    155deg,
-    color-mix(in oklab, var(--accent-3) 60%, transparent),
-    color-mix(in oklab, var(--accent) 52%, transparent) 72%
-  );
+/* Tepsi rengi MODALİN KÂĞIDINDAN türüyor, hazır bir yüzey tokenından değil.
+   Burada önce `--paper-sunken` vardı ve karanlıkta yanlış çıkıyordu: o token
+   aydınlıkta "biraz daha koyu kâğıt" demek ama karanlıkta neredeyse saf siyah
+   (2026-09'da #0d0a08) — sıcak kahve bir modalin ortasında soğuk bir delik gibi
+   duruyor, üstüne konduğu yüzeyle akraba görünmüyordu.
+
+   Karışımın `--ink` ucu bunu kendiliğinden çözüyor, çünkü mürekkep de temayla
+   dönüyor: aydınlıkta koyu (tepsi kâğıda basılıyor), karanlıkta açık (tepsi
+   kâğıttan bir tık yükseliyor). İki temada da renk modalin kendi ailesinden
+   geliyor ve mesafe aynı kalıyor. */
+.pick__sira {
+  --pick-tepsi: color-mix(in oklab, var(--ink) 7%, var(--paper-raised));
+
+  display: flex;
+  gap: var(--ui-sp-3);
+  padding: var(--ui-sp-3);
+  background: var(--pick-tepsi);
+  border-radius: var(--radius-lg);
 }
-.intro__bg::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to top,
-    rgb(0 0 0 / 0.78),
-    rgb(0 0 0 / 0.35) 55%,
-    rgb(0 0 0 / 0.55)
-  );
-}
-/* Karanlıkta sahne zaten koyu; perde okunurluk için değil, körlük için çalışır. */
-:root[data-theme="dark"] .intro__bg::after {
-  background: linear-gradient(
-    to top,
-    rgb(0 0 0 / 0.6),
-    rgb(0 0 0 / 0.14) 55%,
-    rgb(0 0 0 / 0.34)
-  );
-}
-.intro__text {
-  position: relative;
-  z-index: 1;
-  width: min(90vw, 460px);
-  text-align: center;
-  color: #fbf6ee;
+.pick__opt {
+  flex: 1;
+  min-width: 0;
   display: grid;
-  gap: var(--ui-sp-4);
+  gap: var(--ui-sp-2);
   justify-items: center;
 }
-.intro__big {
-  font-family: var(--font-display);
-  font-size: clamp(30px, 9vmin, 52px);
-  line-height: 1.06;
-  font-weight: 600;
-  text-wrap: balance;
-}
-.intro__small {
-  font-family: var(--font-text);
-  font-size: var(--ui-fs-base);
-  line-height: 1.55;
-  opacity: 0.86;
-  text-wrap: pretty;
-}
-.intro__chev {
-  font-size: 30px;
-  line-height: 0.6;
-  opacity: 0.6;
-  animation: bob 2.2s var(--ease-in-out) infinite;
-}
-.intro__start {
-  margin-top: var(--ui-sp-2);
-  padding: 14px 30px;
-  border-radius: var(--radius-full);
-  background: var(--accent);
-  color: var(--accent-ink);
-  font-size: var(--ui-fs-base);
-  font-weight: 700;
-  box-shadow: var(--shadow-2);
-  transition: transform var(--dur-fast) var(--ease-spring);
-}
-.intro__start:hover {
-  transform: scale(1.04);
-}
-.intro__dots {
-  position: fixed;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: grid;
-  gap: 8px;
-}
-.intro__dots i {
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-full);
-  background: #fbf6ee;
-  opacity: 0.28;
-  transition:
-    opacity var(--dur-base) var(--ease-out),
-    height var(--dur-base) var(--ease-out);
-}
-.intro__dots i[data-on="true"] {
-  opacity: 1;
-  height: 18px;
-}
-.intro__skip {
-  position: fixed;
-  top: calc(12px + env(safe-area-inset-top, 0px));
-  right: 12px;
-  padding: 8px 16px;
-  border-radius: var(--radius-full);
-  color: #fbf6ee;
+.pick__ad {
   font-size: var(--ui-fs-sm);
-  background: rgb(255 255 255 / 0.14);
-  backdrop-filter: blur(8px);
+  color: var(--ink-soft);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.pick__opt[data-active="true"] .pick__ad {
+  color: var(--accent);
+  font-weight: 600;
 }
 
-/* --------------------------------------------------------------------------
-   OKUMA MODU SEÇİMİ
-   -------------------------------------------------------------------------- */
-.depth-pick {
-  padding: var(--ui-sp-4);
-  display: grid;
-  gap: var(--ui-sp-3);
-}
-.depth-pick__intro {
-  font-size: var(--ui-fs-sm);
+/* Yalnız SEÇİLİ modun açıklaması, kutuların ALTINDA ve tek tane — her kutunun
+   altına birer paragraf değil. Ölçüsü ve rengi kaldırılan kartların
+   `depth-card__detail`inden devralındı: bu kayıttaki ikincil metnin zaten
+   yerleşmiş biçimi oydu.
+
+   ⚠️ `min-height` iki satırlık ve gerekli: iki metin farklı uzunlukta,
+   yükseklik sabitlenmezse mod değiştikçe altındaki "Görünüm" bloğu zıplıyor.
+   İki metin de bugün 375px ve masaüstünde iki satıra sığıyor (ölçüldü), yani
+   sabit yükseklik boşuna yer kaplamıyor. Metinler uzatılırsa bu ölçü de
+   büyütülmeli — yoksa taşan satır zıplamayı geri getirir. */
+.pick__aciklama {
+  min-height: calc(2 * 1.45em);
+  font-size: var(--ui-fs-xs);
+  line-height: 1.45;
   color: var(--ink-faint);
-  line-height: 1.5;
 }
-.depth-card {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: var(--ui-sp-3);
-  align-items: center;
-  text-align: left;
-  padding: var(--ui-sp-4);
-  border: 1px solid var(--line);
+
+/* --- önizleme kutusu ------------------------------------------------------
+   Kâğıdın üstünde bir sayfa: birkaç satır ve bir vurgu noktası. Sahte metin
+   bilerek sahte — bu kutu bir ekran görüntüsü değil, bir işaret.
+
+   ⚠️ AYDINLIK/KARANLIK KUTULARI TOKEN KULLANAMAZ. Tokenlar temayla birlikte
+   dönüyor (`tokens.css`te `:root[data-theme="dark"]`), yani iki kutu da
+   `var(--paper)` deseydi ikisi de HER ZAMAN aynı renkte çıkardı: okurun o an
+   seçili olan teması. Seçim ekranının tek işi ikisini yan yana göstermek, o
+   yüzden `.pv--light` / `.pv--dark` renkleri elle yazılı ve `tokens.css`teki
+   NÖTR paletin değerleri (sayının kendi kâğıdı değil — sayı temaları dörde
+   katlanınca sekiz ayrı önizleme paleti tutmak gerekirdi). Sayıya ait tek şey
+   vurgu noktası; o `--accent`ten geliyor ve temayla dönmesi doğru.
+
+   Okuma modu kutuları tam tersine tokenda kalıyor: orada sorulan şey renk
+   değil uzunluk, kutu da okurun içinde bulunduğu temada görünmeli.
+   ------------------------------------------------------------------------- */
+.pv {
+  --pv-zemin: var(--paper);
+  --pv-kagit: var(--paper-raised);
+  --pv-murekkep: var(--ink);
+  --pv-cizgi: var(--line);
+
+  /* Grid öğesi olduğu için zaten bloklaşıyor, yine de yazılı: `<span>` bir gün
+     tepsiden çıkarsa satır içi kalır ve `aspect-ratio` sessizce ölürdü. */
+  display: block;
+  width: 100%;
+  max-width: 132px;
+  aspect-ratio: 4 / 3;
+  padding: 10px;
   border-radius: var(--radius-md);
-  background: var(--paper);
+  background: var(--pv-zemin);
+  box-shadow: 0 0 0 1px var(--pv-cizgi), var(--shadow-1);
   transition:
-    border-color var(--dur-fast) var(--ease-out),
-    transform var(--dur-fast) var(--ease-spring),
-    background var(--dur-fast) var(--ease-out);
+    box-shadow var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-spring);
 }
-.depth-card:hover {
-  border-color: var(--accent);
+.pick__opt:hover .pv {
   transform: translateY(-2px);
 }
-.depth-card[data-active="true"] {
-  border-color: var(--accent);
-  background: color-mix(in oklab, var(--accent) 8%, transparent);
+/* Halka ile kutu arasındaki boşluk ikinci bir gölge katmanı: tepsinin rengini
+   3px taşıyıp halkayı onun dışına çiziyor — bu yüzden `--pick-tepsi` tek yerde
+   tanımlı ve buraya kalıtımla geliyor, iki ayrı renk yazılsa ilk düzenlemede
+   ayrışırlardı. `outline-offset` kullanılmadı, çünkü o özelliği `base.css`teki
+   `:focus-visible` kullanıyor. */
+.pick__opt[data-active="true"] .pv {
+  box-shadow:
+    0 0 0 3px var(--pick-tepsi),
+    0 0 0 5px var(--accent),
+    var(--shadow-1);
 }
-/* Tamamlanan mod. Seçili karttan SONRA geliyor ki ikisi üst üste geldiğinde
-   altın kazansın — "şu an buradasın" her zaman görünüyor, "bunu bitirdin"
-   ise okurun tek ödülü. Kenarlık seçiliyken daha diri (aşağıda). */
-.depth-card[data-done="true"] {
-  border-color: color-mix(in oklab, var(--gold) 50%, var(--line));
-  background: linear-gradient(
-    135deg,
-    color-mix(in oklab, var(--gold) 20%, transparent),
-    color-mix(in oklab, var(--gold) 7%, transparent)
-  );
+.pv--light {
+  --pv-zemin: #f5f1e8;
+  --pv-kagit: #fffdf8;
+  --pv-murekkep: #1b1613;
+  --pv-cizgi: #d9cfbe;
 }
-.depth-card[data-done="true"][data-active="true"] {
-  border-color: var(--gold);
+.pv--dark {
+  --pv-zemin: #15120f;
+  --pv-kagit: #1f1b17;
+  --pv-murekkep: #ece3d5;
+  --pv-cizgi: #342d26;
 }
-.depth-card[data-done="true"]:hover {
-  border-color: var(--gold);
-}
-.depth-card[data-done="true"] .depth-card__icon {
-  background: color-mix(in oklab, var(--gold) 22%, transparent);
-}
-.depth-card[data-done="true"] .depth-card__meta b {
-  color: color-mix(in oklab, var(--gold) 80%, var(--ink));
-}
-.depth-card__icon {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  font-size: 26px;
-  line-height: 1;
-  border-radius: var(--radius-md);
-  background: color-mix(in oklab, var(--accent) 9%, transparent);
-}
-.depth-card__main {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-.depth-card__main b {
-  font-family: var(--font-display);
-  font-size: var(--ui-fs-lg);
-  font-weight: 600;
-}
-.depth-card__line {
-  font-size: var(--ui-fs-sm);
-  color: var(--ink-soft);
-}
-.depth-card__detail {
-  font-size: var(--ui-fs-xs);
-  color: var(--ink-faint);
-  line-height: 1.45;
-}
-.depth-card__meta {
-  display: grid;
-  justify-items: end;
-  gap: 2px;
-  text-align: right;
-}
-.depth-card__meta b {
-  font-size: var(--ui-fs-sm);
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-}
-.depth-card__meta span {
-  font-size: var(--ui-fs-xs);
-  color: var(--ink-faint);
-}
-
-/* --------------------------------------------------------------------------
-   GÖRÜNÜM (TEMA) — aynı modalın ikinci sorusu
-   Kartlardan bilerek DAHA KÜÇÜK ve daha sessiz: okuma derinliği sayının nasıl
-   okunacağını değiştiriyor, tema yalnız rengini. İkisi aynı ağırlıkta
-   çizilseydi modal iki eşit soru soruyormuş gibi görünürdü.
-
-   Üstteki çizgi de bu yüzden var: kartlarla arasına bir nefes koyuyor,
-   "burada başka bir şey soruluyor" diyor.
-   -------------------------------------------------------------------------- */
-.tema-sec {
+.pv__kagit {
+  position: relative;
+  overflow: hidden;
   display: flex;
-  align-items: center;
-  gap: var(--ui-sp-3);
-  padding: var(--ui-sp-3) var(--ui-sp-4) var(--ui-sp-4);
-  border-top: 1px solid var(--line);
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  padding: 9px;
+  border-radius: var(--radius-sm);
+  background: var(--pv-kagit);
+  box-shadow: 0 0 0 1px var(--pv-cizgi);
 }
-.tema-sec__etiket {
-  flex: 1;
-  font-size: var(--ui-fs-sm);
-  color: var(--ink-faint);
-}
-.tema-sec__sira {
-  display: flex;
-  gap: var(--ui-sp-2);
-}
-
-.tema-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--ui-sp-2);
-  /* En küçük dokunma hedefi: yatayda geniş ama dikeyde ince bir düğme
-     parmakla ıskalanıyordu. */
-  min-height: var(--ui-tap);
-  padding: var(--ui-sp-2) var(--ui-sp-4);
-  border: 1px solid var(--line);
+.pv__satir {
+  flex: none;
+  height: 3px;
   border-radius: var(--radius-full);
-  background: var(--paper);
-  font-size: var(--ui-fs-sm);
-  color: var(--ink-soft);
-  transition:
-    border-color var(--dur-fast) var(--ease-out),
-    background var(--dur-fast) var(--ease-out),
-    color var(--dur-fast) var(--ease-out);
+  background: var(--pv-murekkep);
+  opacity: 0.34;
 }
-.tema-btn:hover {
-  border-color: var(--accent);
+/* Satırlar bir paragraf taklidi ediyor: tek uzunlukta olsalardı metin değil
+   tarama çizgisi gibi okunurdu. */
+.pv__satir:nth-child(odd) {
+  width: 88%;
 }
-.tema-btn[data-active="true"] {
-  border-color: var(--accent);
-  background: color-mix(in oklab, var(--accent) 8%, transparent);
-  color: var(--ink);
-  font-weight: 600;
+.pv__satir:nth-child(even) {
+  width: 62%;
 }
-.tema-btn__simge {
-  font-size: var(--ui-fs-base);
+.pv__nokta {
+  position: absolute;
+  right: 8px;
+  bottom: 7px;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+}
+
+/* Okuma modu kutusunun İÇERİĞİ: ortada tek bir simge, yanında başka hiçbir şey.
+   Simge bir dönem sağ alt köşede 20px duruyordu, sahte metin satırlarının
+   yanında; orada süs gibi okunuyordu. Kutunun tek içeriği olunca modun kimliği
+   oluyor — arkasında daire ya da tepsi YOK, çünkü o zaman sayfaya yapıştırılmış
+   bir rozete dönerdi. */
+.pv__kagit--simge {
+  align-items: center;
+  justify-content: center;
+}
+.pv__simge {
+  font-size: 38px;
   line-height: 1;
+  font-style: normal;
 }
 
 /* --------------------------------------------------------------------------
@@ -1731,8 +1640,7 @@
 
 /* Düğme manga sayfasına varıldığında BİR KEZ nabız atıyor. Bir ipucu balonu
    yerine bunu seçtik: kendini yazıyla anlatmak zorunda kalan düğmenin ikonu
-   yanlıştır, üstelik sayının zaten dört kartlık bir tanıtımı var ve ikinci
-   bir öğretici katman gürültü olurdu. */
+   yanlıştır. */
 .band__btn--buyut[data-ipucu="true"] {
   animation: buyut-nabiz 1.1s var(--ease-out) 2;
 }

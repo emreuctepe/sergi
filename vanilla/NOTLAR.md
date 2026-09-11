@@ -103,8 +103,8 @@ JSON dizisi yerine düz satırlar: unutulan bir virgül bütün sayıyı kırmas
 
 `<div id="shell">`.
 
-`inert` bilerek açık doğuyor: açılış akışı bitene kadar (yükleme → tanıtım → mod
-seçimi) tuval odaklanamaz ve tıklanamaz olmalı. `acilis.js` sayı hazır olduğunda
+`inert` bilerek açık doğuyor: açılış akışı bitene kadar (yükleme → mod seçimi)
+tuval odaklanamaz ve tıklanamaz olmalı. `acilis.js` sayı hazır olduğunda
 kaldırıyor.
 
 ## §pages
