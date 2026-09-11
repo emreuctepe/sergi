@@ -1,0 +1,628 @@
+/* ============================================================================
+   JENERİK — sayının kapanış akışı (`son-jenerik`)
+   ----------------------------------------------------------------------------
+   Bir film jeneriği iki şeyden ibaret: SABİT BİR PENCERE ve onun içinden geçen
+   metin. Burada pencere tuvalin kendisi, metin de sayfanın uzunluğu — yani
+   akışı yapan şey kaydırmanın ta kendisi, bir animasyon değil. Bu yüzden bu
+   dosyada tek bir `@keyframes` yok: jenerik JS çalışmasa da, hareket kapalı
+   olsa da, okur kaydırdıkça akıyor.
+
+   İki karar bunu mümkün kılıyor:
+
+   ① PERDE `position: sticky` — tuvale yapışıp sayfayla birlikte kaymıyor.
+      Üstte ve altta kâğıda eriyen maske ondan geliyor: yazı alttaki ışık
+      havuzundan doğuyor, yukarıda kâğıda karışıyor. Blok blok beliren giriş
+      animasyonu YOK ve olmamalı — perde zaten aynı işi yapıyor, ikisi üst
+      üste binince "beliren metnin bir daha belirmesi" gibi duruyor.
+
+   ② SAYFANIN `overflow`U `clip` — `hidden` DEĞİL. `hidden` bir kaydırma kabı
+      (scroll container) yaratıyor ve `sticky` her zaman EN YAKIN kaydırma
+      kabına göre yapışıyor: perde `.page`e yapışır, `.page` de kaymadığı için
+      perde sayfanın tepesinde donup kalırdı. `clip` kaydırma kabı yaratmıyor,
+      yani perde doğru kaba — `.pages`e — yapışıyor. Kırpma da sürüyor.
+
+   ⚠️ ÖLÇÜLERİN TEMELİ `--canvas-h`. Tuvalin yüksekliğini `cqh` ile okumak
+   mümkün değil: `.canvas` `container-type: inline-size` (bkz. canvas.css) ve
+   `cqh` yalnız `size` kaplarında var. Tipi `size` yapmak ise BÜTÜN sayının
+   tipografisini kaydırırdı — `--fs-*` ölçeği `cqi` ve o da aynı kaptan
+   okunuyor. Değişkeni doğrudan kullanmak hem ucuz hem doğru.
+   ========================================================================= */
+
+/* ==========================================================================
+   SAYFA
+   ======================================================================= */
+
+/* Seçici bilerek uzun: `canvas.css`teki `.page[data-fit="scroll"]` ile aynı
+   katmanda (blocks) ve aynı özgüllükte bir yarış olmasın. */
+.page.page--jenerik[data-fit="scroll"] {
+  overflow: clip;
+
+  /* ⚠️ DİKEY DOLGU SIFIR ve bu jeneriğin bütün ölçüsünün temeli.
+     İki şeyi birden çözüyor:
+
+     ① Perde tuvalin TEPESİNDEN başlıyor. Dolgu dursaydı perde sayfanın ilk
+        karesinde onun kadar aşağıda doğardı (yapıştıktan sonra düzeliyordu —
+        ama kapanış karesi tam da yapışmadan önce görülen kare). Negatif
+        kenar boşluğuyla yukarı çekmek denendi ve YANLIŞ YOL: üst kenar boşluğu
+        `.page__inner`ın kenarından dışarı çöküyor (margin collapsing), yani
+        akıştaki her şeyi de kendisiyle birlikte oynatıyor.
+
+     ② Kadraj ölçüsü doğrudan `--canvas-h` oluyor. Kartlar "bir tam ekran"
+        derken tam olarak bir tam ekran; dolgu payı düşmek gerekmiyor.
+
+     Yan boşluk DURUYOR: metnin kenara yapışmaması gerekiyor ve yatayda
+     çökme diye bir şey yok. Perde onu kendi negatif yan boşluğuyla aşıyor.
+
+     Alttaki dolgunun gitmesinin ayrı bir gerekçesi de var: `data-fit="scroll"`
+     sayfalara folio'nun altına metin girmesin diye fazladan dip payı
+     veriliyor, oysa jenerikte folio GİZLİ (`data-kind="outro"` →
+     okuyucu.js §5). Ayrılan yer boş duruyordu. */
+  padding-block: 0;
+}
+
+/* Akışın bütün blokları arasında aynı nefes. Jenerikte boşluk bir süs değil
+   TEMPO: iki blok arasındaki kadraj, okura "yeni bir liste başlıyor" diyen
+   tek şey. */
+.page--jenerik .jen__blok + .jen__blok {
+  margin-top: var(--sp-8);
+}
+
+/* Kapanış karesiyle jeneriğin ilk satırı arasındaki ara, blok arasındakinden
+   BÜYÜK ve ölçüsü kadraja bağlı (`--sp-*` değil): 終 karesi listeden önce
+   ekranı tamamen TERK etmeli. Bloklar arası nefesle (15cqi ≈ 81px) "Emeği
+   geçenler" başlığı kapanış karesinin dibinde, daha 終 ekrandayken
+   görünüyordu — sinemada da jenerik, son kare çıkmadan başlamaz. */
+.page--jenerik .jen__kapanis + .jen__blok {
+  margin-top: calc(var(--canvas-h) * 0.28);
+}
+
+/* ==========================================================================
+   PERDE — akışın üstündeki sabit katman
+   --------------------------------------------------------------------------
+   Üç katman, üstten alta doğru boyanma sırasıyla:
+     ① maske   — üstte ve altta kâğıda eriyen geçiş
+     ② tarama  — 35° ince çizgi, sayının baskı dokusu
+     ③ havuz   — altta soluk bir ışık lekesi, yazının doğduğu yer
+
+   Hepsi metnin ÜSTÜNDE. Tarama ve havuz metni de kaplıyor ve bu bilinçli:
+   projeksiyon dokusu camın önündedir, arkasında değil. Opaklıklar buna göre
+   kısıldı — 0.045 tarama ve %7 havuz, gövde metninin kontrastını ölçülebilir
+   biçimde düşürmüyor.
+
+   ⚠️ `pointer-events: none` ŞART. Perde bütün kadrajı kaplıyor; olmasaydı
+   jenerikteki hiçbir bağlantı tıklanamaz, hiçbir metin seçilemezdi.
+   ======================================================================= */
+
+.jen__perde {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  height: var(--canvas-h);
+  /* Akışta yer kaplamıyor: yüksekliğini olduğu gibi geri veriyor, yani
+     kendisinden sonra gelen kart sayfanın tepesinden başlıyor. */
+  margin-bottom: calc(-1 * var(--canvas-h));
+  /* Sayfanın yan boşluğunu da örtmek için tam kanama. Kâğıda erime kenardan
+     kenara olmazsa iki yanda erimemiş birer şerit kalıyor. */
+  margin-inline: calc(-1 * var(--pad-page));
+  width: calc(100% + 2 * var(--pad-page));
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to bottom,
+      var(--paper) 0,
+      color-mix(in oklab, var(--paper) 55%, transparent) 12%,
+      transparent 26%,
+      transparent 72%,
+      color-mix(in oklab, var(--paper) 62%, transparent) 88%,
+      var(--paper) 100%
+    ),
+    repeating-linear-gradient(
+      35deg,
+      color-mix(in oklab, var(--ink) 4.5%, transparent) 0 1px,
+      transparent 1px 4px
+    ),
+    radial-gradient(
+      128% 34% at 50% 104%,
+      color-mix(in oklab, var(--accent) 7%, transparent),
+      transparent 70%
+    );
+}
+
+/* ==========================================================================
+   ① SON — jenerik başlamadan önceki tek kare
+   --------------------------------------------------------------------------
+   Kart tam bir kadraj: sayfanın üst/alt dolgusu düşüldükten sonra kalan her
+   şey. Böylece 終 perdenin erime şeridine değil, ortadaki temiz alana düşüyor
+   ve jenerik gerçekten "bir sonraki kare"den başlıyor.
+   ======================================================================= */
+
+.jen__kapanis {
+  min-height: var(--canvas-h);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--sp-2);
+  text-align: center;
+}
+
+/* 終 (owari) — Japon sinemasının kapanış karakteri. Mincho: sayının Japonca
+   metni de tırnaklı ve aynı kayıtta konuşuyor (bkz. tokens.css §--font-ja). */
+.jen__kanji {
+  font-family: var(--font-ja);
+  font-size: var(--fs-3xl);
+  line-height: 1;
+  color: var(--accent);
+}
+
+.jen__son {
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.42em;
+  /* Harf arası yalnız SAĞA boşluk ekliyor; ortalanmış bir yazıda son harfin
+     ardındaki boşluk metni sola kaydırıyor. Dengeleyen tek satır bu. */
+  text-indent: 0.42em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.jen__kunye {
+  margin-top: var(--sp-2);
+  font-family: var(--font-text);
+  font-size: var(--fs-xs);
+  color: var(--ink-faint);
+}
+
+/* "jenerik ↓" — akışın devam ettiğini söyleyen tek işaret. Bandaki ▶ düğmesi
+   de varış anında bir kez nabız atıyor (overlays.css §JENERİK DÜĞMESİ), ama o
+   düğme hareket kapalıyken hiç görünmüyor; bu satır her koşulda duruyor. */
+.jen__davet {
+  margin-top: var(--sp-6);
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.jen__ok {
+  width: 1.4em;
+  height: 1.4em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: jen-durtme 2.4s var(--ease-in-out) infinite;
+}
+@keyframes jen-durtme {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateY(4px);
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   BÖLÜM BAŞLIĞI — iki yanı çizgili, ortalanmış
+   ======================================================================= */
+
+.jen__baslik {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+/* Çizgiler `::before`/`::after` ve `1fr` değil `flex: 1`: başlık metni ne
+   kadar uzun olursa olsun iki yanda kalan pay eşit bölünüyor. */
+.jen__baslik::before,
+.jen__baslik::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--line), transparent);
+}
+
+/* ==========================================================================
+   ② KADRO — film künyesi düzeni
+   --------------------------------------------------------------------------
+   Görev sağa, ad sola yaslı, ortada tek bir oluk. Bu düzen bir jeneriği başka
+   hiçbir tipografik işaret olmadan tanıtıyor; onu "liste" olmaktan çıkaran
+   şey tam olarak ortadaki hizalama ekseni.
+
+   Sütunlar `1fr 1fr` — yani eksen tam ortada ve satırdan satıra kımıldamıyor.
+   `auto auto` olsaydı eksen en uzun göreve göre kayar, kadro da sayfada
+   sallanırdı.
+   ======================================================================= */
+
+.jen__kadro {
+  display: grid;
+  gap: var(--sp-4);
+}
+.jen__satir {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: var(--sp-4);
+  align-items: baseline;
+}
+.jen__satir dt {
+  text-align: right;
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  line-height: var(--lh-snug);
+}
+/* Görevin ikinci satırı (ör. "yazı ve çizimler"): aynı hücrede, küçük ve
+   düz — görevin kendisiyle karışmasın diye büyük harf YOK. */
+.jen__satir dt span {
+  display: block;
+  margin-top: 0.25em;
+  font-weight: 400;
+  font-size: 0.92em;
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: 0.75;
+}
+.jen__satir dd {
+  margin: 0;
+  text-align: left;
+  font-family: var(--issue-display, var(--font-display));
+  font-size: var(--fs-md);
+  line-height: var(--lh-snug);
+  color: var(--ink);
+}
+/* ⚠️ KADRODAKİ BAĞLANTI VURGU RENGİNE BOYANMIYOR. Sayfanın geri kalanında
+   bağlantılar `--accent` (§BAĞLANTILAR) ama ad sütununda o renk bir AYRIM
+   yaratıyordu: bağlantısı olan kişinin adı kırmızı, olmayanınki mürekkep —
+   jenerikte kimsenin adı bir başkasınınkinden farklı görünmemeli. Bağlantı
+   olduğunu alttaki ince çizgi zaten söylüyor, renk üstlenince söylediği şey
+   "bağlantı" değil "önemli" oluyor. */
+.jen__satir dd a {
+  color: inherit;
+  border-bottom-color: color-mix(in oklab, var(--ink) 28%, transparent);
+}
+.jen__satir dd a:hover,
+.jen__satir dd a:focus-visible {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Kuponun içindeki kadro: orada sağdaki hücre bir AD değil bir CÜMLE, yani
+   gövde metni kaydında okunmalı ve sol sütun daralmalı. */
+.jen__kadro--dar {
+  gap: var(--sp-3);
+}
+.jen__kadro--dar .jen__satir {
+  grid-template-columns: 0.62fr 1fr;
+  column-gap: var(--sp-3);
+}
+.jen__kadro--dar dd {
+  font-family: var(--font-text);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-body);
+  color: var(--ink-soft);
+}
+
+/* ==========================================================================
+   ③ KART — tek başına duran künye (konuk)
+   ======================================================================= */
+
+.jen__kart {
+  text-align: center;
+  padding: var(--sp-5) var(--sp-4);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.jen__kart-ust {
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.jen__kart-ad {
+  margin-top: var(--sp-1);
+  font-family: var(--issue-display, var(--font-display));
+  font-size: var(--fs-lg);
+  line-height: var(--lh-tight);
+}
+.jen__kart-alt {
+  margin-top: var(--sp-2);
+  font-family: var(--font-text);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-body);
+  color: var(--ink-soft);
+}
+
+/* ==========================================================================
+   ④⑤⑥ LİSTE — atıf ve künye satırları
+   --------------------------------------------------------------------------
+   Kadro düzeni burada işlemiyor: sağdaki hücre bir ad değil, kaynak + yazar +
+   lisans üçlüsü ve sağa yaslı iki sütuna sıkıştığında satır satır kırılıyor.
+   Ortalanmış yığın hem uzun metni taşıyor hem jeneriğin ekseni bozulmuyor.
+   ======================================================================= */
+
+.jen__liste {
+  display: grid;
+  gap: var(--sp-4);
+  text-align: center;
+  list-style: none;
+  padding: 0;
+}
+.jen__liste b {
+  display: block;
+  font-family: var(--issue-display, var(--font-display));
+  font-size: var(--fs-base);
+  font-weight: 600;
+  line-height: var(--lh-snug);
+}
+.jen__liste span {
+  display: block;
+  margin-top: 0.15em;
+  font-family: var(--font-text);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-body);
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+.jen__liste a {
+  display: inline-block;
+  margin-top: 0.3em;
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.jen__aciklama {
+  margin-bottom: var(--sp-4);
+  font-family: var(--font-text);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-body);
+  color: var(--ink-faint);
+  text-align: center;
+  text-wrap: pretty;
+}
+.jen__liste + .jen__aciklama {
+  margin-top: var(--sp-4);
+  margin-bottom: 0;
+}
+
+/* Eksik künye uyarısı. Okura görünür olması bilinçli (bkz. sayfa.html §④):
+   yanlış bir künye, eksik künyeden kötüdür — ama eksik olduğunu söylemeyen
+   bir künye ikisinden de kötüdür. */
+.jen__uyari {
+  margin-top: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border-left: 2px solid var(--warn);
+  font-family: var(--font-text);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-body);
+  color: var(--ink-soft);
+  text-align: left;
+  text-wrap: pretty;
+}
+.jen__uyari b {
+  color: var(--ink);
+}
+
+/* ==========================================================================
+   ⑦ SONRAKİ SAYI VE BAŞVURU KUPONU
+   --------------------------------------------------------------------------
+   Kesik çizgili çerçeve bir süs değil, bir TÜR işareti: kupon, form, başvuru.
+   Okur onu okumadan önce ne olduğunu biliyor. Üstündeki "Başvuru" etiketi de
+   çerçevenin üstüne oturuyor — kesilmiş bir kâğıdın üstündeki damga gibi.
+   ======================================================================= */
+
+.jen__sonraki {
+  text-align: center;
+  margin-bottom: var(--sp-5);
+}
+.jen__sonraki span {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.jen__sonraki b {
+  display: block;
+  margin-top: var(--sp-1);
+  font-family: var(--issue-display, var(--font-display));
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--accent);
+}
+
+.jen__kupon {
+  position: relative;
+  padding: var(--sp-6) var(--sp-4) var(--sp-5);
+  border: 1px dashed color-mix(in oklab, var(--ink) 34%, transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--paper-raised) 62%, transparent);
+}
+.jen__kupon-ust {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  translate: -50% -50%;
+  padding: 0.35em 1em;
+  background: var(--paper);
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.jen__kupon-not {
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-3);
+  border-top: 1px dashed color-mix(in oklab, var(--ink) 22%, transparent);
+  font-family: var(--font-text);
+  font-size: var(--fs-2xs);
+  line-height: var(--lh-body);
+  color: var(--ink-faint);
+  text-wrap: pretty;
+}
+
+/* ==========================================================================
+   ⑧ TEŞEKKÜR
+   ======================================================================= */
+
+.jen__tesekkur {
+  font-family: var(--font-text);
+  font-size: var(--fs-base);
+  line-height: var(--lh-loose);
+  color: var(--ink-soft);
+  text-align: center;
+  text-wrap: pretty;
+}
+
+/* ==========================================================================
+   ⑨ DAMGA — stüdyo logosunun yeri
+   --------------------------------------------------------------------------
+   Kendi kadrajı var: jenerik bitti, ekranda tek bir işaret kalıyor.
+   ======================================================================= */
+
+.jen__damga {
+  margin-top: var(--sp-8);
+  min-height: calc(var(--canvas-h) * 0.82);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--sp-2);
+  text-align: center;
+}
+.jen__yaprak {
+  width: 12cqi;
+  height: 12cqi;
+}
+.jen__marka {
+  font-family: var(--issue-display, var(--font-display));
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+}
+.jen__telif {
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-wide);
+  color: var(--ink-faint);
+}
+
+/* ==========================================================================
+   ⑩ JENERİK SONRASI SAHNE
+   --------------------------------------------------------------------------
+   Üstündeki boşluk sahnenin parçası: damgadan sonra bir kadraj hiçbir şey
+   geliyor, yani okur jeneriğin bittiğini sanıyor. Kart da bu yüzden tam
+   ortada değil, kadrajın biraz üstünde duruyor — aşağıda hiçbir şey yok ve
+   olmadığı görünmeli.
+   ======================================================================= */
+
+.jen__sonrasi {
+  margin-top: calc(var(--canvas-h) * 0.45);
+  /* Tam bir kadraj ve sayfanın SON öğesi: dip dolgusu olmadığı için sayfa tam
+     burada bitiyor, yani jeneriğin son karesi bu kartın kendisi ve kart o
+     karenin tam ortasında duruyor. */
+  min-height: var(--canvas-h);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--sp-3);
+  text-align: center;
+}
+.jen__sonrasi-ust {
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  opacity: 0.7;
+}
+.jen__sonrasi-metin {
+  font-family: var(--issue-display, var(--font-display));
+  font-size: var(--fs-md);
+  line-height: var(--lh-snug);
+  color: var(--ink-soft);
+  text-wrap: balance;
+}
+
+/* ==========================================================================
+   BAĞLANTILAR
+   --------------------------------------------------------------------------
+   Jenerikteki bağlantılar okuma akışını bölmemeli: altı çizili değil, alttan
+   ince bir vurgu çizgisiyle. Üstlerinde perdenin taraması olduğu için renk
+   `--accent`te bırakıldı, `--ink-soft`ta değil — sönük bir bağlantı taramanın
+   altında kayboluyor.
+   ======================================================================= */
+
+.page--jenerik a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--accent) 40%, transparent);
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+.page--jenerik a:hover,
+.page--jenerik a:focus-visible {
+  border-bottom-color: var(--accent);
+}
+
+/* ==========================================================================
+   DAR TUVAL
+   --------------------------------------------------------------------------
+   Telefonda kadro sütunları 1fr 1fr kalınca görev hücresine üç kelime
+   sığmıyor ve "Kantō Depremi dosyası" üç satıra kırılıyor. Eksen orada
+   metnin kendisine bırakılıyor: görev üstte, ad altta, ikisi de ortalı.
+   ⚠️ `cqi` değil `px`: kırılma noktası tuvalin oranına değil GERÇEK
+   genişliğine bağlı — 3:4 oranı her ekranda aynı, sığmayan şey harfler.
+   ======================================================================= */
+
+@media (max-width: 400px) {
+  .jen__satir,
+  .jen__kadro--dar .jen__satir {
+    grid-template-columns: 1fr;
+    gap: 0.2em;
+    justify-items: center;
+  }
+  .jen__satir dt,
+  .jen__satir dd {
+    text-align: center;
+  }
+}
+
+/* ==========================================================================
+   HAREKET KAPALI
+   --------------------------------------------------------------------------
+   Akışın kendisi kaydırma olduğu için burada durdurulacak bir şey yok; tek
+   hareketli parça aşağı davet eden ok.
+   ======================================================================= */
+
+:root[data-motion="off"] .jen__ok {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .jen__ok {
+    animation: none;
+  }
+}

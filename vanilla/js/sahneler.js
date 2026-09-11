@@ -2,11 +2,19 @@
    SAHNELER — beş üretilmiş tam ekran arkalık
    ----------------------------------------------------------------------------
    ⚠️ ŞU AN HİÇBİR YERDEN ÇAĞRILMIYOR — çağıranını arama, yok. Bu beş sahne
-   açılıştaki tanıtım kartlarının arkalığıydı; tanıtım kaldırıldı, dosya
-   BİLEREK duruyor: `roadmap.md`deki "outro" aynı işi isteyecek ve buradaki
-   ölçüler (tam ekran, kâğıt zemin, tohumlu serpiştirme) ona hazır. Outro
-   yazılırken `SAHNELER` import edilip kullanılabilir; o da olmazsa dosya
-   gönül rahatlığıyla silinir.
+   açılıştaki tanıtım kartlarının arkalığıydı; tanıtım kaldırıldı ve dosya
+   "outro aynı işi isteyecek" diye saklandı.
+
+   ⚠️ O BEKLEYİŞ BİTTİ: outro yazıldı (`sayfalar/son-jenerik` — jenerik) ve bu
+   sahneleri İSTEMEDİ. Sebebi ölçüde: buradaki beşi de TEK KADRAJLIK tam ekran
+   arkalık (`preserveAspectRatio="slice"`, 300×400), jenerik ise sekiz kadraj
+   boyunda akan bir sayfa — arkasına gerilen bir sahne tanınmaz hâle gelirdi.
+   Jeneriğin arkası bilerek boş: üstünde zaten sabit bir perde var ve ikinci
+   bir katman metni yer (bkz. `css/jenerik.css` §PERDE).
+
+   Yani dosya artık sahipsiz. Silmek serbest — ama bu bir KARAR, kendiliğinden
+   yapılmadı: `roadmap.md`de outro dışında da üretilmiş arkalık isteyebilecek
+   maddeler duruyor.
 
    Beş sahnenin SVG'si burada ÜRETİLİYOR, dosyaya gömülü durmuyor.
    Sebebi ölçüldü: `waves` tek başına 21,6 KB'lık üretilmiş işaretleme —

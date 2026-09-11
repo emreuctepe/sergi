@@ -15,10 +15,15 @@
      overlays → yükleme ekranı, modal, mod seçici
      puzzles  → emoji bilmecesi (bl-1)
 
-   `blocks` katmanına DÖRT dosya giriyor ve bu bir bölünme değil, sınır: ilki
-   sayının her sayfasında işleyen blokları taşıyor, öbür üçü tek birer sayfaya
-   ait (sergi koridoru, hikâye kabuğu, sunuş). Aynı katmanda oldukları için
-   kaskad açısından ayrımın hiçbir bedeli yok.
+   `blocks` katmanına BEŞ dosya giriyor ve bu bir bölünme değil, sınır: ilki
+   sayının her sayfasında işleyen blokları taşıyor, öbür dördü tek birer
+   sayfaya ait (sergi koridoru, hikâye kabuğu, sunuş, jenerik). Aynı katmanda
+   oldukları için kaskad açısından ayrımın hiçbir bedeli yok.
+
+   ⚠️ `jenerik.css` `blocks.css`ten SONRA geliyor ve bu sıraya bağlı: jenerik
+   sayfası `canvas.css`teki iki kuralı (`overflow`, dip dolgusu) eziyor.
+   Seçicileri bu yüzden bir adım uzun yazıldı — aynı özgüllükte bir yarış
+   dosya sırasına bırakılmasın.
 
    Ana projedeki `comments.css` (677 satır, yorum sistemi) BU KLONDA YOK:
    klonun DOM'unda eşleşen tek sınıfı bile bulunmuyor (ölçüldü, 0 eşleşme) ve
@@ -36,6 +41,7 @@
 @import './galeri.css' layer(blocks);
 @import './hikaye.css' layer(blocks);
 @import './sunus.css' layer(blocks);
+@import './jenerik.css' layer(blocks);
 @import './overlays.css' layer(overlays);
 @import './puzzles.css' layer(puzzles);
 

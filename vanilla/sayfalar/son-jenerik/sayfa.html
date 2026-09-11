@@ -1,0 +1,359 @@
+<!--
+  JENERİK — sayının kapanış akışı.
+
+  `son-kunye` (künye) ve `son-1` (boş yaprak sayfası) İKİSİNİN DE YERİNİ ALIYOR.
+  Sebep: künye bir liste olarak duruyordu ve arkasından gelen sayfanın söyleyecek
+  hiçbir şeyi yoktu ("…" yazan tek bir not). Sayı, sönerek değil kapanarak
+  bitmeli. Bir filmin jeneriği tam olarak bunu yapıyor: iş biter, ekran kararmaz,
+  emeği geçenler akmaya başlar.
+
+  Klasörleri diskte duruyor, ikisi de `#sira`dan çıkarıldı (bkz. BENIOKU.md
+  §"Sayının sırasını değiştirmek"). Geri getirmek listeye bir satır yazmak.
+
+  ⚠️ `data-fit="scroll"` VE AKIŞ AYNI ŞEY. Jenerik kendi kendine oynayan bir
+  video değil; sayfanın kendi uzunluğu. Okur kaydırdıkça jenerik akıyor, bandaki
+  ▶ düğmesine basınca da aynı kaydırma kendiliğinden yürüyor (`js/jenerik.js`).
+  Yani otomatik oynatma bir GÖSTERİ DEĞİL, okurun elindeki hareketin motorlusu:
+  durdurulduğu an okur tam kaldığı yerde, sayfanın içinde duruyor.
+
+  ⚠️ METİN DOSYADA, JS'TE DEĞİL. Lisans atıfları (CC BY / CC BY-SA) yasal bir
+  yükümlülük: JS çalışmasa da, oynatma hiç kullanılmasa da okunabilir olmak
+  zorundalar. Bu sayfada JS'in tek işi kaydırmayı yürütmek.
+
+  ⚠️ Perde (`.jen__perde`) `position: sticky` ve bu yüzden sayfanın
+  `overflow`u `clip` (bkz. css/jenerik.css §PERDE) — `hidden` olsaydı sayfanın
+  kendisi bir kaydırma kabı sayılır, perde de sayfaya yapışıp hiç kımıldamazdı.
+-->
+<section
+  class="page page--jenerik"
+  data-page-id="son-jenerik"
+  data-mod="all"
+  data-section="son"
+  data-section-title="Jenerik"
+  data-kind="outro"
+  data-scene="fade-up"
+  data-fit="scroll"
+  data-bleed="none"
+  data-inview="true"
+  role="group"
+  aria-roledescription="sayfa"
+>
+  <div class="page__inner">
+    <!--
+      PERDE — akışın üstünde duran sabit katman: üstte ve altta kâğıda eriyen
+      maske, üstünde 35° tarama (sayının baskı dokusu, bkz. `js/sahneler.js`
+      §TORİİ), altta soluk bir ışık havuzu. Yazı bu havuzdan doğup yukarıda
+      kâğıda karışıyor — jenerik hissini veren şey bu, blok blok beliren
+      animasyonlar değil.
+
+      Akışta yer kaplamıyor (`margin-bottom` yüksekliğini geri alıyor) ve
+      `pointer-events: none` — metin seçilebilir, bağlantılar tıklanabilir.
+    -->
+    <div class="jen__perde" aria-hidden="true"></div>
+
+    <!-- ① SON — jenerik başlamadan önceki tek kare -->
+    <div
+      class="jen__kapanis blk"
+      style="--i: 0"
+      data-block-id="son-jenerik:0"
+      data-block-kind="outro"
+    >
+      <p class="jen__kanji" lang="ja" aria-hidden="true">終</p>
+      <p class="jen__son">Son</p>
+      <p class="jen__kunye">Kızıl Mevsim · Eylül 2026</p>
+      <p class="jen__davet" aria-hidden="true">
+        <span>jenerik</span>
+        <svg class="jen__ok" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 9l6 6 6-6"></path>
+        </svg>
+      </p>
+    </div>
+
+    <!-- ② EMEĞİ GEÇENLER — film kadrosu düzeni: görev sağa, ad sola yaslı.
+         Aynı kişi birden çok satırda görünüyor ve bu bir yineleme hatası değil,
+         künyenin kendisi: bu sayıda bir kişi birden çok iş yaptı. -->
+    <section class="jen__blok">
+      <h2 class="jen__baslik">Emeği geçenler</h2>
+      <dl class="jen__kadro">
+        <div class="jen__satir">
+          <dt>Editör</dt>
+          <dd>Emre Üçtepe</dd>
+        </div>
+        <div class="jen__satir">
+          <dt>Kantō Depremi dosyası<span>yazı ve çizimler</span></dt>
+          <dd>Emre Üçtepe</dd>
+        </div>
+        <div class="jen__satir">
+          <dt>Söyleşi</dt>
+          <dd>Emre Üçtepe</dd>
+        </div>
+        <!--
+          ⚠️ BU SATIR DOĞRULANACAK. Sayının tasarımı ve kodu künyede hiç
+          geçmiyordu; jenerik onu görünür kılıyor ama adı BURADAN gelmiyor,
+          deponun sahibinden varsayıldı. Yanlışsa değiştirilecek yer tek satır.
+        -->
+        <div class="jen__satir">
+          <dt>Tasarım ve kod</dt>
+          <dd>Emre Üçtepe</dd>
+        </div>
+        <div class="jen__satir">
+          <dt>Sözlük<span>illüstrasyon</span></dt>
+          <dd>
+            <a href="https://example.com" target="_blank" rel="noopener">Aslı Ün</a>
+          </dd>
+        </div>
+        <!--
+          ⚠️ "Akıllı Kız"ın çerçevelerinde ŞU AN YER TUTUCU GÖRSELLER var
+          (`sayfalar/ms-galeri/uret.py` §ESERLER ②): on levha üretilmiş
+          SVG taşıyor, Ece Özgür'ün çizimleri değil. Satır yine de burada,
+          çünkü sergiyi tanıtan sayfa (`ms-acilis`) çizeri okura zaten söylüyor
+          ve künye o beyanın karşılığı olmak zorunda. Gerçek çizimler gelince
+          bu satır değişmiyor — değişen tek şey `uret.py`deki `dosya` alanı.
+        -->
+        <div class="jen__satir">
+          <dt>&ldquo;Akıllı Kız&rdquo; sergisi<span>çizimler</span></dt>
+          <dd>Ece Özgür</dd>
+        </div>
+        <div class="jen__satir">
+          <dt>Sergi metinleri<span>on levha · kurgu</span></dt>
+          <dd>sErgi</dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- ③ KONUK — tek kart, çünkü tek konuk var ve satır arasında kaybolmamalı.
+         Filmde de "Özel Konuk" ayrı bir karede geçer. -->
+    <section class="jen__blok">
+      <h2 class="jen__baslik">Konuk</h2>
+      <div class="jen__kart">
+        <p class="jen__kart-ust">One-shot</p>
+        <p class="jen__kart-ad">Kapalı Kapılar</p>
+        <p class="jen__kart-alt">
+          KARGAMANGA · izniyle yayımlandı<br />
+          <a href="https://www.youtube.com/shorts/XaK1Acfo8ZE" target="_blank" rel="noopener"
+            >PIGMENT</a
+          >
+        </p>
+      </div>
+    </section>
+
+    <!--
+      ④ GÖRSELLER — atıf listesi KULLANILAN görselleri sayar. Kullanılmayan bir
+      görselin atfını bırakmak CC BY'nin istediği şeyi yapmak değil, yalnızca
+      listeyi yanlış hâle getirir.
+
+      ⚠️ ALTI ATIF YOK, ÇÜNKÜ ALTI GÖRSEL DE SAYIDA YOK.
+
+      ⚠️⚠️ ALTINCISI BU SAYFAYLA BİRLİKTE DÜŞTÜ — `yaprak.webp`
+      ("Kızıl yaprak · Enko-ji, Kyoto · lumoplank · CC0"). İki sayfada
+      kullanılıyordu: `km-imza` (zaten `#sira`da değildi) ve `son-1` — yani
+      jeneriğin yerini aldığı sayfada. Jeneriğin arka planı yok (uzun bir akış
+      sayfası tek bir tam kanama görseli taşıyamaz), dolayısıyla görsel artık
+      sayının hiçbir yerinde görünmüyor ve atfı da listede duramaz:
+      KULLANILMAYAN bir görselin atfı, CC BY'nin istediği şeyi yapmak değil,
+      listeyi yanlış hâle getirmek. Yaprak motifi sayfada yine de var — aşağıdaki
+      damgada, fotoğraf olarak değil kapağın/sekmenin çizili işareti olarak.
+
+      Dosyası duruyor (`assets/2026-09/yaprak.*`, 1 webp + 3 avif): silinmedi,
+      çünkü `km-imza` bir gün sıraya geri yazılabilir. Geri yazılırsa atıf da
+      geri gelmeli.
+
+      İkisinin dosyası duruyor — `assets/2026-09/sisli-vadi.*` ve `tapinak.*`.
+      Kızıl Mevsim'in arka planlarıydı (`km-acilis`, `km-2`); o sayfalar
+      `#sira`dan çıkınca görseller de çıktı ama klasörde kaldılar.
+
+      Üçünün dosyası SİLİNDİ. Eski "Gece Hattı" foto-öyküsünündüler; o bölüm
+      Kantō Depremi dosyasına dönüşünce öksüz kaldılar. Depoda sürüm kontrolü
+      yok, silinen dosya geri gelmiyor — Commons'tan yeniden indirilecekler.
+      Künyeleri burada KAYITTA, atıf olarak DEĞİL (yorum satırı okura görünmez,
+      CC BY'nin istediği atıf değildir):
+
+          fener  · Taş fener — Kenroku-en, Kanazawa · DimiTalen        · CC0
+          yagmur · Yağmur    — Sensō-ji, Asakusa    · Maarten Heerlien · CC BY 2.0
+          tren   · Tren      — Matsumoto İstasyonu  · Tohnass          · CC BY-SA 4.0
+
+      Görseller geri gelirse atıfları da geri gelmeli.
+    -->
+    <section class="jen__blok">
+      <h2 class="jen__baslik">Görseller</h2>
+      <p class="jen__aciklama">
+        Sayfa arkalıkları Wikimedia Commons'tan. CC BY ve CC BY-SA lisanslı olanlarda atıf
+        zorunlu; CC BY-SA görseller aynı lisansla paylaşılır.
+      </p>
+      <ul class="jen__liste">
+        <li>
+          <b>Kapak</b>
+          <span>Fushimi Inari torii · Balon Greyjoy</span>
+          <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener"
+            >CC0</a
+          >
+        </li>
+        <li>
+          <b>Dalga</b>
+          <span>Breaking wave by rock · Nuwan Devinda</span>
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"
+            >CC BY-SA 4.0</a
+          >
+        </li>
+      </ul>
+      <!--
+        ⚠️ AŞAĞIDAKİ SATIR YER TUTUCU VE OKURA DA ÖYLE GÖRÜNÜYOR — bilerek.
+        Dört kare (üç arşiv + 2023 Tokyo) `assets/2026-09/KantoDepremi/` altında
+        ve künyeleri doğrulanmadı: fotoğraflar 1923 tarihli, yani eserin kendi
+        telifi büyük olasılıkla düşmüş, ama dosya adlarındaki uzun numaralar
+        (`…-1053504330`) stok ajansı kimliğine benziyor ve ajans TARAMASI ayrı
+        bir hak doğurabiliyor. Dördüncüsündeki `960px-` öneki Wikimedia
+        küçük-resim adlandırmasıdır, yani kaynağı orada aranmalı.
+
+        Uydurulmuş bir kaynak yazmaktansa eksik olduğunu söylemek doğrusu.
+        Sayı yayımlanmadan önce her karenin arşivi, erişim bağlantısı ve
+        lisansı doğrulanıp bu satır onunla değiştirilecek.
+      -->
+      <p class="jen__uyari">
+        Kantō Depremi dosyasındaki dört arşiv karesinin künyesi <b>henüz doğrulanmadı</b>.
+        Doğrulanana kadar burada eksik duruyor — yanlış bir künye, eksik künyeden
+        kötüdür.
+      </p>
+      <p class="jen__aciklama">
+        Kantō Depremi dosyasının okuma kaynakçası kendi sayfasında.
+      </p>
+    </section>
+
+    <!-- ⑤ YAZI TİPLERİ — kolofon geleneği. Bad Comic'in burada olması "eklense
+         de olur" değil: OFL 1.1 fontun lisansıyla birlikte dağıtılmasını şart
+         koşuyor ve dosyanın kendisi `fonts/BadComic-OFL.txt`te duruyor. -->
+    <section class="jen__blok">
+      <h2 class="jen__baslik">Yazı tipleri</h2>
+      <ul class="jen__liste">
+        <li>
+          <b>Bad Comic</b>
+          <span>manga balonları ve sayfa başlıkları</span>
+          <a href="https://openfontlicense.org/" target="_blank" rel="noopener">SIL OFL 1.1</a>
+        </li>
+        <li>
+          <b>Iowan Old Style · Georgia</b>
+          <span>gövde ve başlıklar — sistem yığını</span>
+        </li>
+        <li>
+          <b>Mincho (明朝)</b>
+          <span>Japonca metin — sistem yığını</span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- ⑥ NASIL YAPILDI — filmdeki "çekim" künyesinin karşılığı. -->
+    <section class="jen__blok">
+      <h2 class="jen__baslik">Nasıl yapıldı</h2>
+      <ul class="jen__liste">
+        <li>
+          <b>Derlemesiz</b>
+          <span>saf HTML, CSS ve JavaScript · paket yöneticisi, derleme adımı ve dış bağımlılık yok</span>
+        </li>
+        <li>
+          <b>İz yok</b>
+          <span>analitik yok, çerez yok, hesap yok · okuma modu ve tema tarayıcıdan çıkmıyor</span>
+        </li>
+        <li>
+          <b>Sahneler</b>
+          <span>sayıdaki arkalıkların çoğu fotoğraf değil, sayfanın içinde çizilen SVG</span>
+        </li>
+        <!--
+          ⚠️ Bu satır bir künye değil bir BEYAN, ve yazılmasının sebebi
+          `sayfalar/ms-galeri/uret.py` başlığındaki kayıt: koridorun figürleri
+          üretilmiş bir referans görselden kesilip vektöre çevrildi. Sayının
+          telif konusundaki titizliği (bkz. §Görseller) kendi üretim yolunu
+          saklarsa anlamını kaybeder.
+        -->
+        <li>
+          <b>Sergi koridoru</b>
+          <span>figürler, üretilen bir referans görselden kesilip vektöre çevrildi</span>
+        </li>
+      </ul>
+    </section>
+
+    <!--
+      ⑦ BAŞVURU — jeneriğin sonundaki "yakında" karesi.
+
+      ⚠️ ADRES VE TARİH YER TUTUCU. `example.com` sayının kendi yer tutucu
+      kalıbı (künyedeki bağlantılar da öyle); gerçek adres ve gerçek son gün
+      yazılmadan yayımlanmamalı. Uydurulmuş bir tarih, okurun kaçırdığını
+      sandığı bir kapı demek.
+    -->
+    <section class="jen__blok">
+      <h2 class="jen__baslik">Sonraki sayı</h2>
+      <p class="jen__sonraki">
+        <span>Ekim 2026</span>
+        <b>Gürültü</b>
+      </p>
+      <div class="jen__kupon">
+        <p class="jen__kupon-ust">Başvuru</p>
+        <dl class="jen__kadro jen__kadro--dar">
+          <div class="jen__satir">
+            <dt>Ne arıyoruz</dt>
+            <dd>Yazı, çizim, manga, fotoğraf, çeviri. Tema bir davet, sınır değil.</dd>
+          </div>
+          <div class="jen__satir">
+            <dt>Ne gönderilir</dt>
+            <dd>Üç cümlelik bir öneri ve görebileceğimiz bir iş.</dd>
+          </div>
+          <div class="jen__satir">
+            <dt>Nereye</dt>
+            <dd><a href="mailto:sergi@example.com">sergi@example.com</a></dd>
+          </div>
+          <div class="jen__satir">
+            <dt>Son gün</dt>
+            <dd>25 Eylül 2026</dd>
+          </div>
+        </dl>
+        <p class="jen__kupon-not">
+          Daha önce hiçbir yerde yayımlanmamış olması gerekmiyor. Bize ait olmasını da
+          istemiyoruz: işin telifi sende kalıyor, biz yalnız bu sayıda yayımlama izni
+          istiyoruz.
+        </p>
+      </div>
+    </section>
+
+    <!-- ⑧ TEŞEKKÜR -->
+    <section class="jen__blok">
+      <h2 class="jen__baslik">Teşekkür</h2>
+      <p class="jen__tesekkur">
+        Çizimlerini paylaşan herkese, Commons'a yükleyip serbest bırakan adı bilinmeyen
+        fotoğrafçılara, ve sonuna kadar kaydıran sana.
+      </p>
+    </section>
+
+    <!-- ⑨ DAMGA — stüdyo logosunun yeri. Yaprak, kapaktaki ve sekmedeki damganın
+         aynı yolu (bkz. index.html §favicon, js/sahneler.js §YAPRAKLAR). -->
+    <div class="jen__damga">
+      <svg class="jen__yaprak" viewBox="-14 -15 28 30" aria-hidden="true" focusable="false">
+        <path
+          d="M0 13 C-7.5 7 -10.5 -2 -5.5 -8.5 C-3 -11.8 3 -11.8 5.5 -8.5 C10.5 -2 7.5 7 0 13Z"
+          fill="var(--accent)"
+        ></path>
+        <path
+          d="M0 12 L0 -9 M0 2 L5 -3 M0 2 L-5 -3 M0 7 L4.5 3 M0 7 L-4.5 3"
+          fill="none"
+          stroke="var(--paper)"
+          stroke-width="0.8"
+          stroke-linecap="round"
+          opacity="0.55"
+        ></path>
+      </svg>
+      <p class="jen__marka">sErgi</p>
+      <p class="jen__telif">
+        Kızıl Mevsim · Eylül 2026 · her işin telifi sahibinde
+      </p>
+    </div>
+
+    <!-- ⑩ JENERİK SONRASI SAHNE — sonuna kadar kalana. Boşluk da sahnenin
+         parçası: kart bir ekran aşağıda, yani okur önce jeneriğin bittiğini
+         sanıyor. -->
+    <div class="jen__sonrasi">
+      <p class="jen__sonrasi-ust">Jenerik sonrası sahne</p>
+      <p class="jen__sonrasi-metin">
+        Hâlâ buradasın.<br />
+        Sonraki sayı gürültüyle açılıyor — sessizliğe alışma.
+      </p>
+    </div>
+  </div>
+</section>

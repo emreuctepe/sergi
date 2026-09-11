@@ -45,6 +45,11 @@ Sıranın **tek** kaynağı `index.html` içindeki `#sira` bloğu:
 > ikisinin de yerini `ed-sunus` aldı. `ed-2`nin metni oraya taşındı (son üç
 > dilim), yani sayıda iki kez durmuyor. Klasörleri diskte duruyor, geri
 > getirmek listeye bir satır yazmak.
+>
+> Aynısı sayının sonunda: `sayfalar/son-kunye` (künye listesi) ve
+> `sayfalar/son-1` (tek bir "…" taşıyan yaprak sayfası) **sırada yok**,
+> ikisinin de yerini `son-jenerik` aldı. Künyenin içeriği oraya taşındı ve
+> genişledi (lisanslar, yazı tipleri, başvuru).
 
 | Ne istiyorsun | Ne yapacaksın |
 |---|---|
@@ -93,15 +98,18 @@ gizleniyor** — süzme `css/bilesen.css` §7'deki CSS kurallarında:
 
 | Mod | Sayfa | Not |
 |---|---|---|
-| `min` — Doomscroller | 20 | |
-| `full` — Doomreader | 33 | |
-| `mid` — Dengeli | 30 | okura **sorulmuyor** (aşağıya bak) |
-| **DOM'daki toplam** | **34** | |
+| `min` — Doomscroller | 19 | |
+| `full` — Doomreader | 31 | |
+| `mid` — Dengeli | 26 | okura **sorulmuyor** (aşağıya bak) |
+| **DOM'daki toplam** | **32** | |
 
-(Sayılar tarayıcıda ölçüldü. Önceki tablo 19/28/31 ve toplam 32 diyordu; o
-değerler `ms-1` → `ms-galeri` takasından önceye aitti ve eskimişti.)
+(Sayılar tarayıcıda ölçüldü — `#sira`daki satırlar da sayılıp doğrulandı.
+Önceki tablo 20/33/34 diyordu; iki sayfa bir sayfaya indi — `son-kunye` +
+`son-1` → `son-jenerik` — ama tablo zaten bir fazla sayıyordu, yani düşüş
+ikiden fazla görünüyor. Daha önceki 19/28/31 ise `ms-1` → `ms-galeri`
+takasından önceye aitti.)
 
-⚠️ Toplam 34, en büyük mod 33: **`min`, `full`ün alt kümesi değil.** `k-min`
+⚠️ Toplam 32, en büyük mod 31: **`min`, `full`ün alt kümesi değil.** `k-min`
 sayfası ("Üç cümlede 1923") yalnızca `min` modunda var — uzun dosyanın üç
 cümlelik karşılığı. Bu yüzden "full'ü göster, fazlasını gizle" gibi bir kısayol
 kullanılamıyor.
@@ -165,8 +173,10 @@ js/okuyucu.js       dizme, mod, folio, ilerleme, gezinme, giriş animasyonları
 js/manga.js         manga sayfasının tam ekran / yakınlaştırma katmanı
 js/telif.js         çizerin görsellerine dokunma engeli (kapsam: 18 görsel)
 js/kanto.js         alev hortumunun SMIL saati (hareket tercihi CSS'e işlemiyor)
-js/sahneler.js      ŞU AN KULLANILMIYOR — beş üretilmiş arkalık, outro için ayrıldı
+js/sahneler.js      ŞU AN KULLANILMIYOR — beş üretilmiş arkalık; beklediği outro
+                    yazıldı ve onu İSTEMEDİ (aşağıya bak), yani artık sahipsiz
 js/bulmaca.js       emoji bilmecesi (bl-1) — sorular da bu dosyada
+js/jenerik.js       jeneriğin (son-jenerik) motoru: banttaki ▶ kaydırmayı yürütür
 js/hikaye.js        hikâye kabuğu: süre çubukları, dokunma bölgeleri, duraklatma
                     (içeriği tanımaz — dilimin içi boş bir kanvas)
 js/karistir.js      metni karakter karakter çözen yazı motoru (scramble text)
@@ -174,6 +184,7 @@ js/yazi.js          karıştırmayan üç yazı animasyonu: süpürme, daktilo, 
 js/perde.js         SVG sahneyi satır içine indirir (katmanları animasyona açılsın)
 js/sunus.js         `ed-sunus`un koreografisi — sayı ve tezgâh aynı zinciri oynatır
 css/app.css         katman sırasını beyan eder ve diğerlerini çağırır
+css/jenerik.css     jeneriğin düzeni: sabit perde + film künyesi tipografisi
 css/bilesen.css     ana projede bileşenlerin içinde kalan kurallar + mod süzgeci
 css/*.css           derginin küresel stilleri
 sayfalar/<id>/      her snap sayfası kendi klasöründe
@@ -298,11 +309,81 @@ opaklığının kontrastı, ve her dilimin beyan/ölçülen süre payı.
 
 ---
 
+## Jenerik (`son-jenerik`) nasıl çalışıyor?
+
+Sayı bir **jenerikle** kapanıyor: 終 karesi, sonra akan künye — emeği geçenler,
+konuk, görseller ve lisansları, yazı tipleri, "nasıl yapıldı", sonraki sayının
+başvuru kuponu, teşekkür, damga, ve jenerik sonrası sahne.
+
+İki sayfanın yerini aldı: `son-kunye` (künye listesi) ve `son-1` (tek bir "…"
+taşıyan yaprak sayfası). Gerekçe: künye bir liste olarak duruyordu ve ardından
+gelen sayfanın söyleyecek hiçbir şeyi yoktu — sayı sönerek bitiyordu.
+
+**Akış bir animasyon değil, sayfanın kendi uzunluğu.** Jenerik
+`data-fit="scroll"` ve yaklaşık **sekiz kadraj** boyunda; okur kaydırdıkça
+akıyor. Film hissini veren tek şey **perde** (`css/jenerik.css` §PERDE):
+`position: sticky` bir katman tuvale yapışıyor, üstte ve altta yazıyı kâğıda
+eritiyor, üstünde sayının 35° baskı taraması, altta soluk bir ışık havuzu var.
+Yazı o havuzdan doğup yukarıda kâğıda karışıyor.
+
+Bu yüzden jenerikte **blok blok beliren giriş animasyonu yok** ve olmamalı:
+perde zaten aynı işi yapıyor, ikisi üst üste binince "beliren metnin bir daha
+belirmesi" gibi duruyor.
+
+⚠️ Sayfanın `overflow`u `clip`, `hidden` DEĞİL. `hidden` bir kaydırma kabı
+yaratıyor ve `sticky` en yakın kaydırma kabına yapışıyor — perde `.page`e
+yapışır, `.page` de kaymadığı için sayfanın tepesinde donup kalırdı.
+
+⚠️ Sayfanın dikey dolgusu **sıfır**. Perde tuvalin tepesinden başlasın diye:
+dolgu dursaydı ilk karede onun kadar aşağıda doğardı ve kapanış karesi tam da
+yapışmadan önce görülen kare. Kadraj ölçüsü de böylece doğrudan `--canvas-h`.
+
+### Banttaki ▶ düğmesi
+
+`js/jenerik.js` o kaydırmayı **motorlu** hâle getiriyor: sabit hızla, bir tuval
+boyu **11 saniyede** (`KADRAJ_SURESI`) — yani tam tur ~90 saniye. Hız piksele
+değil kadraja bağlı, jenerik her ekranda aynı tempoda akıyor.
+
+- Okur tekerleğe, ekrana, bir tuşa ya da herhangi bir düğmeye dokunduğu anda
+  motor susuyor ve okur **tam kaldığı yerde** kalıyor. Oynatma bir gösteri
+  değil, okurun elindeki hareketin sürdürülmesi.
+- Dipteyken basılan düğme jeneriğin başına sarıp yeniden oynatıyor.
+- Sayfadan çıkılınca kendiliğinden duruyor (`okuyucu.js` §5 her sayfa
+  değişiminde haber veriyor).
+- **Hareket kapalıysa düğme hiç gelmiyor.** Jenerik düğmesiz eksilmiyor.
+
+⚠️ `scroll-snap-type`a DOKUNULMUYOR — `okuyucu.js` §6'daki sıçramaların
+tersine. Gerekmiyor, çünkü jenerik sayfasının snap alanı tuvalden büyük ve CSS
+Scroll Snap bu durumda kabın alanın içinde herhangi bir yerde durmasına izin
+veriyor (sayının bütün uzun sayfaları zaten bu sayede ortasında durabiliyor).
+Kapatmak zararlı da olurdu: durdurma anında geri açılan snap okuru en yakın
+noktaya, yani jeneriğin başına çekebilirdi.
+
+⚠️ Saat `setTimeout`, `requestAnimationFrame` değil — `js/hikaye.js` §SAAT ile
+aynı gerekçe. Mantık da saatten ayrı: `ilerlet()` saf bir fonksiyon (konum, hız,
+geçen süre → yeni konum), rAF'sız da sınanabiliyor.
+
+### Metin dosyada, JS'te değil
+
+Lisans atıfları (CC BY / CC BY-SA) yasal bir yükümlülük: JS çalışmasa da,
+oynatma hiç kullanılmasa da okunabilir olmak zorundalar. Bu sayfada JS'in tek
+işi kaydırmayı yürütmek.
+
+⚠️ **`js/sahneler.js` beş üretilmiş arkalığı "outro için" saklıyordu; outro bu
+sayfa oldu ve onları İSTEMEDİ.** O sahneler tek kadrajlık tam ekran arkalıklar
+(`preserveAspectRatio="slice"`, 300×400); sekiz kadraj boyundaki bir akış
+sayfasının arkasına gerilseler tanınmaz hâle gelirlerdi. Jeneriğin arkası
+bilerek boş: perde zaten bir katman ve ikincisi metni yer. Yani o dosya artık
+sahipsiz — `sahneler.js` başlığının kendi deyişiyle "gönül rahatlığıyla
+silinebilir", ama bu bir karar, kendiliğinden yapılmadı.
+
+---
+
 ## Kantō sahneleri neden temayı izlemiyor?
 
 Kantō Depremi dosyasının (`k-*`) altı arka planı fotoğraf değil, satır içi SVG —
 ana projedeki `src/lib/art/kanto/` klasörünün vanilla karşılığı. Yanlarındaki
-öbür üretilmiş sahneler (`ed-1`, `son-kunye`) renklerini
+öbür üretilmiş sahneler (`ed-1`, `bl-1`) renklerini
 `var(--paper)` / `var(--accent)`ten alıyor ve tema koyuya dönünce onlar da
 dönüyor. **Bunlar dönmüyor: hexleri sabit.**
 
@@ -361,13 +442,23 @@ oturuyor:
 
 | yol | ne | sahibi |
 |---|---|---|
-| `assets/2026-09/*.webp` | 5 arka plan (3'ü kullanımda) | Wikimedia Commons (CC0 / CC BY / CC BY-SA) |
+| `assets/2026-09/*.webp` | 5 arka plan (**2'si** kullanımda) | Wikimedia Commons (CC0 / CC BY / CC BY-SA) |
 | `assets/2026-09/KantoDepremi/` | 3 arşiv fotoğrafı (1923) + 1 Tokyo karesi (2023) | ⚠️ **belirsiz — aşağıya bak** |
 | `assets/2026-09/kapali-kapilar/` | 7 kare + kapak + logo | KARGAMANGA |
 | `assets/2026-09/soylesi/` | 8 çizim + kapak | KARGAMANGA |
 
-Beş webp'ten üçü sayfalarda: `kapak` (kapak-1), `yaprak` (km-imza, son-1),
-`dalga` (sz-1). Kalan ikisi — `sisli-vadi` ve `tapinak` — Kızıl Mevsim'in arka
+Beş webp'ten **ikisi** sayfalarda: `kapak` (kapak-1) ve `dalga` (sz-1).
+
+⚠️ `yaprak` DÜŞTÜ. İki sayfada kullanılıyordu: `km-imza` (zaten `#sira`da
+değildi) ve `son-1` — yani jeneriğin yerini aldığı sayfada. Jeneriğin arka
+planı yok, dolayısıyla görsel artık sayının hiçbir yerinde görünmüyor ve
+**atfı da künyeden çıkarıldı**: kullanılmayan bir görselin atfı, CC BY'nin
+istediği şeyi yapmak değil, listeyi yanlış hâle getirmek. Dosya silinmedi
+(`km-imza` bir gün sıraya geri yazılabilir); geri gelirse atıf da geri gelmeli.
+Yaprak motifi jenerikte yine var — fotoğraf olarak değil, kapağın ve sekmenin
+çizili damgası olarak.
+
+Kalan ikisi — `sisli-vadi` ve `tapinak` — Kızıl Mevsim'in arka
 planlarıydı; sayfaları (`km-acilis`, `km-2`) klasörde duruyor ama `#sira`da
 değil, o yüzden görseller de sayıya girmiyor. Sıraya geri yazılırlarsa
 çalışırlar, künyeye de atıfları geri gelmeli.
@@ -375,14 +466,16 @@ değil, o yüzden görseller de sayıya girmiyor. Sıraya geri yazılırlarsa
 Bir zamanlar sekiz taneydiler. `fener`, `yagmur` ve `tren` eski "Gece Hattı"
 foto-öyküsünündü; o bölüm Kantō Depremi dosyasına dönüşünce hiçbir sayfa onları
 çağırmaz oldu ve **dosyaları silindi** (12 dosya: 3 webp + 9 avif türevi).
-Künyeleri `sayfalar/son-kunye/sayfa.html` içindeki yorumda kayıtlı — depoda
-sürüm kontrolü yok, geri istenirlerse Commons'tan yeniden indirilecekler.
+Künyeleri `sayfalar/son-jenerik/sayfa.html` içindeki yorumda kayıtlı (künyeyle
+birlikte oradan taşındı) — depoda sürüm kontrolü yok, geri istenirlerse
+Commons'tan yeniden indirilecekler.
 
 ⚠️ **`KantoDepremi/` künyesi henüz doğrulanmadı.** Üç kare 1923 tarihli, yani
 eserin kendi telifi büyük olasılıkla düşmüş; ama dosya adlarındaki uzun
 numaralar (`…-1053504330`, `…-1825192360`) stok ajansı kimliğine benziyor ve
-ajans TARAMASI ayrı bir hak doğurabiliyor. `son-kunye` sayfasındaki satır bu
-yüzden yer tutucu. Sayı yayımlanmadan önce her karenin arşivi, erişim
+ajans TARAMASI ayrı bir hak doğurabiliyor. Jenerikteki satır bu yüzden yer
+tutucu — ve artık okura da öyle görünüyor ("künyesi henüz doğrulanmadı"),
+sessizce eksik değil. Sayı yayımlanmadan önce her karenin arşivi, erişim
 bağlantısı ve lisansı doğrulanmalı.
 
 Dördüncü dosya (`960px-Tokyo_Tower_2023-…`, `k-son`un arka planı) ötekilerden

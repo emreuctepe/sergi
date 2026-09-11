@@ -135,6 +135,29 @@ belirip kaybolması ileri/geri düğmelerini yatayda oynatıyordu; bant artık �
 yuvalı bir ızgara ve orta yuva yanlarda ne olursa olsun yerinden kımıldamıyor
 (bkz. `canvas.css` §alt bant).
 
+## §btn-jenerik
+
+`<button id="btn-jenerik">`.
+
+Sayının SON sayfasında beliren oynat/durdur düğmesi. Jenerik (`son-jenerik`)
+uzun bir kaydırma sayfası ve akışı okurun kendi kaydırması yapıyor; bu düğme o
+kaydırmayı motorlu hâle getiriyor — film jeneriği gibi sabit bir hızla akıyor,
+okur tekerleğe, ekrana ya da bir tuşa dokunduğu anda susuyor.
+
+Aynı yuvayı `#btn-buyut` ve sergi oklarıyla paylaşıyor, aynı gerekçeyle: üçü
+hiç aynı anda görünmüyor (manga, galeri, sayı sonu). `.band__nav`ın İÇİNE
+konulmadı — orta yuva yanlarda ne olursa olsun kımıldamamalı.
+
+⚠️ Tek düğme, iki durum: hangi ikonun görüneceğini `aria-pressed` söylüyor
+(`css/overlays.css` §JENERİK DÜĞMESİ). İki ayrı düğme olsaydı durum iki yerde
+yazılı olurdu; ekran okuyucunun duyduğu şeyle gözün gördüğü şey ilk
+düzenlemede ayrışırdı.
+
+⚠️ Hareket kapalıyken (`prefers-reduced-motion`) düğme HİÇ GELMİYOR —
+`hidden`ı `js/jenerik.js` yazıyor. Kendiliğinden kayan bir sayfa tam olarak o
+tercihin istemediği şey ve jenerik düğmesiz eksilmiyor: akışı zaten kaydırma
+yapıyor.
+
 ## §btn-sergi
 
 `<button id="btn-sergi-bas">` ve `<button id="btn-sergi-son">`.

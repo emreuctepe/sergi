@@ -1662,6 +1662,50 @@
 }
 
 /* ============================================================================
+   JENERİK DÜĞMESİ — yalnız sayının son sayfasında
+   ----------------------------------------------------------------------------
+   Tek düğme, iki durum: ▶ akışı yürütüyor, ⏸ durduruyor. İki ayrı düğme
+   olmadığı için ikonu da tek bir SVG taşıyor; hangi yolun görüneceğini
+   `aria-pressed` söylüyor, yani durum tek yerde yazılı ve ekran okuyucunun
+   duyduğu şeyle gözün gördüğü şey ayrışamıyor.
+
+   ⚠️ Üçgen DOLU, çizgi değil. `.icon` bütün bant ikonlarına `fill: none`
+   veriyor (base.css) ve oynat üçgeni onunla boş bir ok ucuna dönüyordu.
+   ========================================================================= */
+
+.band__btn--jenerik .jen-ikon--oynat {
+  fill: currentColor;
+  stroke: none;
+}
+.band__btn--jenerik[aria-pressed="true"] .jen-ikon--oynat,
+.band__btn--jenerik:not([aria-pressed="true"]) .jen-ikon--dur {
+  display: none;
+}
+/* Oynarken düğme "basılı" duruyor: jenerik akarken bantlar sönükleşiyor
+   (`#shell[data-chrome="dim"]`) ve tek açık işaret bu kalıyor. */
+.band__btn--jenerik[aria-pressed="true"] {
+  opacity: 1;
+  color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 14%, transparent);
+}
+
+/* Varışta bir kez nabız — büyütme düğmesiyle aynı gerekçe ve aynı ölçü. */
+.band__btn--jenerik[data-ipucu="true"] {
+  animation: buyut-nabiz 1.1s var(--ease-out) 2;
+}
+/* Hareket kapalıyken düğme zaten hiç gelmiyor (`js/jenerik.js`
+   §BANT DÜĞMESİ); aşağıdaki iki kural yine de duruyor, çünkü tercih sayı
+   açıkken de değişebiliyor ve o an bandda duran bir düğme nabız atmamalı. */
+:root[data-motion="off"] .band__btn--jenerik[data-ipucu="true"] {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .band__btn--jenerik[data-ipucu="true"] {
+    animation: none;
+  }
+}
+
+/* ============================================================================
    İÇİNDEKİLER
    ----------------------------------------------------------------------------
    Alt bandın solundaki düğmeden açılan, bölüm açılışlarına atlayan liste.

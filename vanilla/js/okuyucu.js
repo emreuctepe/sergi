@@ -24,6 +24,7 @@
 import { bulmacaBaslat } from './bulmaca.js';
 import { galeriBaslat, galeriDugmeleriniAyarla } from './galeri.js';
 import { icindekilerBaslat } from './icindekiler.js';
+import { jenerikBaslat, jenerikDugmesiniAyarla } from './jenerik.js';
 import { kantoHareketiniBaslat } from './kanto.js';
 import { mangaBaslat, mangaDugmesiniAyarla } from './manga.js';
 import { sunusuBaslat } from './sunus.js';
@@ -312,6 +313,12 @@ function guncelle() {
      koridoru. İkisi aynı yuvayı paylaşıyor ve hiç çakışmıyorlar (biri manga,
      öbürü galeri sayfasında). */
   galeriDugmeleriniAyarla(sayfa);
+
+  /* Jenerik düğmesi de aynı yuvada, aynı sözleşmeyle — üçü birbirini hiç
+     görmüyor: manga, galeri ve sayının son sayfası. Bu çağrı aynı zamanda
+     motorun durdurulduğu yer: sayfadan çıkılınca jenerik arkada kaymaya
+     devam etmemeli. */
+  jenerikDugmesiniAyarla(sayfa);
 }
 
 function ilerlemeYuzdesi() {
@@ -590,6 +597,7 @@ export function baslat({ modDegistir }) {
   kantoHareketiniBaslat();
   galeriBaslat();
   bulmacaBaslat();
+  jenerikBaslat(kap);
 
   /* ⚠️ TEK BEKLEMEYEN BAŞLATICI BU. `sunusuBaslat` içeride
      `document.fonts.ready`i bekliyor (uzaklıklar yedek yüzün kutularıyla
