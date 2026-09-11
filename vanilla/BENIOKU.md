@@ -273,9 +273,20 @@ Altı dosya, altı iş, hiçbiri öbürünü tanımıyor:
 **Arkadaki sahne neden `<img>` değil?** Çünkü istenen şey katmanların
 **birbirine göre** süzülmesi — dağ ayrı, ay ayrı. Dışarıdan yüklenen bir SVG'nin
 içine CSS giremiyor, o yüzden dosya `fetch` edilip satır içine indiriliyor
-(kopyalanmıyor: iki kopya ilk düzenlemede ayrışır). Çizimler sergi bölümüyle
-ortak ve **yer tutucu** — Ece Özgür'ün asılları gelince sunuşun arkası
-kendiliğinden değişecek, tek satır kod düzenlemeden.
+(kopyalanmıyor: iki kopya ilk düzenlemede ayrışır).
+
+⚠️ **Buradaki dört SVG sunuşa ÖZEL — sergiyle ortak değil.** Bir dönem öyleydi
+ve "asıl çizimler gelince sunuşun arkası kendiliğinden değişecek" diye yazılıydı.
+Asıl çizimler geldi (2026-09-11) ve **bilerek buraya bağlanmadı**: kullanıcı
+kararı, çizimler yalnız sergide. Sebebi bu sayfanın ne olduğu — `ed-sunus` bir
+Instagram hikâyesi gibi kendi kendine akan altı dilim, yani sergi salonu değil.
+Masalın kareleri orada, dolaşılarak, künyesiyle okunuyor; burada yalnız doku var.
+
+İkinci bir sebep teknik: bu modülün varlık nedeni katman ayırmak, `.webp` ise
+**tek katman**. Raster bir perde parallaxı sessizce öldürürdü.
+
+Yani `02/04/06/09.svg` **silinemez** — sunuşun arkası onlara bağlı. Sergideki
+`01…10.webp` ile aynı klasörde durmaları tarihsel: ikisi de aynı masaldan.
 
 **Opaklık (`--kr-perde-opak: 0.38`) ölçülerek seçildi.** Sınırı koyan katman her
 perdede aynı: `#e8d9b0`, ayın/fenerin içindeki krem leke. `--ink` ile kontrastı

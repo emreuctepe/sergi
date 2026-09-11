@@ -195,128 +195,138 @@ ESER_YOLU = "assets/2026-09/akilli-kiz"
 #   alt     sanatçı / teknik / yıl satırı — tek satırlık künye
 #   metin   levhanın gövdesi; sergi metni
 #
-# ⚠️ İKİ AYRI "HENÜZ DEĞİL" VAR, KARIŞTIRMAYIN:
+# ════════════════════════════════════════════════════════════════════════════
+# GERÇEK ÇİZİMLER GELDİ (2026-09-11) — burada eskiden duran iki uyarı da kalktı
+# ────────────────────────────────────────────────────────────────────────────
+# Bir dönem burada "① metinler yazıldı ama ② görseller yer tutucu" diye iki
+# ayrı "henüz değil" yazılıydı. İkisi de aynı anda kapandı ve ikisi de AYNI
+# SEBEPLE kapandı: on çizim geldi, masalın kendi metniyle birlikte.
 #
-#   ① METİNLER YAZILDI (2026-09-07, kullanıcı isteğiyle). Masalın on durağı
-#     hiçbir kaynakta yazılı değildi; sahneler `ms-1`deki kanonik "Kesedeki iki
-#     taş"tan ve akıllı kız masalının bilinen düğümlerinden (külden ip, dokuz
-#     kıvrımlı boncuk, kütüğün kökü, ne giyinik ne çıplak) kuruldu. KURGU,
-#     folklorik kaynak değil — sergi metni olarak okunmalı.
+# ⚠️ ESKİ METİNLER SİLİNDİ, DÜZELTİLMEDİ. Yazıldıkları gün masalın on durağı
+# hiçbir kaynakta yazılı değildi ve sahneler bilinen düğümlerden KURGULANMIŞTI
+# — külden ip, dokuz kıvrımlı boncuk, kütüğün kökü, ne giyinik ne çıplak. Gelen
+# çizimlerde o sahnelerin hiçbiri yok; masal keseden çekilen taşta bitiyor.
+# Yani o on metin "eskimiş" değildi, var olmayan on eseri anlatıyordu.
 #
-#   ② GÖRSELLER HÂLÂ YER TUTUCU. `01.svg`…`10.svg` `referans/araclar/eserler.py`
-#     ile üretildi; Ece Özgür'ün çizimleri DEĞİL. Yani `alt` satırının söylediği
-#     çizerle çerçevede görünen şey şu an örtüşmüyor. Gerçek çizim geldiğinde
-#     tek yapılacak: aşağıdaki `dosya` alanını `"01.webp"` yapmak.
+# Aşağıdaki metinler masalın kendi anlatısını izliyor ve her biri ÇERÇEVEDE
+# GÖRÜNEN bir şeye dayanıyor (çakıl zemini, kırmızı tram, 白い balonu, gökkuşağı).
+# Sıra birebir: `NN.webp` masalın NN. durağı.
+#
+# ⚠️ `alt` SATIRI DOĞRULANMADI. `CIZER` aşağıda ve `ms-acilis` sergiyi Ece
+# Özgür'ün çizimleriyle diye tanıtıyor; gelen dosyaların gerçekten ona ait
+# olduğu bana söylenmedi, varsayıldı. Başka birine aitse düzeltilecek TEK yer
+# `CIZER` sabiti.
 ESERLER = [
     {
-        "dosya": "01.svg",
-        "ad": "Pirinç Ölçeği",
+        "dosya": "01.webp",
+        "ad": "İşler Yolunda",
         "metin":
-            "Masal kızla değil, boş bir ölçekle açılıyor. Babası ortakçı; o "
-            "yılın pirinci vergiye yetmedi. Çizer ölçeği öne, adamı arkaya ve "
-            "küçük koyuyor — konu borç, insan onun gölgesi. Serinin kızın "
-            "görünmediği tek durağı burası. Yokluğu bilerek: bir sonraki "
-            "çerçevede sahneye girdiğinde girişin okunmasını sağlayan şey, bu "
-            "karede kimsenin onu beklemiyor olması.",
+            "Kalabalık bir kasaba, bir tüccar, eşi ve tek kızları. Üçü de "
+            "gülüyor, terazi babanın elinde ve masalın söylediği tek şey "
+            "işlerin iyi gittiği. Ama seride bir daha hiç bu kadar masum "
+            "görünmeyecek bir şey çoktan kadrajda: bastıkları zemin siyah ve "
+            "beyaz çakılla kaplı. Masalın kızı on durak sonra kurtaran şey o "
+            "taşlar olacak ve bu karede kimse onlara bakmıyor.",
     },
     {
-        "dosya": "02.svg",
-        "ad": "Borç Defteri",
+        "dosya": "02.webp",
+        "ad": "İlaç Kore'den Geliyor",
         "metin":
-            "Tefecinin odası, tek fener. Defter kadrajın boyunca açılıyor ve "
-            "kayıtlar uzak uca doğru koyulaşıyor: gözün sonunu bulabildiği bir "
-            "borç değil. Tefeci ışığa doğru eğilmiş bir siluet, ama ışık ona "
-            "değil kâğıda düşüyor. Masalda teklif burada yapılıyor — borç "
-            "silinecek ya da kız verilecek, keseden çekilecek tek bir taşa "
-            "bakarak.",
+            "Anne yatakta, ağzında derece; hastalık gün geçtikçe ağırlaşıyor. "
+            "Doktorlar iyileşme umudu vermiyor, tek çare diye Kore'den "
+            "getirilen bir ilacı gösteriyorlar. Çizim üç kişiyi üç ayrı "
+            "uzaklığa koymuş: anne en geride, kız yastığın hemen yanında, "
+            "baba ise kadrajın önünde ve yüzü dağılmış tek yüz o. Haberi ilk "
+            "alan, bize en yakın duran.",
     },
     {
-        "dosya": "03.svg",
-        "ad": "Kesedeki İki Taş",
+        "dosya": "03.webp",
+        "ad": "Para Yanıyor",
         "metin":
-            "Masalın en bilinen sahnesi. Tefeci keseye iki taş koyar, biri ak "
-            "biri kara der; kız akı çekerse borç yanacaktır. İki taş da "
-            "karadır ve meydandaki herkes bunu bilir, kız dahil. Kız taşı "
-            "çeker ve kimse görmeden yere düşürür. Kaybettiği taşın rengini, "
-            "kesede kalanın rengi söyler. Çizim düşme anını tutuyor: taş hâlâ "
-            "havada ve daha kimse ne olduğundan emin değil.",
+            "Tüccar ilacı almayı bırakmıyor; birikimi tükenince borca "
+            "giriyor. Üç panel, üç ayrı dil: beyaz hız çizgileri içinde "
+            "verilen haber, kırmızı tramın üstünde sandıktan aleve giden ok, "
+            "ve sağda, kadrajın boyunca uzanan tek parça sevinç — やった〜. "
+            "Alanın en büyüğü iyi haberi alana ayrılmış, kötü haberi "
+            "alanlara değil.",
     },
     {
-        "dosya": "04.svg",
-        "ad": "Kırılan Ay",
+        "dosya": "04.webp",
+        "ad": "Geriye Borç Kaldı",
         "metin":
-            "Meydandan sonraki gece. Kız köyün önünde konuşmuş ve hiç yüksek "
-            "sesle söylenmemiş bir kuralı çiğnemiştir: kız babasının yerine "
-            "cevap vermez. Çizer anı geceye ve suya taşımış — pirinç "
-            "tarlasının üstünde duran ay tam ikiye bölünmüş, iki yarısı da "
-            "suya düşmüş. Çizerin alıntıladığı gelenekte ay bütünlüğün "
-            "işaretidir; burada kırılması, az önce kurulan cümlenin bedeli. "
-            "Kadrajda ışıktan başka kırılan bir şey yok.",
+            "İlaç işe yaramadı, kadın öldü ve tüccara dağ gibi bir borç "
+            "kaldı. Adam yerde, hiçbir şey yapamaz hâlde. Serinin rengi "
+            "olmayan tek karesi bu — on çizimin dokuzunda gökyüzü, tram ya da "
+            "bir kalp var, burada yalnız grinin basamakları. Yasın çizime "
+            "yaptığı şey, çizerin paletini elinden almak.",
     },
     {
-        "dosya": "05.svg",
-        "ad": "Külden İp",
+        "dosya": "05.webp",
+        "ad": "Alacağımı Tahsile Geldim",
         "metin":
-            "Kızın adı beye ulaşır ve bey köye çözülmeyecek işler yollar. "
-            "İlki: bana külden örülmüş bir ip getirin. Kız saman halatı "
-            "elinden geldiğince sıkı burar, tuzlu suya batırır ve rüzgârsız "
-            "bir gecede yakar; kül biçimi tutar. Çizim halata tepeden bakıyor. "
-            "Kadrajdaki tek sıcak nokta ortadaki kor — ipin çözümü, onu yok "
-            "eden şeyin kendisi.",
+            "Tefeci kapıda: ödeyemezseniz dava açarım, ama ben o kadar "
+            "kalpsiz değilim — kızınızı verin, borcu sileyim. Kadraj "
+            "bütünüyle onun; yüzü çerçeveyi dolduruyor ve hız çizgileri "
+            "arkasından dışarı taşıyor. Baba ile kız ise soldaki iki küçük "
+            "balonun içine sığmış. Teklifi yapan büyüyor, teklifi alanlar "
+            "küçülüyor.",
     },
     {
-        "dosya": "06.svg",
-        "ad": "Dokuz Kıvrımlı Boncuk",
+        "dosya": "06.webp",
+        "ad": "İkinci Teklif",
         "metin":
-            "İkinci iş: deliği dokuz kez dönen bir boncuğun içinden ip "
-            "geçirmek. Kız ipi bir karıncaya bağlar, öbür ağza bir damla bal "
-            "koyar ve bekler. Serinin tek yakın planı bu: ufuk yok, figür yok, "
-            "boncuk kadrajı dolduruyor. Ölçek de zaten mesele — işler "
-            "büyüdükçe kızın kullandığı araç küçülüyor.",
+            "Tefeci kıza uzun zamandır ilgi duyuyormuş; aradaki büyük yaş "
+            "farkına rağmen bir kez istemiş ve reddedilmiş. Bu ikinci "
+            "teklife ne baba ne kız seviniyor. Çizim bunu tek bir "
+            "asimetriyle söylüyor: kalpler kadrajın yalnız bir yanında. Öbür "
+            "yanda kızın üstüne inen dikey tarama var — aynı sahne, iki ayrı "
+            "hava.",
     },
     {
-        "dosya": "07.svg",
-        "ad": "Kütüğün Kökü",
+        "dosya": "07.webp",
+        "ad": "Bahis",
         "metin":
-            "Üçüncü iş: iki ucu da düzgünce yontulmuş bir kütüğün hangi ucunun "
-            "köke yakın büyüdüğünü söylemek. Kız kütüğü gölete yuvarlatır. "
-            "Kök ucu daha sıkı, daha ağır; suya o uç gömülür. Çizim yatmanın "
-            "tamamlandığı anı değil, eğilmenin ortasını alıyor — halkalar hâlâ "
-            "açık. Masalın her düğümünde olan şey burada da var: kız cevabı "
-            "bilmiyor, cevabı söyletecek yeri biliyor.",
+            "Teklif: keseye biri ak biri kara iki taş koyacağım. Kara "
+            "çekersen benimle evlenirsin ve borç silinir, ak çekersen ikisi "
+            "de silinir — kabul etmezsen baban hapse girer. Tefeci "
+            "ゲラゲラ diye gülerek, kesesi elinde yürüyor; iki yanında "
+            "kabaran şey ilk karenin zemini, yani birazdan kullanacağı "
+            "taşların ta kendisi. Üstünde yürüdüğü şeyi silah yapacak.",
     },
     {
-        "dosya": "08.svg",
-        "ad": "Vurulmadan Çalan Davul",
+        "dosya": "08.webp",
+        "ad": "Taş Elimden Düştü",
         "metin":
-            "Dördüncü iş: vurulmadan çalan bir davul. Kız derinin içine bir "
-            "arı kapatır. Ses, serinin görünmeyen bir şeyi çizmeye kalkıştığı "
-            "tek yeri: düz halkalar hâlinde yayılıyor, gölge veya perspektif "
-            "yok. Bu duraktan sonra bey, hiç karşılaşmadığı biri tarafından "
-            "cevaplandığını kabul etmek zorunda kalır.",
+            "Başka çaresi kalmayan kız bahsi kabul ediyor, elini keseye "
+            "sokuyor ve taşı — dikkatsizce — düşürüyor. Taş yuvarlanıp "
+            "bahçedeki öbür taşların arasına karışıyor. Kadrajda iki şey "
+            "aynı anda oluyor: kız gülümsüyor, sağ kenarda bir şimşek "
+            "çakıyor. Ne olduğunu bilen tek kişi ile daha yeni anlamaya "
+            "başlayan kişi aynı karede.",
     },
     {
-        "dosya": "09.svg",
-        "ad": "Ne Giyinik Ne Çıplak",
+        "dosya": "09.webp",
+        "ad": "Kesedeki Taşın Rengi",
         "metin":
-            "Bey kızı çağırır: ne giyinik ne çıplak gel, ne yürüyerek ne "
-            "binerek, ne yoldan ne yol dışından. Kız balık ağına sarınır, bir "
-            "ayağı hayvanın üstünde bir ayağı yerde sürünerek, yol kenarındaki "
-            "hendekten gelir. Çizim üçünden yalnız ağı tutuyor: kapı, siluet, "
-            "göz. Yüz çizilmemiş — seride kızın yüzü hiçbir karede çizilmiyor "
-            "ve bunu ilk fark ettiğiniz çerçeve bu.",
+            "«Ne kadar sakarım, rengine bakmaya bile fırsat bulamadım» deyip "
+            "yerden beyaz bir taş alıyor: kesede kalan taşa bakarsanız "
+            "benimkinin rengi belli olur. Tefeci keseye iki kara taş "
+            "koyduğunu biliyor ve bunu söyleyemiyor. Panel tam ortadan "
+            "ayrılmış: solda cevabı veren düşünce balonu — 白い — sağda "
+            "cevabı bilen ama ağzını açamayan yüz, tek bir «?!» ile. Çizim "
+            "ikisini bilerek aynı kareye koymuyor.",
     },
     {
-        "dosya": "10.svg",
-        "ad": "En Değerli Yük",
+        "dosya": "10.webp",
+        "ad": "Borç Silindi",
         "metin":
-            "Son. Kız beyle evlenir ve cevap vermeyi sürdürür; bey sonunda onu "
-            "evden kovar, giderken en değer verdiği şeyi yanına almasına izin "
-            "vererek. Kız beyin uyumasını bekler ve onu sırtında taşıyıp "
-            "çıkar. Çizimde taşıyan kadrajın en koyu kütlesi, taşınan ondan "
-            "iki basamak açık: ışık artık aynı kişiye düşmüyor. Anlatıların "
-            "çoğunda bey yolda uyanır ve karısını geri alır; çizer oradan "
-            "önce, masalın hâlâ bir kaçırma olduğu yerde duruyor.",
+            "«Bu kız gerçekten becerikliymiş.» Tefeci sözünde duruyor: "
+            "evlilikten vazgeçiyor, borcu da siliyor. Masal burada bitiyor ve "
+            "kaybedenin ne hissettiğini söylemiyor. Çizim söylüyor — "
+            "gökkuşağının altında ikisi birden gülüyor ve aradaki büyük "
+            "勝ち kimin olduğunu belirtmiyor. Kurnazlıkla kazanılmış bir "
+            "davayı kimsenin küçük düşmediği bir sahneyle kapatmak, "
+            "çizerin masala eklediği tek cümle.",
     },
 ]
 
@@ -593,9 +603,22 @@ def olcek(ad, ayak):
 # ---------------------------------------------------------------------------
 # ⚠️ SIRA `NESNELER` İLE AYNI OLMAK ZORUNDA; `assert` aşağıda bekçilik ediyor.
 #
-# Her figür ÜÇ söz taşıyor ve sırayla açılıyorlar: dokun → birinci, tekrar
-# dokun → ikinci, tekrar → üçüncü, sonra başa dönüyor. Balon kendi kendine
-# kapanıyor; kalan süre kutunun içinde sağdan sola akan bir şeritle görünüyor.
+# Her figür ÜÇ söz taşıyor (② hariç, bkz. aşağısı) ve sırayla açılıyorlar:
+# dokun → birinci, tekrar dokun → ikinci, tekrar → üçüncü, sonra başa dönüyor.
+# Balon kendi kendine kapanıyor; kalan süre kutunun içinde sağdan sola akan bir
+# şeritle görünüyor.
+#
+# ════════════════════════════════════════════════════════════════════════════
+# ⚠️ BU TABLO BİR DÖNEM ÜRETİLEN SAYFAYLA AYRIŞMIŞTI — 2026-09-11'de birleşti
+# ────────────────────────────────────────────────────────────────────────────
+# Öğretici sözler ve ②'nin susturulması doğrudan `sayfa.html`e elle yazılmış,
+# buraya geri işlenmemişti. Yani jeneratörü çalıştırmak sayfayı düzeltmiyor,
+# BOZUYORDU: öğretici balonlar silinir, susturulan iki söz geri gelirdi.
+# Fark yalnızca yeniden üretip diff almakla görüldü — sayfaya bakarak değil.
+#
+# Ders, bu dosyanın başka yerlerinde de yazılı olanın aynısı: üretilen dosya
+# düzenlenmez. Elle bir değişiklik gerekiyorsa yeri BURASI.
+# ════════════════════════════════════════════════════════════════════════════
 #
 # `gizli` NORMALDE ERİŞİLEMEZ — yalnız konami dizisi girilince, yedi figür
 # birden onu söylüyor (bkz. js/galeri.js §KONAMİ).
@@ -607,54 +630,72 @@ def olcek(ad, ayak):
 # ═══════════════════════════════════════════════════════════════════════════
 
 KONUSMALAR = [
-    # ① cantali @182 — duraklar 0-1, karşısında "Pirinç Ölçeği" ve "Borç Defteri"
-    ["Ölçek boş. Adam da arkada, minicik. Sanki asıl portre ölçeğin kendisi.",
-     "Künye “konu borç, insan onun gölgesi” diyor. Bunu yazan kişi "
-     "resme benden dikkatli bakmış.",
-     "Bir sergiye baştan başlamak diye bir şey var mı gerçekten? Hep ortasından "
-     "giriyoruz."],
+    # ① cantali @182 — duraklar 0-1, "İşler Yolunda" ve "İlaç Kore'den Geliyor"
+    #
+    # ⚠️ İLK İKİ SÖZ ÖĞRETİCİ VE SERGİ METNİ DEĞİL — dokunmadan, sergiye varılır
+    # varılmaz kendiliğinden oynuyorlar. `js/galeri.js` §ÖĞRETİCİ ilk
+    # `OGRETICI_SOZ_ADEDI = 2` sözü alıyor, yani bu iki satır SAYIYLA bağlı:
+    # araya bir gözlem sıkıştırılırsa okur karşılama yerine künye yorumu duyar.
+    # Gezinmeyi anlatan başka hiçbir işaret yok, o yüzden yeri burası.
+    #
+    # Çakıl zemini gözlemi bilerek buraya konmadı — üç yuva da dolu. Yeri
+    # eserin kendi künyesi (§ESERLER 01) ve orada duruyor.
+    ["Galeri de gezinmek için sağa-sola kaydır.",
+     "Eserlere detaylı bakmak için tabloya tıkla. ",
+     "Bir sergiye baştan başlamak diye bir şey var mı gerçekten? İstediğim "
+     "yerden başlarım yani."],
 
     # ② bank-adam @530 — telefonlu adam. Serinin ana şakası burada.
-    ["Yaa. Bunu zaten görmüştüm, akışımda çıkmıştı.",
-     "Kaydırıyorum ama duvara doğru değil. Aralarında fark var mı, emin değilim.",
-     "Doomreader'da okumuştum galiba. Ya da Doomreader'ı okurken burayı açtım. "
-     "Aynı kapıya çıkıyor."],
+    #
+    # ⚠️ TEK SÖZ, BİLEREK. Şaka tek satırda duruyor; devamı susturuldu.
+    # Susturulan ikisi kaybolmasın diye burada:
+    #     "Kaydırıyorum ama duvara doğru değil. Aralarında fark var mı, emin
+    #      değilim."
+    #     "Doomreader'da okumuştum galiba. Ya da Doomreader'ı okurken burayı
+    #      açtım. Aynı kapıya çıkıyor."
+    # `gizli` de boş: konami ödülünde bu figür susuyor. `galeri.js` §KONAMİ
+    # boş sözü atlıyor (`if (!gizli) return`), yani bu güvenli bir sessizlik.
+    ["Yaa. Bunu zaten görmüştüm, akışımda çıkmıştı."],
 
-    # ③ paltolu @887 — duraklar 2-3, "Kesedeki İki Taş" ve "Kırılan Ay"
+    # ③ paltolu @887 — duraklar 2-3, "Para Yanıyor" ve "Geriye Borç Kaldı".
+    # ⚠️ MASALIN ÇEKİRDEĞİ. Çizimler değişti, bu üç söz değişmedi: anlattıkları
+    # düğüm masalın kendisinde duruyor ve sekizinci çerçevede aynen çizili.
     ["Şu taş meselesi: kız ak taşı çekiyor ve borç siliniyor, değil mi?",
      "Yok, dur. Çektiği taşı düşürüyor. Ama niye düşürsün, elinde tutsa da olurdu.",
      "…Ha. İkisi de karaymış. Şimdi anladım. Yirmi dakikadır buradayım."],
 
-    # ④ cift @1122 — duraklar 3-4, "Kırılan Ay". Üç söz, iki ağız.
-    ["Ay tam ikiye bölünmüş. Biraz fazla değil mi? Kız sadece konuşmuş.",
-     "— “Sadece” konuşmuş. Kendini bir dinle.",
+    # ④ cift @1122 — duraklar 3-4, "Geriye Borç Kaldı". Üç söz, iki ağız.
+    ["Bu kare neden renksiz? Yanındakilerin hepsinde gökyüzü var.",
+     "— Bir şey eksik olduğu için değil. Alındığı için.",
      "— …Tamam. Haklısın."],
 
-    # ⑤ cantali @1592 — duraklar 5-6. Künyeyi okuyana ödül (bkz. ESERLER §09).
-    ["Beş resimdir bakıyorum: kızın yüzü hiçbirinde yok.",
+    # ⑤ cantali @1592 — duraklar 5-6, "İkinci Teklif" ve "Bahis".
+    # Künyeyi okuyana ödül (bkz. ESERLER §06).
+    ["Kalpler hep aynı tarafta. Kızın durduğu yanda bir tane bile yok.",
      "Künyede yazıyormuş zaten. Ben keşfettim sanmıştım.",
-     "Belki de bütün mesele bu: aklını görüyoruz, yüzünü değil."],
+     "Belki de bütün mesele bu: aynı karedeler ama aynı sahnede değiller."],
 
-    # ⑥ paltolu @1827 — duraklar 6-7, "Kütüğün Kökü" ve "Vurulmadan Çalan Davul"
-    ["Buradaki düzlem kurgusu, negatif alanın taşıyıcılığı üzerinden bir okuma "
-     "öneriyor.",
-     "Yani kütük suya batıyor.",
-     "Ama batışın ontolojisi—"],
+    # ⑥ paltolu @1827 — duraklar 6-7, "Bahis" ve "Taş Elimden Düştü"
+    ["Buradaki zemin, figürün üzerinde yürüdüğü malzemeyle kurduğu araçsal "
+     "ilişki bakımından—",
+     "Yani adam taşların üstünde yürüyor.",
+     "Ama yürüyüşün ontolojisi—"],
 
-    # ⑦ cift @2297 — duraklar 8-9, "En Değerli Yük". Sonun rahatsızlığı.
-    ["Sonu güzelmiş. Kadın adamı sırtında taşıyor.",
-     "— Adam uyuyor. Kimse ona sormamış.",
-     "— …Yani bu bir kaçırma."],
+    # ⑦ cift @2297 — duraklar 8-9, "Borç Silindi". Sonun rahatsızlığı.
+    ["Sonu güzelmiş. Bak, ikisi de gülüyor.",
+     "— Kız da hile yaptı ama.",
+     "— …Adamın hilesini ona geri verdi. Aynı şey mi?"],
 ]
 
 # Konami ödülü: yedi figür aynı anda konuşuyor.
 GIZLI_SOZLER = [
     "Sen de mi baştan başladın? Kimse baştan başlamıyor.",
-    "Tamam tamam, kalkıyorum. …Kalkamıyorum. Bankla aynı parçayım.",
+    "",  # ⚠️ bank-adam susuyor — gerekçe §KONUŞMALAR ②
+
     "Hâlâ taşları düşünüyorum. Sen git, ben yetişirim.",
     "— Sen hep haklı çıkıyorsun. — Biliyorum.",
-    "Ya da çizer yüz çizmeyi sevmiyordur. İki ihtimal de doğru olabilir.",
-    "Kimseye söyleme: kök ucunun neden battığını ben de bugün öğrendim.",
+    "Ya da tefeci gerçekten âşıktı. İki ihtimal de doğru olabilir.",
+    "Kimseye söyleme: taşın neden düşürüldüğünü ben de bugün anladım.",
     "— Künyede de öyle yazıyor. — Okumuşsun demek. — Sen okumadın mı?",
 ]
 
