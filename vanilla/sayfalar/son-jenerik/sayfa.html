@@ -70,30 +70,19 @@
     </div>
 
     <!-- ② EMEĞİ GEÇENLER — film kadrosu düzeni: görev sağa, ad sola yaslı.
-         Aynı kişi birden çok satırda görünüyor ve bu bir yineleme hatası değil,
-         künyenin kendisi: bu sayıda bir kişi birden çok iş yaptı. -->
+         ⚠️ BİR AD, BİR SATIR. Bu blok bir dönem aynı adı dört ayrı satırda
+         yazıyordu (editör / Kantō dosyası / söyleşi / tasarım ve kod) ve
+         yanındaki yorum bunu "yineleme değil, künyenin kendisi" diye
+         savunuyordu. Kullanıcı kararı tersi: dört kez okunan ad künye değil
+         gürültü. Roller `dt`nin alt satırında toplandı — gerçek film
+         jeneriklerinin de yaptığı bu, çünkü orada da göz adı arıyor, görevi
+         değil. Yeni bir görev eklenecekse yeri o `<span>`, yeni bir satır
+         DEĞİL. -->
     <section class="jen__blok">
       <h2 class="jen__baslik">Emeği geçenler</h2>
       <dl class="jen__kadro">
         <div class="jen__satir">
-          <dt>Editör</dt>
-          <dd>Emre Üçtepe</dd>
-        </div>
-        <div class="jen__satir">
-          <dt>Kantō Depremi dosyası<span>yazı ve çizimler</span></dt>
-          <dd>Emre Üçtepe</dd>
-        </div>
-        <div class="jen__satir">
-          <dt>Söyleşi</dt>
-          <dd>Emre Üçtepe</dd>
-        </div>
-        <!--
-          ⚠️ BU SATIR DOĞRULANACAK. Sayının tasarımı ve kodu künyede hiç
-          geçmiyordu; jenerik onu görünür kılıyor ama adı BURADAN gelmiyor,
-          deponun sahibinden varsayıldı. Yanlışsa değiştirilecek yer tek satır.
-        -->
-        <div class="jen__satir">
-          <dt>Tasarım ve kod</dt>
+          <dt>Editör<span>söyleşi · Kantō Depremi dosyası (yazı, çizimler) · tasarım ve kod</span></dt>
           <dd>Emre Üçtepe</dd>
         </div>
         <div class="jen__satir">
