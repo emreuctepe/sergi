@@ -341,19 +341,40 @@
    Çubuk sayısı MOD SAYISI kadar: `okuyucu.js`teki MODLAR listesi kısalırsa
    buradaki `<i>`ler ve aşağıdaki kurallar da kısalmalı, yoksa çip hiç
    yanmayan bir çubuk taşır ve okura olmayan bir mod vaat eder. */
+/* ⚠️ DURUŞTA DA BİR ZEMİNİ VAR. Bir dönem yoktu: çip yalnız `:hover`da
+   yanıyordu ve o hâliyle bandın ortasındaki DÜZ YAZIDAN ayırt edilemiyordu —
+   dokunmatikte hover diye bir şey olmadığı için de tıklanabilir olduğu hiç
+   belli olmuyordu. Şimdi dinlenirken bile kâğıttan bir tık ayrık duruyor.
+
+   Fark BİLEREK bu kadar küçük (%8): bandın işi sayfayı okutmak, kendini
+   okutmak değil. Amaç dikkat çekmek değil, "buraya basılır"ı söylemek.
+   Ölçüldü — kâğıt rgb(8,6,5), çip rgb(26,23,21), oran 1.13:1. Görülüyor,
+   bağırmıyor.
+
+   ⚠️ `currentColor` ÜZERİNDEN, yazılmış bir renk DEĞİL. Bant tuvalin DIŞINDA,
+   sabit koyu masa yüzeyinde duruyor: `--paper` temayla dönse de bandın kendi
+   mürekkebi iki temada da açık kalıyor (ölçüldü: koyuda rgb(236,227,213),
+   açıkta rgb(246,240,228)). Yani buraya yazılacak sabit bir açık ton BUGÜN
+   çalışırdı — ama bant bir gün tuvalin içine alınır ya da yüzeyi temaya
+   bağlanırsa sessizce görünmez olurdu. Mürekkepten karılan zemin o gün de
+   kendini düzeltiyor. Kalıp zaten `.band__btn`de var; çip ondan ayrı
+   düşmesin. */
 .depth-chip {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   padding: 3px 10px 3px 7px;
   border-radius: var(--radius-full);
+  background: color-mix(in oklab, currentColor 8%, transparent);
   color: inherit;
   font-size: var(--ui-fs-sm);
   font-weight: 600;
   transition: background var(--dur-fast) var(--ease-out);
 }
+/* Duruş zemini %8 olunca eski %14'lük hover'ın adımı zayıf kalıyordu; fark
+   yine hissedilsin diye üst uç da yukarı alındı. */
 .depth-chip:hover {
-  background: color-mix(in oklab, currentColor 14%, transparent);
+  background: color-mix(in oklab, currentColor 18%, transparent);
 }
 .depth-chip__bars {
   display: flex;

@@ -336,10 +336,14 @@
   text-transform: uppercase;
   color: var(--accent);
 }
+/* ⚠️ KADRO SATIRLARINDAN BİR KADEME BÜYÜK, bilerek. Kart tek başına duran bir
+   kare ve içindeki ad sayının TEK konuğu; ② kadrodaki adlarla aynı puntoda
+   olsaydı bir liste satırı gibi okunurdu. Metin tümü büyük harf olduğu için
+   `lh-tight` burada sıkışmıyor — inen harf yok. */
 .jen__kart-ad {
   margin-top: var(--sp-1);
   font-family: var(--issue-display, var(--font-display));
-  font-size: var(--fs-lg);
+  font-size: var(--fs-xl);
   line-height: var(--lh-tight);
 }
 .jen__kart-alt {
