@@ -11,10 +11,16 @@
   §"Sayının sırasını değiştirmek"). Geri getirmek listeye bir satır yazmak.
 
   ⚠️ `data-fit="scroll"` VE AKIŞ AYNI ŞEY. Jenerik kendi kendine oynayan bir
-  video değil; sayfanın kendi uzunluğu. Okur kaydırdıkça jenerik akıyor, bandaki
-  ▶ düğmesine basınca da aynı kaydırma kendiliğinden yürüyor (`js/jenerik.js`).
-  Yani otomatik oynatma bir GÖSTERİ DEĞİL, okurun elindeki hareketin motorlusu:
-  durdurulduğu an okur tam kaldığı yerde, sayfanın içinde duruyor.
+  video değil; sayfanın kendi uzunluğu. Okur kaydırdıkça jenerik akıyor, motor
+  (`js/jenerik.js`) da aynı kaydırmayı yürütüyor — başkasını değil. Yani otomatik
+  oynatma bir GÖSTERİ DEĞİL, okurun elindeki hareketin motorlusu: durdurulduğu an
+  okur tam kaldığı yerde, sayfanın içinde duruyor.
+
+  Motor sayfaya ilk gelişte KENDİLİĞİNDEN başlıyor (kullanıcı kararı) — bandaki
+  düğme artık onu başlatan değil durduran şey. Bu güvenli, çünkü yukarıdaki
+  cümle hâlâ doğru: kendiliğinden başlayan şey bir video değil, okurun zaten
+  yapacağı kaydırma. Tekerleğe dokunduğu an susuyor ve okur tam bıraktığı yerde
+  kalıyor. Hareket kapalıysa (`prefers-reduced-motion`) hiç başlamıyor.
 
   ⚠️ METİN DOSYADA, JS'TE DEĞİL. Lisans atıfları (CC BY / CC BY-SA) yasal bir
   yükümlülük: JS çalışmasa da, oynatma hiç kullanılmasa da okunabilir olmak
@@ -88,12 +94,21 @@
     <section class="jen__blok">
       <h2 class="jen__baslik">Emeği geçenler</h2>
       <dl class="jen__kadro">
-        <div class="jen__satir">
-          <dt>Sözlük<span>illüstrasyon</span></dt>
-          <dd>
-            <a href="https://example.com" target="_blank" rel="noopener">Aslı Ün</a>
-          </dd>
-        </div>
+        <!--
+          ⚠️ İKİ SATIR KALDIRILDI (2026-09-11) ve ikisi de AYNI GEREKÇEYLE:
+          künye yalnız sayıda GERÇEKTEN olan işi sayar. §Görseller'in en başından
+          beri uyguladığı kural bu — kullanılmayan bir atfı listede bırakmak
+          atıf vermek değil, listeyi yanlış hâle getirmektir.
+
+          · "Sözlük · illüstrasyon — Aslı Ün": sözlük sayıda duruyor (`sz-1..3`)
+            ama içinde tek illüstrasyon yok; `sz-1`in arkalığı `dalga.webp` ve
+            onun atfı §Görseller'de. Bağlantısı da `example.com`du, yani sayının
+            kendi yer tutucu kalıbı. Sözlüğe çizim girerse satır geri gelmeli.
+
+          · "Sergi metinleri · on levha · kurgu — sErgi": levhalar 80baf7b'den
+            beri kurgu değil ALINTI — `akıllıKız.txt`ten birebir. Bir alıntıyı
+            derginin kendi kurgusu diye künyelemek yanlış atıftı.
+        -->
         <!--
           Bu satır çizimler gelmeden ÖNCE de buradaydı: sergiyi tanıtan sayfa
           (`ms-acilis`) çizeri okura zaten söylüyordu ve künye o beyanın
@@ -109,10 +124,6 @@
         <div class="jen__satir">
           <dt>&ldquo;Akıllı Kız&rdquo; sergisi<span>çizimler</span></dt>
           <dd>Ece Özgür</dd>
-        </div>
-        <div class="jen__satir">
-          <dt>Sergi metinleri<span>on levha · kurgu</span></dt>
-          <dd>sErgi</dd>
         </div>
         <div class="jen__satir">
           <dt>Editör<span>söyleşi · Kantō Depremi dosyası (yazı, çizimler) · tasarım ve kod</span></dt>

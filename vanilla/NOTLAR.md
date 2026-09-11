@@ -140,9 +140,14 @@ yuvalı bir ızgara ve orta yuva yanlarda ne olursa olsun yerinden kımıldamıy
 `<button id="btn-jenerik">`.
 
 Sayının SON sayfasında beliren oynat/durdur düğmesi. Jenerik (`son-jenerik`)
-uzun bir kaydırma sayfası ve akışı okurun kendi kaydırması yapıyor; bu düğme o
-kaydırmayı motorlu hâle getiriyor — film jeneriği gibi sabit bir hızla akıyor,
-okur tekerleğe, ekrana ya da bir tuşa dokunduğu anda susuyor.
+uzun bir kaydırma sayfası ve akışı okurun kendi kaydırması yapıyor; motor o
+kaydırmayı film jeneriği gibi sabit bir hızla yürütüyor, okur tekerleğe,
+ekrana ya da bir tuşa dokunduğu anda susuyor.
+
+⚠️ Motor sayfaya ilk gelişte KENDİLİĞİNDEN başlıyor (`js/jenerik.js`
+§KENDİLİĞİNDEN), yani okur bu düğmeyi çoğu zaman DURDURMAK için görüyor,
+başlatmak için değil. Düğmenin ilk hâli bu yüzden ⏸: `aria-pressed` zaten
+durumu söylüyor, ikon ondan türüyor — değişmesi gereken bir şey yok.
 
 Aynı yuvayı `#btn-buyut` ve sergi oklarıyla paylaşıyor, aynı gerekçeyle: üçü
 hiç aynı anda görünmüyor (manga, galeri, sayı sonu). `.band__nav`ın İÇİNE

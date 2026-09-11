@@ -176,7 +176,7 @@ js/kanto.js         alev hortumunun SMIL saati (hareket tercihi CSS'e işlemiyor
 js/sahneler.js      ŞU AN KULLANILMIYOR — beş üretilmiş arkalık; beklediği outro
                     yazıldı ve onu İSTEMEDİ (aşağıya bak), yani artık sahipsiz
 js/bulmaca.js       emoji bilmecesi (bl-1) — sorular da bu dosyada
-js/jenerik.js       jeneriğin (son-jenerik) motoru: banttaki ▶ kaydırmayı yürütür
+js/jenerik.js       jeneriğin (son-jenerik) motoru: kaydırmayı yürütür, gelişte kendi başlar
 js/hikaye.js        hikâye kabuğu: süre çubukları, dokunma bölgeleri, duraklatma
                     (içeriği tanımaz — dilimin içi boş bir kanvas)
 js/karistir.js      metni karakter karakter çözen yazı motoru (scramble text)
@@ -349,19 +349,29 @@ yapışır, `.page` de kaymadığı için sayfanın tepesinde donup kalırdı.
 dolgu dursaydı ilk karede onun kadar aşağıda doğardı ve kapanış karesi tam da
 yapışmadan önce görülen kare. Kadraj ölçüsü de böylece doğrudan `--canvas-h`.
 
-### Banttaki ▶ düğmesi
+### Motor ve banttaki düğme
 
 `js/jenerik.js` o kaydırmayı **motorlu** hâle getiriyor: sabit hızla, bir tuval
-boyu **11 saniyede** (`KADRAJ_SURESI`) — yani tam tur ~90 saniye. Hız piksele
-değil kadraja bağlı, jenerik her ekranda aynı tempoda akıyor.
+boyu **~7,3 saniyede** (`KADRAJ_SURESI = 11000 / 1.5`) — yani tam tur ~60
+saniye. Hız piksele değil kadraja bağlı, jenerik her ekranda aynı tempoda
+akıyor.
+
+**Motor sayfaya ilk gelişte kendiliğinden başlıyor**, gelişten 1,1 saniye sonra
+(`OTOMATIK_GECIKME`). O bekleme ① 終 karesini bir beat olarak tutuyor. Düğme
+kalkmadı, anlamı değişti: artık başlatan değil durduran.
 
 - Okur tekerleğe, ekrana, bir tuşa ya da herhangi bir düğmeye dokunduğu anda
   motor susuyor ve okur **tam kaldığı yerde** kalıyor. Oynatma bir gösteri
   değil, okurun elindeki hareketin sürdürülmesi.
+- Kendiliğinden başlama **bir kez**: durdurup geri gelince tekrar çalışmıyor.
+  Durdurmak bir karardı, sayfadan çıkmak onu geçersiz kılmaz.
+- Bekleme dolduğunda okur açılış karesinden yarım tuvalden fazla ilerlemişse
+  motor hiç girmiyor — jeneriği zaten kendi eliyle yürütüyor demektir.
 - Dipteyken basılan düğme jeneriğin başına sarıp yeniden oynatıyor.
 - Sayfadan çıkılınca kendiliğinden duruyor (`okuyucu.js` §5 her sayfa
-  değişiminde haber veriyor).
-- **Hareket kapalıysa düğme hiç gelmiyor.** Jenerik düğmesiz eksilmiyor.
+  değişiminde haber veriyor); bekleyen otomatik başlatma da iptal oluyor.
+- **Hareket kapalıysa ne düğme geliyor ne motor kendiliğinden başlıyor.**
+  Jenerik ikisi olmadan da eksilmiyor: akışı zaten okurun kaydırması yapıyor.
 
 ⚠️ `scroll-snap-type`a DOKUNULMUYOR — `okuyucu.js` §6'daki sıçramaların
 tersine. Gerekmiyor, çünkü jenerik sayfasının snap alanı tuvalden büyük ve CSS

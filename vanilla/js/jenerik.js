@@ -3,8 +3,9 @@
    ----------------------------------------------------------------------------
    Bu dosya JENERİĞİ ÇİZMİYOR. Akışın kendisi sayfanın uzunluğu ve perdesi,
    ikisi de CSS (`css/jenerik.css`); okur kaydırdıkça jenerik zaten akıyor.
-   Buradaki tek iş o kaydırmayı MOTORLU hâle getirmek: banttaki ▶ düğmesine
-   basınca `#pages` sabit bir hızla kendi kendine ilerliyor.
+   Buradaki tek iş o kaydırmayı MOTORLU hâle getirmek: `#pages` sabit bir hızla
+   kendi kendine ilerliyor — sayfaya gelindiğinde kendiliğinden, sonrasında
+   banttaki düğmeyle.
 
    Ayrım önemli, çünkü sonucunu belirliyor:
 
@@ -14,6 +15,13 @@
        ya da "animasyon bitene kadar bekle" yok.
      · Lisans atıfları (CC BY / CC BY-SA) sayfanın kendi işaretlemesinde
        duruyor — yasal yükümlülük bir düğmeye bağlanamaz.
+
+   ⚠️ `jenerikDugmesiniAyarla` HER KAYDIRMADA ÇAĞRILIYOR, sayfa değişiminde
+   değil: `okuyucu.js` §5'i besleyen `guncelle()` her `scroll` olayında
+   işliyor. Yani oynatma sürerken motorun kendi kaydırması bu fonksiyonu
+   saniyede onlarca kez çağırıyor. Buraya eklenen her şey ya bedava ya da
+   `ipucuVerildi` / `otomatikDenendi` gibi tek-seferlik bir bayrağın arkasında
+   olmak zorunda.
 
    ⚠️ SNAP'E DOKUNULMUYOR, bilerek. `okuyucu.js` §6 programatik sıçramalarda
    `scroll-snap-type`ı kapatıyor; burada gerek yok ve kapatmak ZARARLI olurdu.
@@ -37,9 +45,19 @@
    ========================================================================= */
 
 /* Bir tuval boyu metnin geçme süresi (ms). Ölçü bu: kadro satırları arasındaki
-   aralık tuvalin ~%9'u, yani bu değerde saniyede bir isim geçiyor — sinema
-   jeneriklerinin temposu. Düşürmek akışı hızlandırır, okunurluğu düşürür. */
-const KADRAJ_SURESI = 11000;
+   aralık tuvalin ~%9'u. Düşürmek akışı hızlandırır, okunurluğu düşürür.
+
+   ⚠️ 11000'DEN İNDİ — kullanıcı kararı, tam 1.5 kat (11000 / 1.5). Eski değerde
+   saniyede bir isim geçiyordu; şimdi ~1.5. Sayı bilerek `11000 / 1.5` olarak
+   duruyor: nereden geldiği okunabilsin, bir dahaki ayarda 7333'ün ne olduğu
+   aranmasın. Tempoyu değiştirecek TEK yer burası. */
+const KADRAJ_SURESI = 11000 / 1.5;
+
+/* Sayfaya gelindikten ne kadar sonra kendiliğinden başlıyor (ms).
+   Sıfır değil, çünkü okur daha yeni indi: ① SON karesi henüz belirdi ve
+   gelişin kaydırması sönmedi. Bu aralık o kareyi bir beat olarak tutuyor —
+   "sayfa açılır açılmaz kayıyor" değil, "okur baktı, sonra akmaya başladı". */
+const OTOMATIK_GECIKME = 1100;
 
 /* Saatin tik aralığı (ms). ~60 Hz. Gerçek ilerleme yine de ÖLÇÜLEN süreden
    hesaplanıyor (`gecen`), bu değerden değil: tarayıcı zamanlayıcıyı kıstığında
@@ -93,6 +111,8 @@ let saat = 0; /* setTimeout kimliği; 0 = saat işlemiyor (okuyucu.js kalıbı) 
 let sonAn = 0;
 let konum = 0;
 let ipucuVerildi = false;
+let otomatikSaat = 0; /* bekleyen kendiliğinden başlatma; 0 = yok */
+let otomatikDenendi = false; /* bir kez kuruldu mu — bkz. §KENDİLİĞİNDEN */
 
 function oynuyorMu() {
   return saat !== 0;
@@ -151,8 +171,15 @@ function oyna() {
 }
 
 /** Saati susturur. Çağrılması her zaman güvenli — saat işlemiyorsa hiçbir şey
-    yapmıyor, yani "durdur"u iki kez çağırmak bir hata değil. */
+    yapmıyor, yani "durdur"u iki kez çağırmak bir hata değil.
+
+    ⚠️ BEKLEYEN OTOMATİK BAŞLATMA DA SUSUYOR ve bu satır `if (!saat)`
+    KORUMASININ ÜSTÜNDE olmak zorunda: "durdur" motor daha oynamıyorken de
+    çağrılıyor (sayfadan çıkış, sekmenin arkaya düşmesi). O çağrılar arkada
+    kurulmuş sayacı iptal edemeseydi jenerik, okur çoktan başka bir sayfaya
+    geçmişken kendi kendine akmaya başlardı. */
 function dur() {
+  otomatigiIptal();
   if (!saat) return;
   clearTimeout(saat);
   saat = 0;
@@ -161,6 +188,55 @@ function dur() {
 
 function jenerikSayfasi() {
   return document.querySelector('.page[data-page-id="son-jenerik"]');
+}
+
+/* ==========================================================================
+   KENDİLİĞİNDEN BAŞLAMA
+   --------------------------------------------------------------------------
+   Okur jenerik sayfasına İLK indiğinde motor kendiliğinden çalışıyor: sayı
+   bitiyor ve jenerik, sinemada olduğu gibi, kimse bir düğmeye basmadan akmaya
+   başlıyor. Düğme kalkmıyor, anlamı değişiyor — artık başlatan değil durduran.
+
+   ⚠️ BİR KEZ, GERİ DÖNÜŞTE DEĞİL (`otomatikDenendi`). Okur jeneriği durdurup
+   önceki sayfaya bakıp geri gelirse motor yeniden çalışmıyor: durdurmak bir
+   karardı ve sayfadan çıkmak o kararı geçersiz kılmaz.
+
+   ⚠️ HAREKET KAPALIYSA HİÇ KURULMUYOR — kendiliğinden kayan bir sayfa tam
+   olarak `prefers-reduced-motion`ın istemediği şey. Düğmenin gizlenmesiyle
+   aynı gerekçe, aynı koşul (`gorunsun`).
+
+   ⚠️ SAYAÇ DOKUNMAYLA İPTAL EDİLMİYOR, bilerek. Edilseydi tekerleğiyle gelen
+   okurun sönmekte olan ivmesi sayacı daha ateşlenmeden öldürürdü ve özellik
+   en sık kullanılan giriş yolunda hiç çalışmazdı. Yerine ateşleme ânında
+   KONUMA bakılıyor: okur hâlâ açılış karesinin yakınındaysa motor gerekli,
+   yarım tuvalden fazla ilerlemişse jeneriği zaten kendi eliyle yürütüyor.
+   ======================================================================= */
+
+function otomatigiIptal() {
+  if (!otomatikSaat) return;
+  clearTimeout(otomatikSaat);
+  otomatikSaat = 0;
+}
+
+function otomatigiKur() {
+  otomatikDenendi = true;
+  otomatikSaat = setTimeout(otomatikBasla, OTOMATIK_GECIKME);
+}
+
+function otomatikBasla() {
+  otomatikSaat = 0;
+
+  /* ⚠️ `kap` ATEŞLENİRKEN SORULUYOR, kurulurken değil. Doğrudan jeneriğe
+     düşen bir bağlantıda `okuyucu.js` §5 (`guncelle`) §9'dan (`jenerikBaslat`)
+     ÖNCE işliyor — yani sayaç kurulurken kap daha atanmamış oluyor. Gecikme
+     dolduğunda atanmış durumda. */
+  if (!kap || oynuyorMu() || azHareket()) return;
+
+  const sayfa = jenerikSayfasi();
+  if (!sayfa) return;
+  if (kap.scrollTop - sayfa.offsetTop > kap.clientHeight / 2) return;
+
+  oyna();
 }
 
 /* ==========================================================================
@@ -210,6 +286,10 @@ export function jenerikDugmesiniAyarla(sayfa) {
     dugme.dataset.ipucu = 'true';
     setTimeout(() => delete dugme.dataset.ipucu, 2600);
   }
+
+  /* İpucuyla aynı kalıp, aynı tek-seferlik bayrak mantığı — bkz.
+     §KENDİLİĞİNDEN ve dosya başlığındaki "her kaydırmada çağrılıyor" uyarısı. */
+  if (gorunsun && !otomatikDenendi) otomatigiKur();
 }
 
 /** Sayfalar dizildikten SONRA çağrılıyor (`okuyucu.js` §9). */
