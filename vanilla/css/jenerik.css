@@ -572,6 +572,16 @@
   text-wrap: balance;
 }
 
+/* Sayfanın SON satırı: üstündeki soruya verilen cevabın kapısı. Arayüz
+   yazı tipinde ve küçük — jeneriğin dili değil, bir düğmenin dili. Rengi ve
+   alt çizgisi §BAĞLANTILAR'dan geliyor, burada yalnız ölçek var. */
+.jen__sonrasi-cagri {
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
 /* ==========================================================================
    BAĞLANTILAR
    --------------------------------------------------------------------------

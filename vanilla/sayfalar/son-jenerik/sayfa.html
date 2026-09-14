@@ -125,6 +125,17 @@
           <dt>&ldquo;Akıllı Kız&rdquo; sergisi<span>çizimler</span></dt>
           <dd>Ece Özgür</dd>
         </div>
+        <!--
+          ⚠️ BU AD JENERİKTE İKİ KEZ GEÇİYOR — bilerek, kullanıcı kararı.
+          §③ Konuk kartı da KARGAMANGA diyor. Yukarıdaki "bir ad, bir satır"
+          kuralı bu bloğun İÇİ için geçerli (aynı ad dört satıra yayılmasın);
+          iki blok iki ayrı şey söylüyor: burası işi KÜNYELİYOR, kart konuğu
+          TANITIYOR. Kart silinirse bu satır künyedeki tek iz olarak kalmalı.
+        -->
+        <div class="jen__satir">
+          <dt>&ldquo;Kapalı Kapılar&rdquo;<span>one-shot · söyleşi konuğu</span></dt>
+          <dd>KARGAMANGA</dd>
+        </div>
         <div class="jen__satir">
           <dt>Editör<span>söyleşi · Kantō Depremi dosyası (yazı, çizimler) · tasarım ve kod</span></dt>
           <dd>Emre Üçtepe</dd>
@@ -138,14 +149,19 @@
          ⚠️ BÜYÜK OLAN AD, İŞ DEĞİL. Kart bir dönem "Kapalı Kapılar"ı puntoyla
          öne çıkarıyordu; konuk olan bir çalışma değil KARGAMANGA ve künyenin
          her yerinde büyük duran şey ad (bkz. ② kadro: `dt` görev, `dd` ad).
-         Sıra o yüzden biçim → ad → iş: "One-shot" üstte kicker, KARGAMANGA
-         kartın kendisi, "Kapalı Kapılar" altta tırnak içinde.
+         Sıra o yüzden biçim → ad → iş: "One-shot · Söyleşi" üstte kicker,
+         KARGAMANGA kartın kendisi, "Kapalı Kapılar" altta tırnak içinde.
+
+         ⚠️ KICKER İKİ İŞ SAYIYOR (kullanıcı kararı): bu sayının konuğu hem
+         one-shot'ı hem söyleşiyi veriyor (`sy-1…sy-8`). Kart tek bir işi
+         değil KONUĞU tanıtıyor, yani ikisi de burada anılmalı — söyleşi
+         yalnız ② kadroda kalsaydı kartın "konuk" iddiası eksik kalırdı.
 
          PIGMENT ayrı satırda ve bağlantı — işin kendisine gidiyor. -->
     <section class="jen__blok">
       <h2 class="jen__baslik">Konuk</h2>
       <div class="jen__kart">
-        <p class="jen__kart-ust">One-shot</p>
+        <p class="jen__kart-ust">One-shot · Söyleşi</p>
         <p class="jen__kart-ad">KARGAMANGA</p>
         <p class="jen__kart-alt">
           &ldquo;Kapalı Kapılar&rdquo; · izniyle yayımlandı<br />
@@ -260,35 +276,20 @@
       </ul>
     </section>
 
-    <!-- ⑥ NASIL YAPILDI — filmdeki "çekim" künyesinin karşılığı. -->
-    <section class="jen__blok">
-      <h2 class="jen__baslik">Nasıl yapıldı</h2>
-      <ul class="jen__liste">
-        <li>
-          <b>Derlemesiz</b>
-          <span>saf HTML, CSS ve JavaScript · paket yöneticisi, derleme adımı ve dış bağımlılık yok</span>
-        </li>
-        <li>
-          <b>İz yok</b>
-          <span>analitik yok, çerez yok, hesap yok · okuma modu ve tema tarayıcıdan çıkmıyor</span>
-        </li>
-        <li>
-          <b>Sahneler</b>
-          <span>sayıdaki arkalıkların çoğu fotoğraf değil, sayfanın içinde çizilen SVG</span>
-        </li>
-        <!--
-          ⚠️ Bu satır bir künye değil bir BEYAN, ve yazılmasının sebebi
-          `sayfalar/ms-galeri/uret.py` başlığındaki kayıt: koridorun figürleri
-          üretilmiş bir referans görselden kesilip vektöre çevrildi. Sayının
-          telif konusundaki titizliği (bkz. §Görseller) kendi üretim yolunu
-          saklarsa anlamını kaybeder.
-        -->
-        <li>
-          <b>Sergi koridoru</b>
-          <span>figürler, üretilen bir referans görselden kesilip vektöre çevrildi</span>
-        </li>
-      </ul>
-    </section>
+    <!--
+      ⑥ NASIL YAPILDI — KALDIRILDI (2026-09-14, kullanıcı kararı). Dört satır
+      vardı: derlemesiz / iz yok / sahneler / sergi koridoru.
+
+      ⚠️ İÇİNDEN BİR BEYAN DA DÜŞTÜ. "Sergi koridoru" satırı künye değil
+      BEYANDI: koridorun figürleri üretilmiş bir referans görselden kesilip
+      vektöre çevrildi (`sayfalar/ms-galeri/uret.py` başlığındaki kayıt).
+      Sayının telif titizliği kendi üretim yolunu saklarsa anlamını kaybeder —
+      o beyan bir daha istenirse yeri burasıydı.
+
+      ⚠️ "İz yok" satırı da buradaydı ("analitik yok, çerez yok, hesap yok").
+      Ölçüm işi (bkz. roadmap.md §analiz scripti) hayata geçerse o cümle zaten
+      yalan olacaktı; blok kalksa da kalkmasa da yeniden yazılması gerekiyordu.
+    -->
 
     <!--
       ⑦ BAŞVURU — jeneriğin sonundaki "yakında" karesi.
@@ -300,9 +301,19 @@
     -->
     <section class="jen__blok">
       <h2 class="jen__baslik">Sonraki sayı</h2>
+      <!--
+        ⚠️ SAYININ ADI YOK, TARİHİ VAR (2026-09-14, kullanıcı kararı). Burada
+        bir dönem `<span>Ekim 2026</span>` üstte kicker, `<b>Gürültü</b>` altta
+        büyük başlık olarak duruyordu. Sonraki sayının adı Gürültü DEĞİL ve
+        henüz belli değil; uydurulmuş bir ad, okurun bekleyeceği olmayan bir
+        şey demek (§⑦ başlığındaki yer tutucu gerekçesiyle aynı).
+
+        Ad yerine tarih öne çıktı: "Ekim 2026" artık `<b>`de, yani büyük olan o.
+        Yeni CSS YOK — `.jen__sonraki b` kuralı (jenerik.css §⑦) olduğu gibi
+        kullanılıyor. Ad belli olunca `<span>`li iki satırlı hâle dönülür.
+      -->
       <p class="jen__sonraki">
-        <span>Ekim 2026</span>
-        <b>Gürültü</b>
+        <b>Ekim 2026</b>
       </p>
       <div class="jen__kupon">
         <p class="jen__kupon-ust">Başvuru</p>
@@ -315,9 +326,24 @@
             <dt>Ne gönderilir</dt>
             <dd>Üç cümlelik bir öneri ve görebileceğimiz bir iş.</dd>
           </div>
+          <!--
+            ⚠️ BURASI BİR FORM DEĞİL, BİR DAVET (2026-09-14, kullanıcı isteği:
+            "çok daha rahat iletişim kurulabilir" olsun). Eskiden tek satırlık
+            bir adres vardı (`sergi@example.com`, sayının yer tutucu kalıbı) ve
+            başvuru kapısı gibi duruyordu — oysa gelen şeyin bir başvuru olması
+            gerekmiyor.
+
+            ⚠️ E-POSTA ARTIK GERÇEK: `contact@emreuctepe.com`. §⑦ başlığındaki
+            "adres yer tutucu" uyarısı bu satır için KAPANDI; son gün için
+            hâlâ açık.
+          -->
           <div class="jen__satir">
             <dt>Nereye</dt>
-            <dd><a href="mailto:sergi@example.com">sergi@example.com</a></dd>
+            <dd>
+              Aklında herhangi bir şey varsa doğrudan bana yaz — WhatsApp'tan
+              <b>@emreuctepe</b>, ya da
+              <a href="mailto:contact@emreuctepe.com">contact@emreuctepe.com</a>
+            </dd>
           </div>
           <div class="jen__satir">
             <dt>Son gün</dt>
@@ -367,11 +393,28 @@
     <!-- ⑩ JENERİK SONRASI SAHNE — sonuna kadar kalana. Boşluk da sahnenin
          parçası: kart bir ekran aşağıda, yani okur önce jeneriğin bittiğini
          sanıyor. -->
+    <!--
+      ⚠️ ESKİ METİN SAYININ ADINA YASLANIYORDU: "Sonraki sayı gürültüyle
+      açılıyor — sessizliğe alışma." Cümlenin tamamı `Gürültü` adı üzerine
+      kurulu bir kelime oyunuydu; ad §⑦'de kalkınca cümle dayanaksız kaldı.
+      Yerine sorulan bir soru kondu — sonuna kadar kaydıran okurdan istenecek
+      en doğru şey zaten bu.
+
+      ⚠️ ANKET BAĞLANTISI YER TUTUCU ve okura da öyle görünüyor: `example.com`
+      sayının kendi yer tutucu kalıbı (bkz. §⑦). Gerçek Google Form adresi
+      gelince yalnız `href` değişecek. Sahte bir `forms.gle/…` yazmak kasten
+      yapılmadı — gerçek duran ama 404 veren bir bağlantı, yer tutucudan kötü.
+    -->
     <div class="jen__sonrasi">
       <p class="jen__sonrasi-ust">Jenerik sonrası sahne</p>
       <p class="jen__sonrasi-metin">
         Hâlâ buradasın.<br />
-        Sonraki sayı gürültüyle açılıyor — sessizliğe alışma.
+        Sonraki sayıda ne olsun istersin?
+      </p>
+      <p class="jen__sonrasi-cagri">
+        <a href="https://example.com/anket" target="_blank" rel="noopener"
+          >Önerini bırak</a
+        >
       </p>
     </div>
   </div>
