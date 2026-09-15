@@ -20,10 +20,47 @@
 !/vanilla/
 !/wrangler.jsonc
 
-# `vanilla/` içinde de derleme artığı istemiyoruz. `sayfalar/ms-galeri/`
-# altındaki `uret.py` çalışınca __pycache__ bırakıyor.
+# ----------------------------------------------------------------------------
+# `vanilla/` YAYINLANIYOR — içindeki her dosya siteye çıkıyor.
+# ----------------------------------------------------------------------------
+# Dağıtım diskten değil DEPODAN besleniyor: Cloudflare paneli repoyu klonlayıp
+# `npx wrangler deploy` çalıştırıyor, o da `assets.directory` (yani `vanilla/`)
+# altında NE VARSA sunuyor. Bu yüzden aşağıdaki her satır, dosyayı diskte
+# yerinde bırakıp yalnız yayından düşürüyor.
+#
+# ⚠️ TAM DA BU YÜZDEN TAŞIMADIK. `tezgah-*.html` dosyaları komşularına göreli
+# bağlı (`css/app.css`, `./js/galeri.js`, `fetch('sayfalar/…')`); `context/`
+# gibi bir yere alınsalardı üçü de kırılır, `sunucu.py`nin kökü de değişmek
+# zorunda kalırdı. Yerinde durup izlenmemeleri her iki sorunu da çözüyor.
+#
+# ⚠️ BURAYA GİREN ARTIK YEDEKLENMİYOR. Depo projenin yedeği değil, yayınlanan
+# sayının aynası; aşağıdakiler diskte TEK KOPYA duruyor.
+
+# Tezgâh araçları — yalnız yerelde, `sunucu.py` üzerinden açılıyor.
+/vanilla/tezgah-*.html
+
+# İç dokümantasyon — okuyucuya değil, üzerinde çalışana yazıldı.
+/vanilla/BENIOKU.md
+/vanilla/NOTLAR.md
+
+# Üretim betikleri: `uret.py`, `sayfalar/ms-galeri/sayfa.html`i ÜRETİYOR.
+# Çıktısı yayına giriyor, kendisi girmiyor.
+/vanilla/**/*.py
+
+# Çalışınca __pycache__ da bırakıyor.
 __pycache__/
 *.pyc
+
+# Kaynak görseller. Sayfalar türetilmişleri çağırıyor (`-1080.avif`, `.webp`)
+# ve yalnız onlar yayınlanıyor; PNG ustaları kökteki `png-…zip` gibi yerelde
+# kalıyor. Kural olmasaydı klasöre bırakılan her kaynak sessizce izlenip
+# yayına giderdi — başlıktaki "kazara yayın" endişesinin `vanilla/` içi hâli.
+#
+# ⚠️ KÖŞELİ PARANTEZ ŞART. gitignore kalıpları büyük/küçük harfe duyarlı;
+# düz `*.png` yazılsaydı `07-ask.PNG` (telefondan/Windows'tan gelen hâli)
+# kaçardı. Yeni bir kaynak türü çıkarsa (`.psd`, `.tif`) kendi satırını
+# ister — bu dosyada kararlar bilerek veriliyor.
+/vanilla/**/*.[pP][nN][gG]
 
 # OS / editör
 .DS_Store
