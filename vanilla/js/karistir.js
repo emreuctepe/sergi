@@ -51,6 +51,12 @@ export const IMLEC = '░▒▓';
    başkasının.
    ======================================================================= */
 
+/* ⚠️ ZAMAN `performance.now()`TAN DEĞİL, `saat.js`TEN OKUNUYOR. İkisi de
+   monotonik ms veriyor; farkı duraklıyken ilerlememesi. Okur parmağını basılı
+   tuttuğunda bu dosyadaki döngü ve `bekle()` olduğu yerde donuyor — eskiden
+   yalnız süre çubuğu duruyor, metin karışmaya devam ediyordu. */
+import { durakliMi, simdi } from './saat.js';
+
 export const IPTAL = Symbol('karistir:iptal');
 
 /* ==========================================================================
@@ -281,7 +287,7 @@ export function karistir(el, hedef, ayar = {}) {
   const k = karisim(basla, hedef, ayar);
 
   return new Promise((bitti, iptal) => {
-    const t0 = performance.now();
+    const t0 = simdi();
     let yedekDevraldi = false;
     let sabir = 0;
 
@@ -294,13 +300,19 @@ export function karistir(el, hedef, ayar = {}) {
     };
     isaret?.addEventListener('abort', kes, { once: true });
 
-    /* Geçen süre rAF'ın zaman damgasından değil `performance.now()`tan: iki
-       kare kaynağı aynı saate bakmak zorunda, yoksa yedek devraldığında
-       animasyon zamanda zıplardı. */
+    /* Geçen süre rAF'ın zaman damgasından değil `saat.js`ten: iki kare kaynağı
+       aynı saate bakmak zorunda, yoksa yedek devraldığında animasyon zamanda
+       zıplardı.
+
+       ⚠️ DURAKLIYKEN DÖNGÜ DÖNMEYE DEVAM EDİYOR, yalnız `gecen` ilerlemiyor —
+       yani `k.kare()` aynı kareyi döndürüyor ve elemana aynı metin yazılıyor.
+       Döngüyü büsbütün durdurmak daha temiz görünürdü ama sürdürmek için onu
+       yeniden kurmak gerekirdi; `karisim()` saf olduğu için aynı `gecen` aynı
+       kareyi veriyor ve bedeli görünmüyor. */
     function ilerle() {
       if (isaret?.aborted) return;
 
-      const gecen = performance.now() - t0;
+      const gecen = simdi() - t0;
       if (k.bittiMi(gecen)) {
         el.textContent = hedef;
         clearTimeout(sabir);
@@ -359,16 +371,36 @@ export const bekle = (ms, isaret) =>
   new Promise((bitti, iptal) => {
     if (isaret?.aborted) return iptal(IPTAL);
 
-    const saat = setTimeout(() => {
-      isaret?.removeEventListener('abort', kes);
-      bitti();
-    }, ms);
+    /* ⚠️ TEK ZAMANLAYICI YETMİYOR, ÇÜNKÜ BEKLEME DE DURAKLAMALI. Koreografi
+       `await bekle(...)` zincirinden ibaret ve okuma beklemeleri uzun
+       (`SEHIR_OKUMA` 2600ms, `SOZ_OKUMA` 4200ms). Düz bir `setTimeout(ms)`
+       duvar saatiyle işlediği için okur parmağını basılı tutarken de doluyor,
+       yani bıraktığında dilim çoktan ilerlemiş oluyordu.
+
+       Onun yerine `saat.js` üzerinden KALAN hesaplanıyor: zamanlayıcı yine
+       kuruluyor ama uyandığında kalanı yeniden ölçüyor. Duraklıyken kalan
+       azalmadığı için kısa aralıkla yokluyor; akarken tam kalan kadar
+       uyuyor, yani duraklama olmayan yolda davranış eskisiyle birebir aynı
+       (tek zamanlayıcı, tek uyanma). */
+    const t0 = simdi();
+    let saat = 0;
+
+    function kontrol() {
+      const kalan = ms - (simdi() - t0);
+      if (kalan <= 0) {
+        isaret?.removeEventListener('abort', kes);
+        return bitti();
+      }
+      saat = setTimeout(kontrol, durakliMi() ? KARE_ARASI : kalan);
+    }
 
     function kes() {
       clearTimeout(saat);
       iptal(IPTAL);
     }
     isaret?.addEventListener('abort', kes, { once: true });
+
+    kontrol();
   });
 
 /**

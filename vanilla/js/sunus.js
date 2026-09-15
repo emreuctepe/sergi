@@ -18,8 +18,8 @@
    ────────────────────────────────────────────────────────────────────────────
    ALTI DİLİM
    ────────────────────────────────────────────────────────────────────────────
-       baslik  ① tek "sErgi" 3 katından inerek boşluktan çözülür
-               ② 22 kopya merkezden dışa dalga hâlinde doğar (tarla dolar)
+       baslik  ① tek "Erü Japonoloji" 3 katından inerek boşluktan çözülür
+               ② 22 "sErgi" kopyası merkezden dışa dalga hâlinde doğar
                ③ 22'si BİRDEN dağılır — dalga yok
                ④ zemin koyulaşır, hayatta kalan kopya "Kızıl Mevsim"e dönüşür
                ⑤ "Sonbahar, bir şehrin rengi değişirken"e dönüşür
@@ -28,7 +28,7 @@
        sehir   iki beyit soldan sağa SÜPÜRÜLEREK açılır, okunur, geri süpürülür
        icerik  dört satır DAKTİLOYLA yazılır
        cagri   alıntı ve çağrı bulanıktan NETLEŞİR, okunur, geri bulanıklaşır
-       kunye   "Aylık · Eylül 2026" çözülür → "Sayı 03"a dönüşür →
+       kunye   "Aylık · Eylül 2026" çözülür → "Sayı 01"e dönüşür →
                büyüyerek özel karakterlere dağılır, zemin açılış rengine döner
 
    ⚠️ İLK İKİSİ VE SONUNCUSU KARIŞTIRMA, ORTADAKİ ÜÇÜ DEĞİL — ve bu bir üslup
@@ -47,10 +47,14 @@
    olduğu gibi duruyor, yalnız nerede durakladıkları seçildi.
 
    ⚠️ SIRA ÖNEMLİ VE BİR DÖNEM YANLIŞTI. Eskiden tarla dolarken merkez AYNI
-   ANDA başlığa dönüşüyordu; demoda ise tarla merkezle aynı kelimeyi tutuyor ve
-   başlık ancak tarla dağıldıktan SONRA geliyor. Fark koreografinin fikrinin
-   kendisi: "kelime çoğalır, hepsi çekilir, kalan sayının adı olur". Eski sırada
-   ekranda 23 kopyalı tek kelime anı hiç oluşmuyordu. Ayrıntı: `baslikOyna`.
+   ANDA başlığa dönüşüyordu; başlık ancak tarla dağıldıktan SONRA gelmeli.
+   Eski sırada ekranda dolu tarla anı hiç oluşmuyordu. Ayrıntı: `baslikOyna`.
+
+   ⚠️ MERKEZ VE TARLA ARTIK FARKLI KELİME. Demoda (ve bu dosyanın bir önceki
+   hâlinde) ikisi aynıydı ve fikir şuydu: "kelime çoğalır, hepsi çekilir,
+   kalan sayının adı olur". Kullanıcı merkezi ayırdı; okunan şey artık
+   "yayıncı → tema çoğalır → sayının adı". Çoğalan kelime merkezdeki değil,
+   yani üç vuruş da ayrı bir şey söylüyor. `MERKEZ_KELIMESI` ↓.
 
    Demonun zaman çizelgesi (`codepen.io/juliangarnier/pen/vEyYdXN`) `tl.seek()`
    ile kare kare örneklenerek çıkarıldı — anime.js yerel bir kopyadan yüklendi,
@@ -86,8 +90,29 @@ import { hikaye } from './hikaye.js';
 export const BASLIK = 'Kızıl Mevsim';
 export const ALT_BASLIK = 'Sonbahar, bir şehrin rengi değişirken';
 export const KUNYE_META = 'Aylık · Eylül 2026';
-export const KUNYE_NO = 'Sayı 03';
+/* ⚠️ İŞARETLEMEDEKİ `<p class="kr__son">` İLE AYNI KALMALI. Künyenin metni
+   oradan OKUNMUYOR, buraya yazılanı ekrana `kunyeOyna` basıyor — yani ikisi
+   ayrışırsa dosyaya bakan kişi sayfada olmayan bir sayı numarası görür.
+   Bir dönem tam bu oldu: işaretlemede 'Sayı 01' yazıyordu, ekranda 'Sayı 03'
+   görünüyordu ve düzenleme sessizce hiçbir şey yapmıyordu. */
+export const KUNYE_NO = 'Sayı 01';
 export const TARLA_KELIMESI = 'sErgi';
+
+/* Baklavanın ORTASINDAKİ kopyanın açılış kelimesi — çevredeki 22'den ayrı.
+   İşaretlemedeki `<p class="kr--merkez">` ile aynı kalmalı (aynı gerekçe
+   `KUNYE_NO` ↑).
+
+   ⚠️ BİR DÖNEM MERKEZ DE `TARLA_KELIMESI`Yİ KULLANIYORDU ve dosya başlığındaki
+   "tarla merkezle aynı kelimeyi tutuyor" notu onu anlatıyor. Ayrılması
+   kullanıcı kararı: perde artık yayıncıyı söyleyerek açılıyor, tarla temayı
+   çoğaltıyor, geriye sayının adı kalıyor.
+
+   ⚠️ UZUNLUĞU ÖLÇÜLDÜ. 23 kopyanın hepsi bu kelime olsaydı 4. satır 615px
+   ederdi ve 560px'lik tuvali 55px taşardı — dosya başlığındaki uyarı tam
+   bunu söylüyor. TEK kopya olarak 328px, yani "Kızıl Mevsim"in (322px) zaten
+   oturduğu yuvaya sığıyor. Bu kelime uzatılacaksa ölçüm yeniden yapılmalı;
+   tezgâhtaki TAŞMA panosu bunun için var. */
+export const MERKEZ_KELIMESI = 'Erü Japonoloji';
 
 /* ⚠️ ASIL OKUMA SÜRESİ BU. Sözler yerine oturduktan sonra ekranda kaldıkları
    süre — dokuz cümlenin okunabildiği tek an. Bir dönem 1400ms'ti ve
@@ -405,7 +430,7 @@ export async function dilimleriKur(sahne, ayar = {}) {
     kanvas.style.setProperty('--kr-slayt-olcek', '1');
     sahne.dataset.zemin = '2';
 
-    await karistir(merkez, TARLA_KELIMESI, vurus('tarla', isaret));
+    await karistir(merkez, MERKEZ_KELIMESI, vurus('tarla', isaret));
 
     /* ② Tarla merkezden dışa doğuyor. Her kopya KENDİ sırası gelince büyüyor —
        ölçek `isle` geri çağrısının içinde, dalganın dışında değil (demodaki
@@ -538,6 +563,25 @@ export async function dilimleriKur(sahne, ayar = {}) {
     sec(DILIM_PERDESI.sehir);
     sahne.style.removeProperty('--kr-olcek');
 
+    /* ⚠️ KUTULAR İLK `await`TEN ÖNCE BOŞALIYOR — mesele sıra.
+       `bol()` (bkz. `js/yazi.js`) kutuyu zaten boşaltıyor, ama onu çağıran
+       ilk satır aşağıdaki `bekle(150)`in ARKASINDA. İşaretlemedeki ham metni
+       gizleyen bir kural da yok: `css/sunus.css` §YAZI'nın tamamı `bol()`un
+       ürettiği `.yz__b` çocuklarına iniyor, `<p>`nin kendisine değil. İkisi
+       birleşince dilim açılırken cümle bir anda TAM görünüyor, sonra kaybolup
+       baştan animasyona giriyor — üst beyitte 150ms, alt beyitte ~710ms.
+
+       1, 2 ve 6. dilimler bu tuzağa düşmüyor çünkü metni senkron siliyorlar
+       (`baslikOyna` ↑ 'TARLA BOŞ DOĞUYOR', `kunyeOyna` ↓). Aşağıdaki iki
+       satır onları taklit ediyor.
+
+       ⚠️ YALNIZ İLK TUR İÇİN DEĞİL. Okuma beklemesi iptal edilince
+       (`js/hikaye.js` §durakla → `abort`) metin tam görünür kalıyor; dilim
+       tekrar oynadığında çakma yeniden oluyordu. Sunuş kapaktan hemen sonra
+       geldiği için o yol çok sık işliyor. */
+    sehirBas.textContent = '';
+    sehirAlt.textContent = '';
+
     if (bilgi.duragan) {
       /* Durağan poz: iki beyit de yerinde. Süpürmenin dinlenme düzeni zaten
          işaretlemedeki hâli — `ac()` hareket kapalıyken tam bunu yapıyor. */
@@ -578,6 +622,17 @@ export async function dilimleriKur(sahne, ayar = {}) {
     sec(DILIM_PERDESI.icerik);
     sahne.style.removeProperty('--kr-olcek');
 
+    /* Sıra gerekçesi `sehirOyna` ↑ ile aynı. Burada FARKLI olan: ilk turda
+       sorun yok, çünkü `hayaletKur` kurulumda kutuyu zaten boşaltıyor
+       (↑ §KOREOGRAFİ öncesi). Çakma DÖNGÜDE çıkıyor — `daktilo()` bitişte
+       akan kopyaya metnin tamamını bırakıyor (bkz. `js/yazi.js` §DAKTİLO
+       sonu) ve ikinci turda o tam metin 150ms boyunca duruyor.
+
+       ⚠️ BOŞALAN AKAN KOPYA, HAYALET DEĞİL. Hayalet metnin tam hâlini
+       görünmez tutarak bloğun yerini ayırıyor; boşaltılsaydı daktilo her
+       yeni satırda bloğu yukarı itmeye geri dönerdi. */
+    daktiloAkan.textContent = '';
+
     if (bilgi.duragan) {
       /* `daktilo()` hareket kapalıyken metni doğrudan yazıyor ve imleci
          söndürüyor — durağan poz tam olarak o. */
@@ -604,6 +659,14 @@ export async function dilimleriKur(sahne, ayar = {}) {
     sahne.dataset.zemin = '3';
     sec(DILIM_PERDESI.cagri);
     sahne.style.removeProperty('--kr-olcek');
+
+    /* Sıra gerekçesi `sehirOyna` ↑ ile aynı, ama bedeli EN AĞIR olan dilim
+       burası: dipnotu boşaltan `ac()` çağrısı, alıntının kendi süresinin
+       (`sureHesapla` ile ~1390ms) ve iki beklemenin arkasında kalıyordu —
+       yani dipnot ~1,88 saniye tam görünür durup sonra baştan animasyona
+       giriyordu. İki satır ikisini birden kapatıyor. */
+    alinti.textContent = '';
+    dipnot.textContent = '';
 
     if (bilgi.duragan) {
       await ac(alinti, ALINTI, akis('alinti', isaret));

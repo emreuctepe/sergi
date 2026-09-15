@@ -47,6 +47,11 @@
    ========================================================================= */
 
 import { IPTAL, azHareket, bekle } from './karistir.js';
+/* Daktilo da duraklatılabilir saatten okuyor — gerekçe `karistir.js`in aynı
+   satırında. Süpürme ve netleşme CSS'in elinde olduğu için onlar buraya
+   uğramıyor; onları `css/sunus.css` §PERDE'deki `animation-play-state`
+   donduruyor. */
+import { simdi } from './saat.js';
 
 /* ==========================================================================
    BÖLME — metni birimlere ayırır
@@ -346,7 +351,7 @@ export function daktilo(el, metin, ayar = {}) {
   const k = daktiloKurgusu(metin, { adim });
 
   return new Promise((bitti, iptal) => {
-    const t0 = performance.now();
+    const t0 = simdi();
     let saat = 0;
 
     const kes = () => {
@@ -358,7 +363,7 @@ export function daktilo(el, metin, ayar = {}) {
     function ilerle() {
       if (isaret?.aborted) return;
 
-      const gecen = performance.now() - t0;
+      const gecen = simdi() - t0;
       el.textContent = k.kare(gecen);
 
       if (k.bittiMi(gecen)) {

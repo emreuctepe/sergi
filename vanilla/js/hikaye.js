@@ -62,6 +62,21 @@
    hesaplanmış dönüşümü okuyup geri yazmayı gerektirirdi.
    ======================================================================= */
 
+/* ⚠️ İKİ AYRI SAAT VAR, KARIŞTIRMAMAK GEREKİYOR:
+
+     `saatiKur` / `saatiDurdur`   ↓ aşağıda — DİLİM saati. Dilimin ne zaman
+                                   biteceğini ve çubuğun dolmasını yönetiyor.
+     `animasyonuDondur` / `-Coz`  → `saat.js` — ANİMASYON saati. `karistir()`,
+                                   `daktilo()` ve `bekle()` geçen süreyi
+                                   oradan okuyor.
+
+   İkincisi sonradan geldi ve sebebi ölçülmüş bir eksikti: duraklatma yalnız
+   dilim saatini donduruyordu, yani çubuk duruyor ama metin karışmaya/yazmaya
+   devam ediyordu (ölçüm: duraklıyken 700ms'de karıştırma kareyi değiştirdi,
+   daktilo 3→13 karakter yazdı). CSS tarafı `animation-play-state` ile zaten
+   donuyordu; donmayan şey JS'in sürdüğü iki motordu. */
+import { duraklat as animasyonuDondur, surdur as animasyonuCoz } from './saat.js';
+
 /* Dokunuşu "basılı tutma"dan ayıran eşik (ms). Altında kalan her şey dilim
    atlıyor, üstü duraklatıyor. */
 const BASMA_ESIGI = 150;
@@ -396,6 +411,7 @@ export function hikaye(kap, dilimler, ayar = {}) {
     sebepler.add(sebep);
     kap.dataset.durakta = 'true';
     saatiDurdur();
+    animasyonuDondur();
 
     /* Kimse bakmıyorsa koreografi de kesiliyor (bkz. §IZLENMIYOR). Bayrak
        `git()`te temizleniyor, yani okur dilim atlarsa geri sarma borcu da
@@ -410,6 +426,11 @@ export function hikaye(kap, dilimler, ayar = {}) {
     sebepler.delete(sebep);
     if (sebepler.size) return;
     kap.dataset.durakta = 'false';
+
+    /* ⚠️ AŞAĞIDAKİ HER İKİ YOLDAN DA ÖNCE. `geriSarilacak` dalı `git()`
+       çağırıyor ve `git()` yeni bir koreografi başlatıyor; saat hâlâ donuk
+       olsaydı o zincir `gecen: 0`da takılır, hiç ilerlemezdi. */
+    animasyonuCoz();
 
     /* ⚠️ `!otomatik` KONTROLÜNDEN ÖNCE. Hareket azaltmada da perde geri
        gelmeli: `git()` orada saat kurmuyor ama dilimin DİNLENME DÜZENİNİ
@@ -470,6 +491,43 @@ export function hikaye(kap, dilimler, ayar = {}) {
       olay.stopPropagation();
     },
     { capture: true, signal: kapatma.signal }
+  );
+
+  /* ── MERKEZE DOKUNMA: DURAKLAT / SÜRDÜR ───────────────────────────────────
+     ⚠️ YALNIZ MERKEZ, KENARLAR DEĞİL. Kenarlar zaten `.hik__bolge` düğmeleri
+     ve tıklanınca dilim atlıyorlar (↑ §BÖLGELER); oraya duraklatmayı da
+     bindirmek okurun ilerlemesini çalardı. Ortadaki serbest alan boştu —
+     basılı tutma zaten orada yaşıyor, dokunma onun kısa hâli olarak aynı
+     yere düşüyor.
+
+     ⚠️ BASILI TUTMANIN ARDINDAN GELEN TIKLAMA BURAYA VARMIYOR: yukarıdaki
+     yakalama evresi dinleyicisi onu yutuyor. İkisi aynı `click`i paylaşsaydı
+     parmağını kaldıran okur duraklatmayı açıp anında kapatırdı.
+
+     ⚠️ KENDİ BAYRAĞINI TUTUYOR, `duraktaMi`YE BAKMIYOR. Hikâye görüş ya da
+     sekme yüzünden de duraklayabiliyor; dokunuşla o duraklamayı açmak okurun
+     ekranda olmayan bir şeyi sürdürmesi olurdu. Ayrı bayrak, `sebepler`
+     kümesinin kendi mantığını bozmadan yalnız 'elle'yi açıp kapatıyor.
+
+     ⚠️ KLAVYE KARŞILIĞI BİLEREK YOK. Buradaki doğal tuş Space olurdu ama sayı
+     dikey snap akışıyla okunuyor ve Space orada KAYDIRIYOR; kapmak okumanın
+     kendisini bozardı. Ok tuşları bile belge düzeyinde ve varsayılan kapalı
+     (↓ §KLAVYE, `galeri.js` ile kavga etmesin diye). İki kenar gerçek
+     `<button>` olduğu için klavyeyle gezinme yine de çalışıyor. */
+  let dokunmaDurdurdu = false;
+  kap.addEventListener(
+    'click',
+    (olay) => {
+      if (olay.target.closest('.hik__bolge')) return;
+      /* Hareket kapalıyken dilim kendiliğinden geçmiyor: duraklatacak bir
+         saat yok, dokunuş da sessiz kalmalı (aynı gerekçe `jenerik.js`te
+         düğmenin hiç gelmemesi). */
+      if (azHareket()) return;
+      dokunmaDurdurdu = !dokunmaDurdurdu;
+      if (dokunmaDurdurdu) durakla('elle');
+      else surdur('elle');
+    },
+    sok
   );
 
   /* ── SEKME ARKAYA DÜŞTÜ ───────────────────────────────────────────────────

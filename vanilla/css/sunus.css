@@ -222,6 +222,28 @@
   animation-play-state: paused;
 }
 
+/* ⚠️ YAZI DA DONMAK ZORUNDA — ve bir dönem donmuyordu. Yukarıdaki seçici
+   yalnız `.kr__sahne`ye iniyor; yazı birimleri (`.yz__b`) ve daktilo imleci
+   AYRI AĞAÇTA, `.kr__slayt` altında duruyorlar. Sonuç, duraklatmanın en kötü
+   hâliydi: okur parmağını basılı tutuyor, arka plan ve süre çubuğu duruyor,
+   ama cümle akmaya devam ediyor — yani "duraklattım" duygusu yarım yalan
+   oluyordu. Bir eksik kuralın belirtisi, davranışın kendisi değil.
+
+   Seçiciler §HAREKET AZALTMA'daki ikizinden alındı (aşağı bkz.): orada da
+   tam bu iki şey susturuluyor, yalnız sebebi farklı.
+
+   ⚠️ BU KURAL YALNIZ CSS'İN OYNATTIĞINI DONDURUR, yani 3. ve 5. dilimi
+   (süpürme, netleşme). 1/2/6'daki karıştırma `js/karistir.js`in kendi
+   döngüsüyle, 4'teki daktilo `setTimeout`la akıyor; ikisi de `performance.now()`
+   okuyor ve duraklatmayı DİNLEMİYOR. Basılı tutmak onları durdurmuyor,
+   yalnız süre çubuğunu donduruyor — devam eden animasyon bittiği yerde
+   kalıyor. Gerçekten durdurmak o iki motora duraklatılabilir bir saat
+   eklemeyi gerektiriyor. */
+.kr[data-durakta="true"] .yz__b,
+.kr[data-durakta="true"] .yz__akan::after {
+  animation-play-state: paused;
+}
+
 /* ============================================================================
    §TARLA — 1. ve 2. perdenin ızgarası
    ========================================================================= */
