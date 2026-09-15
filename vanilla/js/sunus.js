@@ -185,34 +185,46 @@ export const AKIS = {
 };
 
 /* ==========================================================================
-   §PERDELER — hangi dilimin arkasında hangi çizim duruyor
+   §PERDELER — hangi dilimin arkasında hangi görsel duruyor
    --------------------------------------------------------------------------
-   Dosyalar `assets/2026-09/akilli-kiz/`te ve sayının sergi bölümüyle ORTAK.
-   Yeniden çizilmediler, ödünç alındılar: sunuş sayının kendisini tanıtıyor ve
-   arkasında sayının kendi görselleri duruyor.
+   Dördü de UTAGAWA HIROSHIGE (1797-1858), kamu malı, müze taramalarından.
+   Künyeleri her `.svg` dosyasının ilk satırında yazılı; sayfadaki karşılıkları
+   `sayfalar/son-kunye/`de.
 
-   ⚠️ ÇİZİMLER YER TUTUCU — dosyaların içinde öyle yazıyor. Ece Özgür'ün asıl
-   çizimleri gelince bu dosyalar değişecek ve sunuşun arkası kendiliğinden
-   değişecek; burada tek satır düzenlemek gerekmiyor.
+     ay      «Tama Nehrinde Sonbahar Ayı» (1839-47), BnF
+     fener   «Eitai Köprüsü, Tsukuda açıklarında balıkçı tekneleri» (1852-58), BnF
+     yagmur  «Shōno», Tōkaidō'nun Elli Üç Durağı (yak. 1833), Google Cultural Institute
+     halka   «Sōshū Enoshima» (1840-42), BnF
+
+   ⚠️ ESKİDEN `assets/2026-09/akilli-kiz/`TEN ÖDÜNÇ ALINIYORDU. O çizimler
+   sergiye ait ve sunuşa bağlanmamaları kullanıcı kararı (bkz. `referans/
+   DURUM.md` §SUNUŞ BİLEREK DIŞARIDA). Artık sunuşun kendi klasörü var;
+   `akilli-kiz/` altındaki `02/04/06/09.svg` sergi tarafında duruyor,
+   buradan çağrılmıyor.
+
+   ⚠️ RASTER AMA KATMANLI. `perde.js`in varlık sebebi katmanları ayrı ayrı
+   süzdürmek ve düz bir fotoğraf TEK katman olur — `--i` 0'da kalır, süzülme
+   hiçbir şey kırılmadan sessizce ölürdü (bu ölçülmüş bir tuzak, `DURUM.md`de
+   yazılı). Sargı onun için: `.svg` içinde görsel bir katman, vinyet ikinci
+   katman. İkisi ayrı süzülüyor, parallax duruyor.
 
    ⚠️ AÇILIŞ VE KAPANIŞ AYNI PERDE (`ay`) ve bu §ZEMİN'deki dönüşün eşi:
    sayfa `dongu: true` ile çalışıyor, yani son dilimden ilkine SARIYOR. İkisi
    farklı sahneler olsaydı başa sarışta perde de değişir ve döngü görünür
-   olurdu. Zemin rengi zaten 1'e dönüyor; sahnenin de dönmesi aynı dikişi
-   kapatıyor.
+   olurdu.
 
-   Kalan üçü dilimin konusuna göre: yanan şehir bir ışık lekesinin altındaki
-   sıra (`fener`), sayının içindekiler bir kapıdan geçmek (`yagmur` —
-   dosyadaki torii ve yağmur çizgileri), çağrı ise iç içe halkalar (`halka`).
+   Kalan üçü dilimin konusuna göre: şehir bir köprü ve tekne kalabalığı
+   (`fener`), sayının içindekiler sağanak altında yürüyen yolcular (`yagmur`),
+   çağrı ise varılacak ada (`halka`).
    ======================================================================= */
 
-const KOK = 'assets/2026-09/akilli-kiz/';
+const KOK = 'assets/2026-09/sunus/';
 
 export const PERDELER = {
-  ay: `${KOK}04.svg`,
-  fener: `${KOK}02.svg`,
-  yagmur: `${KOK}09.svg`,
-  halka: `${KOK}06.svg`
+  ay: `${KOK}ay.svg`,
+  fener: `${KOK}fener.svg`,
+  yagmur: `${KOK}yagmur.svg`,
+  halka: `${KOK}halka.svg`
 };
 
 /** Dilim → perde. Tezgâhtaki PERDE panosu da bu tabloyu okuyor. */

@@ -1,0 +1,41 @@
+<!-- Utagawa Hiroshige, «Sōshū Enoshima» (1840-42) · Bibliothèque nationale de France · kamu malı
+
+     RASTER PERDE. `js/perde.js` bir <svg> kökü bekliyor ve katmanları
+     `svg.children`dan sayıyor; düz bir <img> tek katman olur, süzülme
+     (`kr-suzul`, bkz. `css/sunus.css` §PERDE) sessizce ölürdü. Sargı tam
+     bunun için: görsel, karartma ve vinyet ayrı katmanlar.
+
+     .webp seçildi, .avif değil: SVG <image> içinde <source>/srcset yok, yani
+     tek format zorunlu. webp'in desteği daha geniş, fark yaklaşık 12KB.
+
+     ⚠️ `fill-opacity`, `opacity` DEĞİL — ve bu fark bir kez hataya yol açtı.
+     `kr-katman-gir` (bkz. `css/sunus.css` §KATMANLAR) her katmanın
+     `opacity`sini 0'dan 1'e sürüyor; buraya `opacity` yazılırsa animasyon onu
+     EZİYOR ve karartma %32 yerine %100 çiziliyor, yani görsel belirdikten
+     ~90ms sonra düz siyaha dönüyor. `fill-opacity`ye animasyon dokunmuyor.
+
+     KARARTMA 0.32 ÖLÇÜLDÜ, göz kararı değil. Bu baskılar açık tonlu ve
+     opaklığı tek başına kısmak yetmiyordu: kısık yazı (ink-soft, küçük punto)
+     perdesiz 8.50 kontrasttan karartmasız 3.79'a düşüyordu, yani AA'nın
+     altına. Karartma 0.32 + perde opaklığı 0.30 ile en dar durum (başlık
+     açılışındaki merkez kelimesi, açık zeminde) 4.78 oluyor ve baskı hâlâ
+     tanınıyor. Tam tablo `css/sunus.css` §PERDE'de; biri değişirse öteki
+     yeniden ölçülmeli.
+
+     6px TAŞMA bilerek: katmanlar `kr-kayma` kadar (1.5px) süzülüyor; kenar
+     payı olmasaydı süzülürken kadrajın kenarında boşluk açılırdı.
+
+     DİKKAT: bu yorumun içine iki tireli CSS belirteci yazılamaz, XML yorumu
+     onu kapanış sayar ve DOMParser dosyayı bozuk döndürür. -->
+<svg viewBox="0 0 828 554" xmlns="http://www.w3.org/2000/svg">
+  <image href="assets/2026-09/sunus/halka.webp" x="-6" y="-6" width="840" height="566"
+         preserveAspectRatio="xMidYMid slice"/>
+  <rect x="-6" y="-6" width="840" height="566" fill="#14140f" fill-opacity="0.32"/>
+  <rect x="-6" y="-6" width="840" height="566" fill="url(#vinyet-halka)"/>
+  <defs>
+    <radialGradient id="vinyet-halka" cx="50%" cy="48%" r="72%">
+      <stop offset="45%" stop-color="#14140f" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#14140f" stop-opacity="0.42"/>
+    </radialGradient>
+  </defs>
+</svg>
